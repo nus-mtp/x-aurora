@@ -20,7 +20,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class LoginUI extends Application{
@@ -29,13 +28,28 @@ public class LoginUI extends Application{
     }
      
     @Override
-    public void start(Stage primaryStage){
-        primaryStage.setTitle("Login");
+    public void start(Stage stage){
+        stage.setTitle("x-aurora");      
+        Scene loginScene = createLoginScene();
+        stage.setScene(loginScene);
+        stage.show();
+    }
+    
+    private Scene createLoginScene(){
         BorderPane borderPane = new BorderPane();
-
+        GridPane grid = createLoginForm();
+        HBox hbox = createSkipLoginBar();
+        borderPane.setCenter(grid);
+        borderPane.setBottom(hbox);
+        
+        Scene scene = new Scene(borderPane, 500, 300);
+        return scene;
+    }
+    
+    private GridPane createLoginForm(){
         GridPane grid = new GridPane();
         grid.setHgap(50);
-        grid.setVgap(20);
+        grid.setVgap(10);
         grid.setPadding(new Insets(10, 10, 10, 10));
         grid.setAlignment(Pos.CENTER);
         
@@ -64,20 +78,20 @@ public class LoginUI extends Application{
         register.setText("register");
         grid.add(register, 3, 3);
         
+        return grid;
+    }
+    
+    private HBox createSkipLoginBar(){
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(15, 10, 15, 10));
         hbox.setSpacing(20);
         hbox.setAlignment(Pos.CENTER_RIGHT);
+        
         Label warning = new Label("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
         Button skip = new Button("skip login");
         hbox.getChildren().addAll(warning, skip);
-
-        borderPane.setCenter(grid);
-        borderPane.setBottom(hbox);
         
-        Scene scene = new Scene(borderPane, 500, 300);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        return hbox;
     }
 }
