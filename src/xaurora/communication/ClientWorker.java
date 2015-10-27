@@ -43,6 +43,7 @@ public class ClientWorker implements Runnable {
 				System.out.println(line);
 			}
 			System.out.println("Receive Completed");
+			out.flush();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
