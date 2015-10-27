@@ -7,10 +7,11 @@ package xaurora.ui;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -19,8 +20,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -86,8 +85,19 @@ public class PreferenceUI extends Application{
     
     private GridPane createSystemPane(){
         GridPane grid = new GridPane();
+        grid.setHgap(50);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setAlignment(Pos.CENTER);
+        
         Label label1 = new Label("Run on start up");
         Label label2 = new Label("Hide in toolbar when close");
+        CheckBox checkbox1 = new CheckBox();
+        CheckBox checkbox2 = new CheckBox();
+        grid.add(label1, 0, 0);
+        grid.add(checkbox1, 1, 0);
+        grid.add(label2, 0, 1);
+        grid.add(checkbox2, 1, 1);
         
         return grid;
     }
