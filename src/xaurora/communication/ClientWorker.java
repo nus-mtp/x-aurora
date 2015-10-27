@@ -42,6 +42,7 @@ public class ClientWorker implements Runnable {
 			while((line = in.readLine())!=null){
 				System.out.println(line);
 			}
+			System.out.println("Receive Completed");
 		} catch (Exception e){
 			e.printStackTrace();
 		}
