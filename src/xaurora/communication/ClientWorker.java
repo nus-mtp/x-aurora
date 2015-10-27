@@ -1,4 +1,4 @@
-package communication;
+package xaurora.communication;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +18,7 @@ public class ClientWorker implements Runnable {
 		try{
 			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			out = new PrintWriter(client.getOutputStream(), true);
+			processInput(in,out);
 		} catch(IOException e){
 			
 		}
@@ -32,6 +33,17 @@ public class ClientWorker implements Runnable {
 			client.close();
 		} catch(IOException e){
 			System.out.println("Close failed");
+		}
+	}
+	private void processInput(BufferedReader in, PrintWriter out){
+		String line = "";
+		try {
+			
+			while((line = in.readLine())!=null){
+				System.out.println(line);
+			}
+		} catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package communication;
+package xaurora.communication;
 
 import java.io.IOException;
 import java.net.InetAddress;
