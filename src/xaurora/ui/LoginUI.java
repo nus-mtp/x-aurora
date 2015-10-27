@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package xaurora.ui;
 
 import javafx.application.Application;
@@ -23,7 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class LoginUI extends Application{
-     public static void main(String[] args) {
+    public static void main(String[] args) {
         launch(args);
     }
      
@@ -32,6 +28,7 @@ public class LoginUI extends Application{
         stage.setTitle("x-aurora");      
         Scene loginScene = createLoginScene();
         stage.setScene(loginScene);
+        loginScene.getStylesheets().add("style.css");
         stage.show();
     }
     
@@ -89,7 +86,7 @@ public class LoginUI extends Application{
         
         Label warning = new Label("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
-        Button skip = new Button("skip login");
+        Button skip = new Button("Skip login");
         hbox.getChildren().addAll(warning, skip);
         
         return hbox;
