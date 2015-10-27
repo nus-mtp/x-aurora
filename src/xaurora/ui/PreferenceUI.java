@@ -119,7 +119,8 @@ public class PreferenceUI extends Application{
         Label label1 = new Label("Number of matching text displayed");
         Label label2 = new Label("Show source of text");
         Label label3 = new Label("Box Colour");
-        Label label4 = new Label("Box Transparency");
+        Label label4 = new Label("Text Colour");
+        Label label5 = new Label("Box Transparency");
         
         Spinner spinner = new Spinner();
         SpinnerValueFactory svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20);
@@ -130,9 +131,13 @@ public class PreferenceUI extends Application{
         
         CheckBox checkbox = new CheckBox();
         
-        ColorPicker colorPicker = new ColorPicker();
-        colorPicker.setValue(Color.WHITE);
-        colorPicker.setStyle("-fx-color-label-visible: false;");
+        ColorPicker boxColorPicker = new ColorPicker();
+        boxColorPicker.setValue(Color.WHITE);
+        boxColorPicker.setStyle("-fx-color-label-visible: false;");
+        
+        ColorPicker textColorPicker = new ColorPicker();
+        textColorPicker.setValue(Color.BLACK);
+        textColorPicker.setStyle("-fx-color-label-visible: false;");
         
         Slider transparency = new Slider();
         transparency.setMin(0);
@@ -146,10 +151,12 @@ public class PreferenceUI extends Application{
         grid.add(label2, 0, 1);
         grid.add(label3, 0, 2);
         grid.add(label4, 0, 3);
+        grid.add(label5, 0, 4);
         grid.add(spinner, 1, 0);
         grid.add(checkbox, 1, 1);
-        grid.add(colorPicker, 1, 2);
-        grid.add(transparency, 1, 3);
+        grid.add(boxColorPicker, 1, 2);
+        grid.add(textColorPicker, 1, 3);
+        grid.add(transparency, 1, 4);
         
         return grid;
     }
