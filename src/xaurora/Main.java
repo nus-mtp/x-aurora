@@ -1,4 +1,4 @@
-package xauora;
+package xaurora;
 import xaurora.communication.*;
 import java.util.*;
 public class Main {
