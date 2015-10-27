@@ -11,6 +11,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -19,6 +20,11 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -66,9 +72,9 @@ public class PreferenceUI extends Application{
         HBox hbox = new HBox();
         hbox.getChildren().addAll(tabs, email);
         
-        border.setTop(tabs);
+        border.setCenter(tabs);
         
-        Scene scene = new Scene(border, 500, 300);
+        Scene scene = new Scene(border, 550, 300);
         return scene;
     }
     
@@ -80,6 +86,7 @@ public class PreferenceUI extends Application{
         Tab tabTextEditor = new Tab("Text Editor");
         tabTextEditor.setContent(createTextEditorPane());
         Tab tabBlockedList = new Tab("Blocked List");
+        tabBlockedList.setContent(createBlockedListPane());
         Tab tabDropbox = new Tab("Dropbox");
         Tab tabPath = new Tab("Path");
         Tab tabStorage = new Tab("Storage");
@@ -159,5 +166,34 @@ public class PreferenceUI extends Application{
         grid.add(transparency, 1, 4);
         
         return grid;
+    }
+    
+    private BorderPane createBlockedListPane(){
+        BorderPane border = new BorderPane();
+        TableView table = new TableView();
+        TableColumn UrlCol = new TableColumn("Website URL");
+        UrlCol.setMinWidth(400);
+        TableColumn toggleCol = new TableColumn("Enable/Disable");
+        toggleCol.setMinWidth(100);
+        TableColumn deleteCol = new TableColumn("Delete");
+        deleteCol.setPrefWidth(50);
+        deleteCol.setMinWidth(50);
+        table.getColumns().addAll(UrlCol, toggleCol, deleteCol);
+        table.setEditable(false);
+        
+        //ToggleButton toggleButton = new ToggleButton("Enable");
+        //toggleCol.setGraphic(toggleButton);
+        
+        TextField urlField = new TextField();
+        urlField.setPromptText("add url of websites to block");
+        urlField.setMinWidth(400);
+        Button addButton = new Button("Add to blocked list");
+        addButton.setMinWidth(150);
+        HBox hbox = new HBox();
+        hbox.getChildren().addAll(urlField, addButton);
+
+        border.setCenter(table);
+        border.setBottom(hbox);
+        return border;
     }
 }
