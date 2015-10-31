@@ -8,10 +8,11 @@ package xaurora.ui;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -25,15 +26,12 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -94,6 +92,7 @@ public class PreferenceUI extends Application{
         Tab tabPath = new Tab("Path");
         tabPath.setContent(createPathPane());
         Tab tabStorage = new Tab("Storage");
+        tabStorage.setContent(createStoragePane());
         tabs.getTabs().addAll(tabSystem, tabHotkeys, tabTextEditor, tabBlockedList, tabDropbox, tabPath, tabStorage);
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         //tabs.setSide(Side.LEFT);
@@ -214,11 +213,10 @@ public class PreferenceUI extends Application{
         pathField.setMinWidth(300);
         Button pathButton = new Button("Browse");
         CheckBox checkbox = new CheckBox();
-        Label label2 = new Label("Store data as caches to improve matching speed");
+        Label label2 = new Label("Store preview text as caches to improve matching speed");
         Label label3 = new Label("Clear caches after ");
         ChoiceBox cb = new ChoiceBox();
-        cb.setItems(FXCollections.observableArrayList("device is off", 
-                "one day", "one week", "never"));
+        cb.setItems(FXCollections.observableArrayList("device is off", "one day", "one week", "never"));
         cb.setValue("device is off");
         
         grid.add(label1, 0, 0);
@@ -228,6 +226,39 @@ public class PreferenceUI extends Application{
         grid.add(checkbox, 1, 2);
         grid.add(label3, 0, 3);
         grid.add(cb, 1, 3);
+        
+        return grid;
+    }
+    
+    private GridPane createStoragePane(){
+        GridPane grid = new GridPane();
+        grid.setHgap(50);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setAlignment(Pos.CENTER);
+        
+        Label label1 = new Label("Store single text size of at most");
+         ChoiceBox cb1 = new ChoiceBox();
+        cb1.setItems(FXCollections.observableArrayList("100MB", "500MB", "1GB", "unlimited"));
+        cb1.setValue("100MB");
+        Label label2 = new Label("Preview text length");
+        ChoiceBox cb2 = new ChoiceBox();
+        cb2.setItems(FXCollections.observableArrayList("one sentence", "two sentence", "three words", "one paragraph"));
+        cb2.setValue("one sentence");
+        Label label3 = new Label("Used space: 2.0/20.0 GB");
+        Label label4 = new Label("Used percentage: 10%");  
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
+               new PieChart.Data("Used Space", 10), new PieChart.Data("FreeSpace", 90));
+        PieChart pieChart = new PieChart(pieChartData);
+        pieChart.setPrefSize(100, 100);
+       
+        grid.add(label1, 0, 0);
+        grid.add(cb1, 1, 0);
+        grid.add(label2, 0, 1);
+        grid.add(cb2, 1, 1);
+        grid.add(pieChart, 0, 2, 1, 2);
+        grid.add(label3, 1, 2);
+        grid.add(label4, 1, 3);
         
         return grid;
     }
