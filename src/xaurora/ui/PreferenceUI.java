@@ -60,6 +60,7 @@ public class PreferenceUI extends Application{
         Tab tabTutorial = new Tab("Tutorial");
         Tab tabAboutUs = new Tab("About Us");
         Tab tabDataManaging = new Tab("Data Managing");
+        tabDataManaging.setContent(createDataManagingPane());
         tabs.getTabs().addAll(tabSetting, tabTutorial, tabAboutUs, tabDataManaging);
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         
@@ -92,6 +93,7 @@ public class PreferenceUI extends Application{
         Tab tabSystem = new Tab("System");
         tabSystem.setContent(createSystemPane());
         Tab tabHotkeys = new Tab("Hotkeys");
+        tabHotkeys.setContent(createHotkeysPane());
         Tab tabTextEditor = new Tab("Text Editor");
         tabTextEditor.setContent(createTextEditorPane());
         Tab tabBlockedList = new Tab("Blocked List");
@@ -108,6 +110,25 @@ public class PreferenceUI extends Application{
         return tabs;
     } 
     
+    private BorderPane createDataManagingPane(){
+        BorderPane border = new BorderPane();
+        TableView table = new TableView();
+        TableColumn contentCol = new TableColumn("Content");
+        TableColumn lengthCol = new TableColumn("Length");
+        TableColumn sourceCol = new TableColumn("Source");
+        TableColumn deviceCol = new TableColumn("Device");
+        TableColumn timeCol = new TableColumn("Time");
+        TableColumn statusCol = new TableColumn("Status");
+        TableColumn deleteCol = new TableColumn("Delete");
+        table.getColumns().addAll(contentCol, lengthCol, sourceCol, 
+                deviceCol, timeCol, statusCol, deleteCol);
+        table.setEditable(false);
+        
+        border.setCenter(table);
+        
+        return border;
+    }
+    
     private GridPane createSystemPane(){
         GridPane grid = new GridPane();
         grid.setHgap(50);
@@ -123,6 +144,16 @@ public class PreferenceUI extends Application{
         grid.add(checkbox1, 1, 0);
         grid.add(label2, 0, 1);
         grid.add(checkbox2, 1, 1);
+        
+        return grid;
+    }
+    
+    private GridPane createHotkeysPane(){
+        GridPane grid = new GridPane();
+        grid.setHgap(50);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setAlignment(Pos.CENTER);
         
         return grid;
     }
