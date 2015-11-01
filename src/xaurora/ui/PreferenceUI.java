@@ -59,6 +59,7 @@ public class PreferenceUI extends Application{
         tabSetting.setContent(createSettingPane());
         Tab tabTutorial = new Tab("Tutorial");
         Tab tabAboutUs = new Tab("About Us");
+        tabAboutUs.setContent(createAboutUsPane());
         Tab tabDataManaging = new Tab("Data Managing");
         tabDataManaging.setContent(createDataManagingPane());
         tabs.getTabs().addAll(tabSetting, tabTutorial, tabAboutUs, tabDataManaging);
@@ -109,6 +110,20 @@ public class PreferenceUI extends Application{
 
         return tabs;
     } 
+    
+    private GridPane createAboutUsPane(){
+        GridPane grid = new GridPane();
+        grid.setHgap(50);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setAlignment(Pos.CENTER);
+        
+        Label label = new Label("The main objective behind developing this application is to make it easier to copy and paste across documents and information on the webpages. The program aims at minimizing the act of window switching, visually searching for the sentence one needs to select/highlight and copy the text. Thereby reducing the time spent, increasing the efficiency of the user and making it a useful tool while working heavily on text-processing, such as drafting research papers or a thesis. This auto-complete mechanism will not entirely replace the copy-paste procedure; rather it would enhance the original functionality.");
+        label.setAlignment(Pos.CENTER);
+        label.setWrapText(true);
+        grid.getChildren().add(label);
+        return grid;
+    }
     
     private BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
