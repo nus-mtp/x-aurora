@@ -71,11 +71,19 @@ public class PreferenceUI extends Application{
         email.setGraphic(imageView);
         
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(tabs, email);
+        Button okButton = new Button("OK");
+        okButton.setPrefWidth(70);
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setPrefWidth(70);
+        Button applyButton = new Button("Apply");
+        applyButton.setPrefWidth(70);
+        hbox.getChildren().addAll(okButton, cancelButton, applyButton);
+        hbox.setAlignment(Pos.CENTER_RIGHT);
         
         border.setCenter(tabs);
+        border.setBottom(hbox);
         
-        Scene scene = new Scene(border, 550, 300);
+        Scene scene = new Scene(border, 550, 400);
         return scene;
     }
     
