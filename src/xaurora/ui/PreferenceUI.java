@@ -58,6 +58,7 @@ public class PreferenceUI extends Application{
         Tab tabSetting = new Tab("Setting");
         tabSetting.setContent(createSettingPane());
         Tab tabTutorial = new Tab("Tutorial");
+        tabTutorial.setContent(createTutorialPane());
         Tab tabAboutUs = new Tab("About Us");
         tabAboutUs.setContent(createAboutUsPane());
         Tab tabDataManaging = new Tab("Data Managing");
@@ -110,6 +111,26 @@ public class PreferenceUI extends Application{
 
         return tabs;
     } 
+    
+    private BorderPane createTutorialPane(){
+        BorderPane border = new BorderPane();
+        
+        Image image = new Image("File:dropbox.png");
+        ImageView imageView = new ImageView(image);
+        
+        HBox hbox = new HBox();
+        hbox.setSpacing(20);
+        Button previousButton = new Button("Previous");
+        previousButton.setPrefWidth(70);
+        Button nextButton = new Button("Next");
+        nextButton.setPrefWidth(70);
+        hbox.getChildren().addAll(previousButton, nextButton);
+        hbox.setAlignment(Pos.CENTER);
+        
+        border.setCenter(imageView);
+        border.setBottom(hbox);
+        return border;
+    }
     
     private GridPane createAboutUsPane(){
         GridPane grid = new GridPane();
