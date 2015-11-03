@@ -2,6 +2,7 @@ package xaurora.communication;
 import java.util.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,14 +23,17 @@ public class ClientWorker implements Runnable {
 			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			out = new PrintWriter(client.getOutputStream(), true);
 			processInput(in,out);
-			
+			DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+	            dos.writeBytes("HTTP/1.1 200 OK\r\n");
+	            dos.writeBytes("Content-length: 0"  + "\r\n");
+	            dos.flush();
 		} catch(IOException e){
 			
 		}
 		
 			
 		close(in, out);
-		System.exit(0);
+		//System.exit(0);
 	}
 	private void close(BufferedReader in, PrintWriter out){
 		try{
