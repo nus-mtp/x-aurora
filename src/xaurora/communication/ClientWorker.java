@@ -1,5 +1,5 @@
 package xaurora.communication;
-
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,8 +47,9 @@ public class ClientWorker implements Runnable {
 			int count = 0;
 			int length = 0;
 			String contentData = "";
-			while(in.ready()){
-				line = in.readLine();
+			Scanner sc = new Scanner(in);
+			while(sc.hasNext()){
+				line = sc.nextLine();
 				System.out.println(line);
 				
 				count++;
