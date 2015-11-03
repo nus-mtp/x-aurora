@@ -189,10 +189,44 @@ public class PreferenceUI extends Application{
     
     private GridPane createHotkeysPane(){
         GridPane grid = new GridPane();
-        grid.setHgap(50);
-        grid.setVgap(15);
+        grid.setHgap(30);
+        grid.setVgap(10);
         grid.setPadding(new Insets(10, 10, 10, 10));
         grid.setAlignment(Pos.CENTER);
+        
+        Label[] labels = new Label[6];
+        labels[0] = new Label("Extend Words: ");
+        labels[1] = new Label("Reduce Words: ");
+        labels[2] = new Label("Extend Sentences: ");
+        labels[3] = new Label("Reduce Sentences: ");
+        labels[4] = new Label("Extend Paragraphs: ");
+        labels[5] = new Label("Reduce Paragraphs: ");
+        
+        TextField[] textFields = new TextField[6];
+        for (int i=0; i < textFields.length; i++){
+            textFields[i] = new TextField();
+            textFields[i].setMaxWidth(70);
+        }
+        
+        ChoiceBox[] boxes = new ChoiceBox[12];
+        Label[] plus = new Label[12];
+        for (int i=0; i < boxes.length; i++){
+            boxes[i] = new ChoiceBox();
+            boxes[i].setItems(FXCollections.observableArrayList("Ctrl", "Alt", "Shift"));
+            boxes[i].setValue("Ctrl");
+            plus[i] = new Label("+");
+        }
+        
+        for (int i=0; i < labels.length; i++){
+            grid.add(labels[i], 0, i);
+            grid.add(boxes[2*i], 1, i);
+            grid.add(plus[2*i], 2, i);
+            grid.add(boxes[2*i+1], 3, i);
+            grid.add(plus[2*i+1], 4, i);
+            grid.add(textFields[i], 5, i);
+        }
+       
+ 
         
         return grid;
     }
@@ -316,7 +350,7 @@ public class PreferenceUI extends Application{
         grid.setAlignment(Pos.CENTER);
         
         Label label1 = new Label("Store single text size of at most");
-         ChoiceBox cb1 = new ChoiceBox();
+        ChoiceBox cb1 = new ChoiceBox();
         cb1.setItems(FXCollections.observableArrayList("100MB", "500MB", "1GB", "unlimited"));
         cb1.setValue("100MB");
         Label label2 = new Label("Preview text length");
