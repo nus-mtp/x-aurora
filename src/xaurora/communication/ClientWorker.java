@@ -8,12 +8,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ClientWorker implements Runnable {	
 	private Socket client;
-	public ClientWorker(Socket client){
+	private ServerSocket server;
+	public ClientWorker(Socket client,ServerSocket server){
 		this.client = client;
+		this.server = server;
 	}
 	public void run() {
 		BufferedReader in = null;
@@ -24,9 +27,9 @@ public class ClientWorker implements Runnable {
 			out = new PrintWriter(client.getOutputStream(), true);
 			processInput(in,out);
 			DataOutputStream dos = new DataOutputStream(client.getOutputStream());
-	            dos.writeBytes("HTTP/1.1 200 OK\r\n");
-	            dos.writeBytes("Content-length: 0"  + "\r\n");
-	            dos.flush();
+            dos.writeBytes("HTTP/1.1 200 OK\r\n");
+            dos.writeBytes("Content-length: 0"  + "\r\n");
+            dos.flush();
 		} catch(IOException e){
 			
 		}
@@ -40,6 +43,7 @@ public class ClientWorker implements Runnable {
 			in.close();
 			out.close();
 			client.close();
+			this.client = server.accept();
 		} catch(IOException e){
 			System.out.println("Close failed");
 		}
