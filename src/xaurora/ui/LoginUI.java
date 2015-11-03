@@ -2,6 +2,8 @@
 package xaurora.ui;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -73,6 +75,14 @@ public class LoginUI extends Application{
         grid.add(forgotPassword, 2, 3);
         Hyperlink register = new Hyperlink();
         register.setText("register");
+        String registerUrl = "https://www.dropbox.com/1/oauth2/authorize?locale=en_US&client_id=4tpptik431fwlqo&response_type=code";
+        register.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                getHostServices().showDocument(registerUrl);
+            }
+        });
         grid.add(register, 3, 3);
         
         return grid;
