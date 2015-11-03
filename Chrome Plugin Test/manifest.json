@@ -1,13 +1,17 @@
 {
     "name": "2333",
-    "version": "0.2",
+    "version": "1.1",
     "manifest_version": 2,
-    "description": "X-aurora Browser Test Extractor",
-    "content_scripts" : [
-        {"js": ["content.js"], "matches": ["<all_urls>"]}
-    ],
+    "description": "This is a test",
     "background": { 
         "scripts": ["background.js"]
     },
-    "permissions": ["tabs"]
+    "content_scripts" : [{
+            "matches" : [ "<all_urls>" ],
+            "js": ["content.js"]
+    }],
+    "page_action" : {
+        "default_title" : "Example Title"
+    },
+    "permissions": ["tabs", "<all_urls>", "geolocation"]
 }
