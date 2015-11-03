@@ -29,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import static javafx.scene.layout.BorderPane.setMargin;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -82,9 +83,9 @@ public class PreferenceUI extends Application{
         applyButton.setPrefWidth(70);
         hbox.getChildren().addAll(okButton, cancelButton, applyButton);
         hbox.setAlignment(Pos.CENTER_RIGHT);
-        
         border.setCenter(tabs);
         border.setBottom(hbox);
+        
         
         Scene scene = new Scene(border, 550, 400);
         return scene;
@@ -100,12 +101,11 @@ public class PreferenceUI extends Application{
         tabTextEditor.setContent(createTextEditorPane());
         Tab tabBlockedList = new Tab("Blocked List");
         tabBlockedList.setContent(createBlockedListPane());
-        Tab tabDropbox = new Tab("Dropbox");
         Tab tabPath = new Tab("Path");
         tabPath.setContent(createPathPane());
         Tab tabStorage = new Tab("Storage");
         tabStorage.setContent(createStoragePane());
-        tabs.getTabs().addAll(tabSystem, tabHotkeys, tabTextEditor, tabBlockedList, tabDropbox, tabPath, tabStorage);
+        tabs.getTabs().addAll(tabSystem, tabHotkeys, tabTextEditor, tabBlockedList, tabPath, tabStorage);
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         //tabs.setSide(Side.LEFT);
 
@@ -129,20 +129,23 @@ public class PreferenceUI extends Application{
         
         border.setCenter(imageView);
         border.setBottom(hbox);
+        setMargin(hbox, new Insets(0, 10, 20, 10));
+        
         return border;
     }
     
     private GridPane createAboutUsPane(){
         GridPane grid = new GridPane();
-        grid.setHgap(50);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setHgap(20);
+        grid.setVgap(20);
+        grid.setPadding(new Insets(20, 20, 20, 20));
         grid.setAlignment(Pos.CENTER);
         
         Label label = new Label("The main objective behind developing this application is to make it easier to copy and paste across documents and information on the webpages. The program aims at minimizing the act of window switching, visually searching for the sentence one needs to select/highlight and copy the text. Thereby reducing the time spent, increasing the efficiency of the user and making it a useful tool while working heavily on text-processing, such as drafting research papers or a thesis. This auto-complete mechanism will not entirely replace the copy-paste procedure; rather it would enhance the original functionality.");
         label.setAlignment(Pos.CENTER);
         label.setWrapText(true);
         grid.getChildren().add(label);
+        
         return grid;
     }
     
@@ -325,15 +328,15 @@ public class PreferenceUI extends Application{
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
                new PieChart.Data("Used Space", 10), new PieChart.Data("FreeSpace", 90));
         PieChart pieChart = new PieChart(pieChartData);
-        pieChart.setPrefSize(100, 100);
+        pieChart.setPrefSize(200, 200);
        
         grid.add(label1, 0, 0);
         grid.add(cb1, 1, 0);
         grid.add(label2, 0, 1);
         grid.add(cb2, 1, 1);
-        grid.add(pieChart, 0, 2, 1, 2);
-        grid.add(label3, 1, 2);
-        grid.add(label4, 1, 3);
+        grid.add(pieChart, 0, 2, 1, 4);
+        grid.add(label3, 1, 3);
+        grid.add(label4, 1, 4);
         
         return grid;
     }
