@@ -1,5 +1,6 @@
 package xaurora.communication;
 
+import java.io.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -56,11 +57,18 @@ public class Server implements Runnable{
 			ClientWorker w;
 			try{
 				Socket client = server.accept();
+				DataOutputStream out =
+		                 new DataOutputStream(client.getOutputStream());
+		            out.writeUTF("Thank you for connecting to "
+		              + server.getLocalSocketAddress() + "\nGoodbye!");
+		            
 				//client.setSoTimeout(10000);
 				w = new ClientWorker(client);
 				
 				Thread t = new Thread(w);
 				t.start();
+				out.flush();
+				out.close();
 			} catch(IOException e){
 				
 			}
