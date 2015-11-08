@@ -57,18 +57,19 @@ public class Server implements Runnable{
 			ClientWorker w;
 			try{
 				Socket client = server.accept();
-				DataOutputStream out =
-		                 new DataOutputStream(client.getOutputStream());
-		            out.writeUTF("Thank you for connecting to "
-		              + server.getLocalSocketAddress() + "\nGoodbye!");
+				
 		            
 				//client.setSoTimeout(10000);
 				w = new ClientWorker(client);
 				
 				Thread t = new Thread(w);
 				t.start();
+				DataOutputStream out =
+		                 new DataOutputStream(client.getOutputStream());
+		            out.writeUTF("Thank you for connecting to "
+		              + server.getLocalSocketAddress() + "\nGoodbye!");
 				out.flush();
-				out.close();
+				//out.close();
 			} catch(IOException e){
 				
 			}
