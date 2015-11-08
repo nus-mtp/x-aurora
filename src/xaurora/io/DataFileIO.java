@@ -20,7 +20,7 @@ public class DataFileIO {
 		return true;
 	}
 	public void createDataFile(byte[] filename,byte[] content){
-		String dstpath = this.syncDirectory+String.valueOf(filename);
+		String dstpath = this.syncDirectory+String.valueOf(filename+".txt");
 		File dstFile = new File(dstpath);
 		if(dstFile.exists()){
 			System.err.println("ERROR MESSAGE: MD5 COLLISION");

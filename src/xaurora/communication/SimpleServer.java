@@ -9,10 +9,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
+import xaurora.io.DataFileIO;
+import xaurora.io.IDGenerator;
+
 public class SimpleServer implements Runnable{
 	ServerSocket server = null;
 	Socket client = null;
-
+	private static final int TYPE_FULL_TEXT = 0;
 	public SimpleServer(int port) {
 		try{
 			server = new ServerSocket(6789);
@@ -27,11 +30,15 @@ public class SimpleServer implements Runnable{
 	public void run()  {
 
 		while (true) {
-			receiveMessage();
+			String text = receiveMessage();
+			String[] data = text.split("\n");
+			byte[] id = IDGenerator.instanceOf().GenerateID(data[0], TYPE_FULL_TEXT);
+			DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
 		}
 	}
 
-	private void receiveMessage() {
+	private String receiveMessage() {
+		String contentData = "";
 		try {
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				client.getInputStream()));
@@ -40,7 +47,7 @@ public class SimpleServer implements Runnable{
 		String line = "";
 		int count = 0;
 		int length = 0;
-		String contentData = "";
+		
 		for (int i=0; i<4; i++){
 			line = in.readLine();
 			if (i==3){
@@ -68,5 +75,6 @@ public class SimpleServer implements Runnable{
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+		return contentData;
 	}
 }
