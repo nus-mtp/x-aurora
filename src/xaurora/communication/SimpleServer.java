@@ -70,7 +70,7 @@ public class SimpleServer implements Runnable{
 		}
 		
 		if (contentData!="") System.out.println(contentData);
-		out.println("received!");
+		out.print(genOutput(contentData));
 		out.flush();
 		in.close();
 		out.close();
@@ -80,5 +80,15 @@ public class SimpleServer implements Runnable{
 			e.printStackTrace();
 		}
 		return contentData;
+	}
+	
+	private String genOutput(String input){
+		String res = new String();
+		if (input.equalsIgnoreCase("Request to Connect")) 
+			res = "200";
+		else 
+			res = "Received";
+		
+		return res;
 	}
 }
