@@ -118,7 +118,7 @@ public class PreferenceUI extends Application{
     }
     
     private BorderPane createSettingPane(){
-        initSettings();
+        readSettings();
         BorderPane border = new BorderPane();
         
         TabPane tabs = new TabPane();
@@ -485,12 +485,12 @@ public class PreferenceUI extends Application{
             runOnStartUp = Boolean.valueOf(settings[0]);
             hideInToolbar = Boolean.valueOf(settings[1]);
             //Hotkeys Pane
-            extendWordHotkey = settings[2].split("[,]");
-            reduceWordHotkey = settings[3].split("[,]");
-            extendSentenceHotkey = settings[4].split("[,]");
-            reduceSentenceHotkey = settings[5].split("[,]");
-            extendParagraphHotkey = settings[6].split("[,]");
-            reduceParagraphHotkey = settings[7].split("[,]");
+            extendWordHotkey = settings[2].substring(1, settings[2].length()-1).split(",\\s+");
+            reduceWordHotkey = settings[3].substring(1, settings[3].length()-1).split(",\\s+");
+            extendSentenceHotkey = settings[4].substring(1, settings[4].length()-1).split(",\\s+");
+            reduceSentenceHotkey = settings[5].substring(1, settings[5].length()-1).split(",\\s+");
+            extendParagraphHotkey = settings[6].substring(1, settings[6].length()-1).split(",\\s+");
+            reduceParagraphHotkey = settings[7].substring(1, settings[7].length()-1).split(",\\s+");
             //Text Editor Pane
             numMatchingTextDisplay = Integer.valueOf(settings[8]);
             showTextSource = Boolean.valueOf(settings[9]);
@@ -505,8 +505,8 @@ public class PreferenceUI extends Application{
             //Storage Pane
             maxTextSizeStored = Integer.valueOf(settings[16]);
             previewTextLength = settings[17];
-            usedSpace = Integer.valueOf(settings[18]);
-            usedPercentage = Integer.valueOf(settings[19]);
+            usedSpace = Float.valueOf(settings[18]);
+            usedPercentage = Float.valueOf(settings[19]);
             
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
