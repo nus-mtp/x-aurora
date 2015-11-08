@@ -50,31 +50,32 @@ import javafx.stage.Stage;
 public class PreferenceUI extends Application{          
     
     //System Pane
-    boolean runOnStartUp;
-    boolean hideInToolbar;
+    private boolean runOnStartUp;
+    private boolean hideInToolbar;
     //Hotkeys Pane
-    String[] extendWordHotkey;
-    String[] reduceWordHotkey;
-    String[] extendSentenceHotkey;
-    String[] reduceSentenceHotkey;
-    String[] extendParagraphHotkey;
-    String[] reduceParagraphHotkey;
+    private String[] extendWordHotkey;
+    private String[] reduceWordHotkey;
+    private String[] extendSentenceHotkey;
+    private String[] reduceSentenceHotkey;
+    private String[] extendParagraphHotkey;
+    private String[] reduceParagraphHotkey;
     //Text Editor Pane
-    int numMatchingTextDisplay;
-    boolean showTextSource;
-    Color boxColour;
-    Color textColour;
-    int boxTransparency;
+    private int numMatchingTextDisplay;
+    private boolean showTextSource;
+    private Color boxColour;
+    private Color textColour;
+    private int boxTransparency;
     //Blocked List Pane
     //Path Pane
-    String dataPath;
-    boolean showPreviewText;
-    String clearCachesTime;
+    private String dataPath;
+    private boolean showPreviewText;
+    private String clearCachesTime;
     //Storage Pane
-    int maxTextSizeStored;
-    String previewTextLength;
-    float usedSpace;
-    float usedPercentage;
+    private int maxTextSizeStored;
+    private String previewTextLength;
+    private float usedSpace;
+    private float usedPercentage;
+    private static final int numSettings = 20;
     
     public static void main(String[] args) {
         launch(args);
@@ -476,9 +477,37 @@ public class PreferenceUI extends Application{
         try{
             FileReader fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while ((line = bufferedReader.readLine()) != null){
-                System.out.println(line);
+            String[] settings = new String[numSettings];
+            for (int i=0; i < numSettings; i++){
+                settings[i] = bufferedReader.readLine();
             }
+            //System Pane
+            runOnStartUp = Boolean.valueOf(settings[0]);
+            hideInToolbar = Boolean.valueOf(settings[1]);
+            //Hotkeys Pane
+            extendWordHotkey = settings[2].split("[,]");
+            reduceWordHotkey = settings[3].split("[,]");
+            extendSentenceHotkey = settings[4].split("[,]");
+            reduceSentenceHotkey = settings[5].split("[,]");
+            extendParagraphHotkey = settings[6].split("[,]");
+            reduceParagraphHotkey = settings[7].split("[,]");
+            //Text Editor Pane
+            numMatchingTextDisplay = Integer.valueOf(settings[8]);
+            showTextSource = Boolean.valueOf(settings[9]);
+            boxColour = Color.valueOf(settings[10]);
+            textColour = Color.valueOf(settings[11]);
+            boxTransparency = Integer.valueOf(settings[12]);;
+            //Blocked List Pane
+            //Path Pane
+            dataPath = settings[13];
+            showPreviewText = Boolean.valueOf(settings[14]);
+            clearCachesTime = settings[15];
+            //Storage Pane
+            maxTextSizeStored = Integer.valueOf(settings[16]);
+            previewTextLength = settings[17];
+            usedSpace = Integer.valueOf(settings[18]);
+            usedPercentage = Integer.valueOf(settings[19]);
+            
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
             System.out.println("File " + filename + " not found");
