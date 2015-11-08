@@ -54,8 +54,8 @@ public class PreferenceUI extends Application{
     //Text Editor Pane
     int numMatchingTextDisplay;
     boolean showTextSource;
-    String boxColour;
-    String TextColour;
+    Color boxColour;
+    Color textColour;
     int boxTransparency;
     //Blocked List Pane
     //Path Pane
@@ -67,35 +67,6 @@ public class PreferenceUI extends Application{
     String previewTextLength;
     float usedSpace;
     float usedPercentage;
-    
-    PreferenceUI(){
-    //System Pane
-    runOnStartUp = true;
-    hideInToolbar = true;
-    //Hotkeys Pane
-    extendWordHotkey = new String[]{"Ctrl","Alt","Z"};
-    reduceWordHotkey = new String[]{"Ctrl","Alt","X"};
-    extendSentenceHotkey = new String[]{"Ctrl","Alt","C"};
-    reduceSentenceHotkey = new String[]{"Ctrl","Alt","V"};
-    extendParagraphHotkey = new String[]{"Ctrl","Alt","B"};
-    reduceParagraphHotkey = new String[]{"Ctrl","Alt","N"};
-    //Text Editor Pane
-    numMatchingTextDisplay = 5;
-    showTextSource = true;
-    boxColour = "White";
-    TextColour = "Black";
-    boxTransparency = 0;
-    //Blocked List Pane
-    //Path Pane
-    dataPath = "C:/User/Desktop";
-    showPreviewText = true;
-    clearCachesTime = "device is off";
-    //Storage Pane
-    maxTextSizeStored = 100;
-    previewTextLength = "one sentence";
-    usedSpace = 0;
-    usedPercentage = 0;
-    }
     
     public static void main(String[] args) {
         launch(args);
@@ -138,6 +109,7 @@ public class PreferenceUI extends Application{
     }
     
     private BorderPane createSettingPane(){
+        initSettings();
         BorderPane border = new BorderPane();
         
         TabPane tabs = new TabPane();
@@ -174,6 +146,35 @@ public class PreferenceUI extends Application{
 
         return border;
     } 
+    
+    private void initSettings(){
+    //System Pane
+    runOnStartUp = true;
+    hideInToolbar = true;
+    //Hotkeys Pane
+    extendWordHotkey = new String[]{"Ctrl","Alt","Z"};
+    reduceWordHotkey = new String[]{"Ctrl","Alt","X"};
+    extendSentenceHotkey = new String[]{"Ctrl","Alt","C"};
+    reduceSentenceHotkey = new String[]{"Ctrl","Alt","V"};
+    extendParagraphHotkey = new String[]{"Ctrl","Alt","B"};
+    reduceParagraphHotkey = new String[]{"Ctrl","Alt","N"};
+    //Text Editor Pane
+    numMatchingTextDisplay = 5;
+    showTextSource = true;
+    boxColour = Color.WHITE;
+    textColour = Color.BLACK;
+    boxTransparency = 0;
+    //Blocked List Pane
+    //Path Pane
+    dataPath = "C:/User/Desktop";
+    showPreviewText = true;
+    clearCachesTime = "device is off";
+    //Storage Pane
+    maxTextSizeStored = 100;
+    previewTextLength = "one sentence";
+    usedSpace = 2;
+    usedPercentage = 10;
+    }
     
     private BorderPane createTutorialPane(){
         BorderPane border = new BorderPane();
@@ -241,7 +242,9 @@ public class PreferenceUI extends Application{
         Label label1 = new Label("Run on start up");
         Label label2 = new Label("Hide in toolbar when close");
         CheckBox checkbox1 = new CheckBox();
+        checkbox1.setSelected(runOnStartUp);
         CheckBox checkbox2 = new CheckBox();
+        checkbox2.setSelected(hideInToolbar);
         grid.add(label1, 0, 0);
         grid.add(checkbox1, 1, 0);
         grid.add(label2, 0, 1);
@@ -268,7 +271,8 @@ public class PreferenceUI extends Application{
         TextField[] textFields = new TextField[6];
         for (int i=0; i < textFields.length; i++){
             textFields[i] = new TextField();
-            textFields[i].setMaxWidth(70);
+            textFields[i].setMaxWidth(50);
+            textFields[i].setAlignment(Pos.CENTER);
         }
         
         ChoiceBox[] boxes = new ChoiceBox[12];
@@ -276,8 +280,23 @@ public class PreferenceUI extends Application{
         for (int i=0; i < boxes.length; i++){
             boxes[i] = new ChoiceBox();
             boxes[i].setItems(FXCollections.observableArrayList("Ctrl", "Alt", "Shift"));
-            boxes[i].setValue("Ctrl");
             plus[i] = new Label("+");
+        }
+        
+        for (int i=0; i < labels.length; i++){
+            String[] hotkey;
+            switch(i){
+                case 0: hotkey = extendWordHotkey; break;
+                case 1: hotkey = reduceWordHotkey; break;
+                case 2: hotkey = extendSentenceHotkey; break;
+                case 3: hotkey = reduceSentenceHotkey; break;
+                case 4: hotkey = extendParagraphHotkey; break;
+                case 5: hotkey = reduceParagraphHotkey; break; 
+                default: hotkey = new String[3];    
+            }
+            boxes[2*i].setValue(hotkey[0]);
+            boxes[2*i+1].setValue(hotkey[1]);
+            textFields[i].setText(hotkey[2]);
         }
         
         for (int i=0; i < labels.length; i++){
@@ -310,27 +329,26 @@ public class PreferenceUI extends Application{
         spinner.setValueFactory(svf);
         spinner.setEditable(true);
         spinner.setPrefWidth(70);
-        spinner.increment(4);
-        Label l = new Label();
-        
-        
+        spinner.increment(numMatchingTextDisplay-1);
+
         CheckBox checkbox = new CheckBox();
+        checkbox.setSelected(showTextSource);
         
         ColorPicker boxColorPicker = new ColorPicker();
-        boxColorPicker.setValue(Color.WHITE);
+        boxColorPicker.setValue(boxColour);
         boxColorPicker.setStyle("-fx-color-label-visible: false;");
         
         ColorPicker textColorPicker = new ColorPicker();
-        textColorPicker.setValue(Color.BLACK);
+        textColorPicker.setValue(textColour);
         textColorPicker.setStyle("-fx-color-label-visible: false;");
         
         Slider transparency = new Slider();
         transparency.setMin(0);
         transparency.setMax(100);
-        transparency.setValue(0);
         transparency.setShowTickLabels(true);
         transparency.setShowTickMarks(true);
         transparency.setMajorTickUnit(50);
+        transparency.setValue(boxTransparency);
       
         grid.add(label1, 0, 0);
         grid.add(label2, 0, 1);
@@ -386,13 +404,15 @@ public class PreferenceUI extends Application{
         TextField pathField = new TextField();
         pathField.setEditable(false);
         pathField.setMinWidth(300);
+        pathField.setText(dataPath);
         Button pathButton = new Button("Browse");
         CheckBox checkbox = new CheckBox();
+        checkbox.setSelected(showPreviewText);
         Label label2 = new Label("Store preview text as caches to improve matching speed");
         Label label3 = new Label("Clear caches after ");
         ChoiceBox cb = new ChoiceBox();
         cb.setItems(FXCollections.observableArrayList("device is off", "one day", "one week", "never"));
-        cb.setValue("device is off");
+        cb.setValue(clearCachesTime);
         
         grid.add(label1, 0, 0);
         grid.add(pathField, 0, 1);
@@ -415,13 +435,13 @@ public class PreferenceUI extends Application{
         Label label1 = new Label("Store single text size of at most");
         ChoiceBox cb1 = new ChoiceBox();
         cb1.setItems(FXCollections.observableArrayList("100MB", "500MB", "1GB", "unlimited"));
-        cb1.setValue("100MB");
+        cb1.setValue(maxTextSizeStored + "MB");
         Label label2 = new Label("Preview text length");
         ChoiceBox cb2 = new ChoiceBox();
         cb2.setItems(FXCollections.observableArrayList("one sentence", "two sentence", "three words", "one paragraph"));
-        cb2.setValue("one sentence");
-        Label label3 = new Label("Used space: 2.0/20.0 GB");
-        Label label4 = new Label("Used percentage: 10%");  
+        cb2.setValue(previewTextLength);
+        Label label3 = new Label("Used space: " + usedSpace + "/20.0 GB");
+        Label label4 = new Label("Used percentage: " + usedPercentage + "%");  
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
                new PieChart.Data("Used Space", 10), new PieChart.Data("FreeSpace", 90));
         PieChart pieChart = new PieChart(pieChartData);
