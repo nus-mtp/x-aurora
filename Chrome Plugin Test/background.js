@@ -50,10 +50,11 @@ var textExtractor = {
         if ((serverStat == "connected") && (!isInNGList(tabUrl))) {
             chrome.tabs.sendMessage(tabid, {action: "getDOM"}, function(response) {
                 var request = new XMLHttpRequest();
-                console.log("Sending Texts!")
-                request.open('PUSH', 'http://127.0.0.1:'+dataPort, true); 
-                request.send(encode_utf8(response.extracted));
+                console.log("Sending Texts!");
+                request.open('PUSH', 'http://127.0.0.1:'+dataPort, true);
+                request.send(tabUrl+"\n"+encode_utf8(response.extracted));
                 ngList.push(tabUrl);
+                console.log(response.extracted);
             });     
         }
     }
@@ -67,15 +68,17 @@ function decode_utf8(s) {
   return decodeURIComponent(escape(s));
 }
 
+/*
 chrome.tabs.onActivated.addListener(function (info){
     chrome.tabs.query({currentWindow:true, active:true}, function(tabs){
         if (tabs[0].status == "complete")   textExtractor.pushText(tabs[0].id, tabs[0].url);
     })
 });
+*/
 
 chrome.tabs.onUpdated.addListener(function(tabId , status) {
-    chrome.tabs.query({currentWindow:true, active:true}, function(tabs){
-        if ((tabs[0].status == "complete") && (tabId == tabs[0].id))   textExtractor.pushText(tabs[0].id, tabs[0].url);
+    chrome.tabs.get(tabId, function(tarTab){
+        textExtractor.pushText(tabId, tarTab.url);
     })
 });
 
