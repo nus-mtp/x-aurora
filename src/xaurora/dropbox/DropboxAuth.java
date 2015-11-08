@@ -17,18 +17,33 @@ public class DropboxAuth {
 	final String APP_KEY = "4tpptik431fwlqo";
 	final String APP_SECRET = "xe5robnc898oy37";
 	
-	String accessToken;
+	static String accessToken;
+	static String userID;
+	static int index;
 	
-	public void getAccessToken () throws IOException{
-		if (Dropbox.user.getAccessToken() == null){
-			String redirectUri = "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
-			Desktop.getDesktop().browse(java.net.URI.create(redirectUri));
-			accessToken = "_csCIJFXenAAAAAAAAAAEwa7tOFlw9BtBom7BcBdhO-OFsFcIj7wOUwxe8LNsQRi";;
+	public static void setAccessToken (String url) throws IOException{
+		
+		for (int i = 0; i< Dropbox.user.size(); i++){
+			userProfile demo = Dropbox.user.get(i);
+			if (demo.getAccessToken()==null){
+				index = i;
+				userID = parseUserID(url);
+				accessToken = parseAccessToken(url);
+				break;
+			}
 		}
-		else {
-		accessToken = Dropbox.user.getAccessToken();
-		}
-		System.out.println("accessToken is = " + accessToken);
+	}
+	
+	public static String parseUserID(String url){
+		String[] elements = url.split("=");
+		return elements[3];	
+	}
+	
+	public static String parseAccessToken(String url){
+		String[] parts = url.split("=");
+		String[] token = parts[1].split("&");
+		
+		return token[0];	
 	}
 	
 	public void Auth() throws DbxException{
@@ -45,11 +60,12 @@ public class DropboxAuth {
 		DbxAccountInfo account = client.getAccountInfo();
 
 		userProfile user = new userProfile();
+		user.setUserID(userID);
 		user.setAccessToken(accessToken);
 		user.setUserName(account.displayName);
 		user.setEmail(account.email);
 		user.setStorage(formulateStorage(bytesToGB(account.quota.normal),bytesToGB(account.quota.total)));
-		user = Dropbox.user;
+		Dropbox.user.set(index, user);
 		System.out.println(user.toString());
 	}
 	
