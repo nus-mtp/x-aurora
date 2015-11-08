@@ -10,10 +10,14 @@ public class DataFileIO {
 		if(instance == null){
 			instance = new DataFileIO();
 		}
-		return new DataFileIO();
+		return instance;
 	}
-	public void setDirectory(String path){
+	public boolean setDirectory(String path){
+		if(!new File(path).exists()){
+			return false;
+		}
 		this.syncDirectory = path;
+		return true;
 	}
 	public void createDataFile(byte[] filename,byte[] content){
 		String dstpath = this.syncDirectory+String.valueOf(filename);
