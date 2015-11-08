@@ -39,7 +39,64 @@ import javafx.stage.Stage;
  *
  * @author Lee
  */
-public class PreferenceUI extends Application{
+public class PreferenceUI extends Application{          
+    
+    //System Pane
+    boolean runOnStartUp;
+    boolean hideInToolbar;
+    //Hotkeys Pane
+    String[] extendWordHotkey;
+    String[] reduceWordHotkey;
+    String[] extendSentenceHotkey;
+    String[] reduceSentenceHotkey;
+    String[] extendParagraphHotkey;
+    String[] reduceParagraphHotkey;
+    //Text Editor Pane
+    int numMatchingTextDisplay;
+    boolean showTextSource;
+    String boxColour;
+    String TextColour;
+    int boxTransparency;
+    //Blocked List Pane
+    //Path Pane
+    String dataPath;
+    boolean showPreviewText;
+    String clearCachesTime;
+    //Storage Pane
+    int maxTextSizeStored;
+    String previewTextLength;
+    float usedSpace;
+    float usedPercentage;
+    
+    PreferenceUI(){
+    //System Pane
+    runOnStartUp = true;
+    hideInToolbar = true;
+    //Hotkeys Pane
+    extendWordHotkey = new String[]{"Ctrl","Alt","Z"};
+    reduceWordHotkey = new String[]{"Ctrl","Alt","X"};
+    extendSentenceHotkey = new String[]{"Ctrl","Alt","C"};
+    reduceSentenceHotkey = new String[]{"Ctrl","Alt","V"};
+    extendParagraphHotkey = new String[]{"Ctrl","Alt","B"};
+    reduceParagraphHotkey = new String[]{"Ctrl","Alt","N"};
+    //Text Editor Pane
+    numMatchingTextDisplay = 5;
+    showTextSource = true;
+    boxColour = "White";
+    TextColour = "Black";
+    boxTransparency = 0;
+    //Blocked List Pane
+    //Path Pane
+    dataPath = "C:/User/Desktop";
+    showPreviewText = true;
+    clearCachesTime = "device is off";
+    //Storage Pane
+    maxTextSizeStored = 100;
+    previewTextLength = "one sentence";
+    usedSpace = 0;
+    usedPercentage = 0;
+    }
+    
     public static void main(String[] args) {
         launch(args);
     }
@@ -74,24 +131,15 @@ public class PreferenceUI extends Application{
         Label email = new Label("user@example.com");
         email.setGraphic(imageView);
         
-        HBox hbox = new HBox();
-        Button okButton = new Button("OK");
-        okButton.setPrefWidth(70);
-        Button cancelButton = new Button("Cancel");
-        cancelButton.setPrefWidth(70);
-        Button applyButton = new Button("Apply");
-        applyButton.setPrefWidth(70);
-        hbox.getChildren().addAll(okButton, cancelButton, applyButton);
-        hbox.setAlignment(Pos.CENTER_RIGHT);
         border.setCenter(tabs);
-        border.setBottom(hbox);
-        
         
         Scene scene = new Scene(border, 550, 400);
         return scene;
     }
     
-    private TabPane createSettingPane(){
+    private BorderPane createSettingPane(){
+        BorderPane border = new BorderPane();
+        
         TabPane tabs = new TabPane();
         Tab tabSystem = new Tab("System");
         tabSystem.setContent(createSystemPane());
@@ -108,8 +156,23 @@ public class PreferenceUI extends Application{
         tabs.getTabs().addAll(tabSystem, tabHotkeys, tabTextEditor, tabBlockedList, tabPath, tabStorage);
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         //tabs.setSide(Side.LEFT);
+        
+        HBox hbox = new HBox();
+        Button okButton = new Button("OK");
+        okButton.setPrefWidth(70);
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setPrefWidth(70);
+        Button applyButton = new Button("Apply");
+        applyButton.setPrefWidth(70);
+        hbox.getChildren().addAll(okButton, cancelButton, applyButton);
+        hbox.setAlignment(Pos.CENTER_RIGHT);
+        border.setCenter(tabs);
+        border.setBottom(hbox);
+        
+        border.setCenter(tabs);
+        border.setBottom(hbox);
 
-        return tabs;
+        return border;
     } 
     
     private BorderPane createTutorialPane(){
@@ -225,9 +288,7 @@ public class PreferenceUI extends Application{
             grid.add(plus[2*i+1], 4, i);
             grid.add(textFields[i], 5, i);
         }
-       
- 
-        
+
         return grid;
     }
     
@@ -247,9 +308,11 @@ public class PreferenceUI extends Application{
         Spinner spinner = new Spinner();
         SpinnerValueFactory svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20);
         spinner.setValueFactory(svf);
-        spinner.increment(4);
         spinner.setEditable(true);
         spinner.setPrefWidth(70);
+        spinner.increment(4);
+        Label l = new Label();
+        
         
         CheckBox checkbox = new CheckBox();
         
