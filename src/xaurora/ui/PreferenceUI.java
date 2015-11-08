@@ -5,6 +5,14 @@
  */
 package xaurora.ui;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import static java.lang.System.exit;
+import java.util.Arrays;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
@@ -132,9 +140,12 @@ public class PreferenceUI extends Application{
         HBox hbox = new HBox();
         Button okButton = new Button("OK");
         okButton.setPrefWidth(70);
+        okButton.setOnAction(event -> {writeSettings(); exit(0);});
         Button cancelButton = new Button("Cancel");
         cancelButton.setPrefWidth(70);
+        cancelButton.setOnAction(event -> {exit(1);});
         Button applyButton = new Button("Apply");
+        applyButton.setOnAction(event -> {writeSettings();});
         applyButton.setPrefWidth(70);
         hbox.getChildren().addAll(okButton, cancelButton, applyButton);
         hbox.setAlignment(Pos.CENTER_RIGHT);
@@ -456,5 +467,55 @@ public class PreferenceUI extends Application{
         grid.add(label4, 1, 4);
         
         return grid;
+    }
+    
+    private void readSettings(){
+        String filename = "settings.txt";
+        String line = null;
+        
+        try{
+            FileReader fileReader = new FileReader(filename);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while ((line = bufferedReader.readLine()) != null){
+                System.out.println(line);
+            }
+            bufferedReader.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println("File " + filename + " not found");
+        } catch (IOException ex) {
+            System.out.println("Error reading file " + filename);
+        }
+    }
+    
+    private void writeSettings(){
+        String filename = "settings.txt";
+        
+        try{
+            FileWriter fileWriter = new FileWriter(filename);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(String.valueOf(runOnStartUp)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(hideInToolbar)); bufferedWriter.newLine();
+            bufferedWriter.write(Arrays.toString(extendWordHotkey)); bufferedWriter.newLine();
+            bufferedWriter.write(Arrays.toString(reduceWordHotkey)); bufferedWriter.newLine();
+            bufferedWriter.write(Arrays.toString(extendSentenceHotkey)); bufferedWriter.newLine();
+            bufferedWriter.write(Arrays.toString(reduceSentenceHotkey)); bufferedWriter.newLine();
+            bufferedWriter.write(Arrays.toString(extendParagraphHotkey)); bufferedWriter.newLine();
+            bufferedWriter.write(Arrays.toString(reduceParagraphHotkey)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(numMatchingTextDisplay)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(showTextSource)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(boxColour)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(textColour)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(boxTransparency)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(dataPath)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(showPreviewText)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(clearCachesTime)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(maxTextSizeStored)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(previewTextLength)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(usedSpace)); bufferedWriter.newLine();
+            bufferedWriter.write(String.valueOf(usedPercentage));
+            bufferedWriter.close();
+        } catch (IOException ex) {
+            System.out.println("Error writing file " + filename);
+        }
     }
 }
