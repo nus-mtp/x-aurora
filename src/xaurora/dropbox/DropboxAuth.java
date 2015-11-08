@@ -1,13 +1,9 @@
 package xaurora.dropbox;
 
-import java.awt.Desktop;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
 import com.dropbox.core.DbxAccountInfo;
-import com.dropbox.core.DbxAppInfo;
-import com.dropbox.core.DbxAuthInfo;
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
@@ -20,8 +16,9 @@ public class DropboxAuth {
 	static String accessToken;
 	static String userID;
 	static int index;
+	static DbxClient client;
 	
-	public static void setAccessToken (String url) throws IOException{
+	public static void setAccessToken (String url){
 		
 		for (int i = 0; i< DropboxMain.user.size(); i++){
 			userProfile demo = DropboxMain.user.get(i);
@@ -47,16 +44,17 @@ public class DropboxAuth {
 	}
 	
 	public static DbxClient Auth() throws DbxException{
-		DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
 
 		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
 				Locale.getDefault().toString());
-		
-		// Save auth information to output file.
-        DbxAuthInfo authInfo = new DbxAuthInfo(accessToken, appInfo.host);
 
 		// Now use the access token to make Dropbox API calls.
-        DbxClient client = new DbxClient(config, accessToken);
+        client = new DbxClient(config, accessToken);
+		setUserProfile();
+		return client;
+	}
+	
+	public static void setUserProfile() throws DbxException{
 		DbxAccountInfo account = client.getAccountInfo();
 
 		userProfile user = new userProfile();
@@ -66,9 +64,10 @@ public class DropboxAuth {
 		user.setEmail(account.email);
 		user.setStorage(formulateStorage(bytesToGB(account.quota.normal),bytesToGB(account.quota.total)));
 		DropboxMain.user.set(index, user);
+		DropboxMain.setCurrentIndex(index);;
+		user.setCurrent();
 		System.out.println(user.toString());
 		
-		return client;
 	}
 	
 	public static String formulateStorage (String used, String total){

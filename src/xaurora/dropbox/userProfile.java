@@ -12,6 +12,7 @@ public class userProfile {
 	private static String storage;
 	private static String path;
 	private static String userID;
+	private static boolean current;
 	
 	userProfile(){	
 		accessToken = null;
@@ -20,6 +21,7 @@ public class userProfile {
 		storage = null;
 		path = null;
 		userID = null;
+		current = false;
 	}
 	
 	public void setAccessToken(String token){
@@ -70,8 +72,20 @@ public class userProfile {
 		return userID;
 	}
 	
+	public void setCurrent(){
+		current = true;
+	}
+	
+	public String getCurrent(){
+		if (current == true){
+			return "User is current account";
+		}
+		return "User is not current account";
+	}
+	
 	public String toString(){
-		String userInfo = "UserName: " + userName + "\nEmail: " + emailAddress + "\nUserID: " + userID + "\nStorage: " + storage + "\nLocal file is stored at: " + storage + "\n";
+		String userInfo = "UserName: " + userName + "\nEmail: " + emailAddress + "\nUserID: " + userID + 
+				"\nStorage: " + storage + "\nLocal file is stored at: " + storage + "\n" + getCurrent() + "\n";
 		return userInfo;
 	}
 
