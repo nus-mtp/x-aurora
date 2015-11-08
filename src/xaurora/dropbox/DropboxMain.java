@@ -1,13 +1,11 @@
 package xaurora.dropbox;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-
-public class Dropbox {
+public class DropboxMain {
 	public static final ArrayList<userProfile> user = null;
 	
-	public void doSomething() throws IOException{
+	public void doSomething(){
 
 	}
 

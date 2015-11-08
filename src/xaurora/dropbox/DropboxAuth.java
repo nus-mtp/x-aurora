@@ -14,8 +14,8 @@ import com.dropbox.core.DbxRequestConfig;
 
 public class DropboxAuth {
 
-	final String APP_KEY = "4tpptik431fwlqo";
-	final String APP_SECRET = "xe5robnc898oy37";
+	final static String APP_KEY = "4tpptik431fwlqo";
+	final static String APP_SECRET = "xe5robnc898oy37";
 	
 	static String accessToken;
 	static String userID;
@@ -23,8 +23,8 @@ public class DropboxAuth {
 	
 	public static void setAccessToken (String url) throws IOException{
 		
-		for (int i = 0; i< Dropbox.user.size(); i++){
-			userProfile demo = Dropbox.user.get(i);
+		for (int i = 0; i< DropboxMain.user.size(); i++){
+			userProfile demo = DropboxMain.user.get(i);
 			if (demo.getAccessToken()==null){
 				index = i;
 				userID = parseUserID(url);
@@ -46,7 +46,7 @@ public class DropboxAuth {
 		return token[0];	
 	}
 	
-	public void Auth() throws DbxException{
+	public static DbxClient Auth() throws DbxException{
 		DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
 
 		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
@@ -65,8 +65,10 @@ public class DropboxAuth {
 		user.setUserName(account.displayName);
 		user.setEmail(account.email);
 		user.setStorage(formulateStorage(bytesToGB(account.quota.normal),bytesToGB(account.quota.total)));
-		Dropbox.user.set(index, user);
+		DropboxMain.user.set(index, user);
 		System.out.println(user.toString());
+		
+		return client;
 	}
 	
 	public static String formulateStorage (String used, String total){
