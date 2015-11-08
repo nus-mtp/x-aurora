@@ -31,10 +31,14 @@ public class SimpleServer implements Runnable{
 
 		while (true) {
 			String text = receiveMessage();
-			String[] data = text.split("\n");
-			byte[] id = IDGenerator.instanceOf().GenerateID(data[0], TYPE_FULL_TEXT);
-			DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
+			outputToFile(text);
 		}
+	}
+
+	private void outputToFile(String text) {
+		String[] data = text.split("\n");
+		byte[] id = IDGenerator.instanceOf().GenerateID(data[0], TYPE_FULL_TEXT);
+		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
 	}
 
 	private String receiveMessage() {
