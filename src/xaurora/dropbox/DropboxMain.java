@@ -28,6 +28,7 @@ public class DropboxMain {
 	}
 	
 	public static UserProfile getCurrentUser(){
+		while(user.isEmpty()){}
 		return user.get(currentUserIndex);
 	}
 	

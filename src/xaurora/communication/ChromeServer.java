@@ -77,7 +77,7 @@ public class ChromeServer implements Runnable{
 			contentData += String.valueOf(content[i]);
 		}
 		
-		if (contentData!="") System.out.println("Chrome Plugin Message : "+contentData);
+		if (contentData!="") //System.out.println("Chrome Plugin Message : "+contentData);
 		out.print(genOutput(contentData));
 		out.flush();
 		in.close();
