@@ -1,15 +1,10 @@
 package xaurora.ui;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import static java.lang.System.exit;
-import java.util.Arrays;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -36,7 +31,6 @@ import javafx.scene.layout.BorderPane;
 import static javafx.scene.layout.BorderPane.setMargin;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import xaurora.util.UserPreference;
 
@@ -203,8 +197,10 @@ public class PreferenceUI extends Application{
         Label label2 = new Label("Hide in toolbar when close");
         CheckBox checkbox1 = new CheckBox();
         checkbox1.setSelected(preferences.isRunOnStartUp());
+        checkbox1.setOnAction(event -> {preferences.setIsRunOnStartUp(!preferences.isRunOnStartUp());});
         CheckBox checkbox2 = new CheckBox();
         checkbox2.setSelected(preferences.isHideInToolbar());
+        checkbox2.setOnAction(event -> {preferences.setIsHideInToolbar(!preferences.isHideInToolbar());});
         grid.add(label1, 0, 0);
         grid.add(checkbox1, 1, 0);
         grid.add(label2, 0, 1);
@@ -226,14 +222,7 @@ public class PreferenceUI extends Application{
         labels[2] = new Label("Extend Sentences: ");
         labels[3] = new Label("Reduce Sentences: ");
         labels[4] = new Label("Extend Paragraphs: ");
-        labels[5] = new Label("Reduce Paragraphs: ");
-        
-        TextField[] textFields = new TextField[6];
-        for (int i=0; i < textFields.length; i++){
-            textFields[i] = new TextField();
-            textFields[i].setMaxWidth(50);
-            textFields[i].setAlignment(Pos.CENTER);
-        }
+        labels[5] = new Label("Reduce Paragraphs: ");     
         
         ChoiceBox[] boxes = new ChoiceBox[12];
         Label[] plus = new Label[12];
@@ -241,6 +230,13 @@ public class PreferenceUI extends Application{
             boxes[i] = new ChoiceBox();
             boxes[i].setItems(FXCollections.observableArrayList("Ctrl", "Alt", "Shift"));
             plus[i] = new Label("+");
+        }
+
+        TextField[] textFields = new TextField[6];
+        for (int i = 0; i < textFields.length; i++) {
+            textFields[i] = new TextField();
+            textFields[i].setMaxWidth(50);
+            textFields[i].setAlignment(Pos.CENTER);
         }
         
         for (int i=0; i < labels.length; i++){
@@ -258,6 +254,101 @@ public class PreferenceUI extends Application{
             boxes[2*i+1].setValue(hotkey[1]);
             textFields[i].setText(hotkey[2]);
         }
+
+        boxes[0].setOnAction(event -> {
+            String[] hotkey = preferences.getExtendWordHotkey();
+            hotkey[0] = (String) boxes[0].getSelectionModel().getSelectedItem();
+            preferences.setExtendWordHotkey(hotkey);
+        });
+        boxes[1].setOnAction(event -> {
+            String[] hotkey = preferences.getExtendWordHotkey();
+            hotkey[1] = (String) boxes[1].getSelectionModel().getSelectedItem();
+            preferences.setExtendWordHotkey(hotkey);
+        });
+        boxes[2].setOnAction(event -> {
+            String[] hotkey = preferences.getReduceWordHotkey();
+            hotkey[0] = (String) boxes[2].getSelectionModel().getSelectedItem();
+            preferences.setReduceWordHotkey(hotkey);
+        });
+        boxes[3].setOnAction(event -> {
+            String[] hotkey = preferences.getReduceWordHotkey();
+            hotkey[1] = (String) boxes[3].getSelectionModel().getSelectedItem();
+            preferences.setReduceWordHotkey(hotkey);
+        });
+        
+        boxes[4].setOnAction(event -> {
+            String[] hotkey = preferences.getExtendSentenceHotkey();
+            hotkey[0] = (String) boxes[4].getSelectionModel().getSelectedItem();
+            preferences.setExtendSentenceHotkey(hotkey);
+        });
+        boxes[5].setOnAction(event -> {
+            String[] hotkey = preferences.getExtendSentenceHotkey();
+            hotkey[1] = (String) boxes[5].getSelectionModel().getSelectedItem();
+            preferences.setExtendSentenceHotkey(hotkey);
+        });
+        boxes[6].setOnAction(event -> {
+            String[] hotkey = preferences.getReduceSentenceHotkey();
+            hotkey[0] = (String) boxes[6].getSelectionModel().getSelectedItem();
+            preferences.setReduceSentenceHotkey(hotkey);
+        });
+        boxes[7].setOnAction(event -> {
+            String[] hotkey = preferences.getReduceSentenceHotkey();
+            hotkey[1] = (String) boxes[7].getSelectionModel().getSelectedItem();
+            preferences.setReduceSentenceHotkey(hotkey);
+        });
+        
+        boxes[8].setOnAction(event -> {
+            String[] hotkey = preferences.getExtendParagraphHotkey();
+            hotkey[0] = (String) boxes[8].getSelectionModel().getSelectedItem();
+            preferences.setExtendParagraphHotkey(hotkey);
+        });
+        boxes[9].setOnAction(event -> {
+            String[] hotkey = preferences.getExtendParagraphHotkey();
+            hotkey[1] = (String) boxes[9].getSelectionModel().getSelectedItem();
+            preferences.setExtendParagraphHotkey(hotkey);
+        });
+        boxes[10].setOnAction(event -> {
+            String[] hotkey = preferences.getReduceParagraphHotkey();
+            hotkey[0] = (String) boxes[10].getSelectionModel().getSelectedItem();
+            preferences.setReduceParagraphHotkey(hotkey);
+        });
+        boxes[11].setOnAction(event -> {
+            String[] hotkey = preferences.getReduceParagraphHotkey();
+            hotkey[1] = (String) boxes[11].getSelectionModel().getSelectedItem();
+            preferences.setReduceParagraphHotkey(hotkey);
+        });
+        
+        textFields[0].setOnKeyPressed(key ->{
+            String[] hotkey = preferences.getExtendWordHotkey();
+            hotkey[2] = key.getText().toUpperCase();
+            preferences.setExtendWordHotkey(hotkey);
+        });
+        textFields[1].setOnKeyPressed(key ->{
+            String[] hotkey = preferences.getReduceWordHotkey();
+            hotkey[2] = key.getText().toUpperCase();
+            preferences.setReduceWordHotkey(hotkey);
+        });
+        textFields[2].setOnKeyPressed(key ->{
+            String[] hotkey = preferences.getExtendSentenceHotkey();
+            hotkey[2] = key.getText().toUpperCase();
+            preferences.setExtendSentenceHotkey(hotkey);
+        });
+        textFields[3].setOnKeyPressed(key ->{
+            String[] hotkey = preferences.getReduceSentenceHotkey();
+            hotkey[2] = key.getText().toUpperCase();
+            preferences.setReduceSentenceHotkey(hotkey);
+        });
+        textFields[4].setOnKeyPressed(key ->{
+            String[] hotkey = preferences.getExtendParagraphHotkey();
+            hotkey[2] = key.getText().toUpperCase();
+            preferences.setExtendParagraphHotkey(hotkey);
+        });
+        textFields[5].setOnKeyPressed(key ->{
+            String[] hotkey = preferences.getReduceParagraphHotkey();
+            hotkey[2] = key.getText().toUpperCase();
+            preferences.setReduceParagraphHotkey(hotkey);
+        });
+       
         
         for (int i=0; i < labels.length; i++){
             grid.add(labels[i], 0, i);
