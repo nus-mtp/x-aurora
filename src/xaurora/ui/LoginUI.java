@@ -13,6 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import xaurora.system.SystemManager;
 
 public class LoginUI extends Application{
     
@@ -79,7 +80,7 @@ public class LoginUI extends Application{
         grid.add(dropboxView, 0, 0);
         
         Button loginButton = new Button("Login to Dropbox");
-        loginButton.setOnAction(event -> {getHostServices().showDocument(loginPage);});
+        loginButton.setOnAction(event -> {SystemManager.getInstance().login(true);getHostServices().showDocument(loginPage);});
         grid.add(loginButton, 1, 0);
         
         /*****
@@ -117,7 +118,7 @@ public class LoginUI extends Application{
         Label warning = new Label("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
         Button skipButton = new Button("Skip login");;
-        skipButton.setOnAction(event -> {stage.setScene(preferenceUI.createPreferenceScene());});
+        skipButton.setOnAction(event -> {SystemManager.getInstance().login(false);stage.setScene(preferenceUI.createPreferenceScene());});
         hbox.getChildren().addAll(warning, skipButton);
         
         return hbox;

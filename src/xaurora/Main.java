@@ -2,7 +2,7 @@ package xaurora;
 import xaurora.communication.*;
 
 import xaurora.security.Security;
-
+import xaurora.system.SystemManager;
 import xaurora.ui.LoginUI;
 
 
@@ -16,7 +16,7 @@ public class Main {
 		
 		chromeSvrThread.start();
 		wordSvrThread.start();
-
+		SystemManager s = SystemManager.getInstance();
                 
         LoginUI.main();
 
