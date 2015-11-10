@@ -13,7 +13,7 @@ public class DataFileIO {
 		if(instance == null){
 			instance = new DataFileIO();
 		}
-		instance.syncDirectory = DropboxMain.getCurrentUser().getPath();
+		
 		return instance;
 	}
 	public boolean setDirectory(String path){
