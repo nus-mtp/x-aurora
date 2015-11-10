@@ -5,10 +5,18 @@
  */
 package xaurora.ui;
 
+import javafx.application.Application;
+import javafx.stage.Stage;
+
 /**
  *
  * @author Lee
  */
-public class UISystem {
+public class UISystem extends Application{
+
+    @Override
+    public void start(Stage primaryStage){
+        
+    }
     
 }
