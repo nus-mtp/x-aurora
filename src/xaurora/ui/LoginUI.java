@@ -118,7 +118,10 @@ public class LoginUI extends Application{
         Label warning = new Label("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
         Button skipButton = new Button("Skip login");;
-        skipButton.setOnAction(event -> {SystemManager.getInstance().login(false);stage.setScene(preferenceUI.createPreferenceScene());});
+        skipButton.setOnAction(event -> {
+            SystemManager.getInstance().login(false);
+            stage.setScene(preferenceUI.createPreferenceScene());
+        });
         hbox.getChildren().addAll(warning, skipButton);
         
         return hbox;
