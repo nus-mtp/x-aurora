@@ -1,0 +1,11 @@
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\bin\Debug\Test Word Plugin.pdb
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\bin\Debug\Test Word Plugin.vsto
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.dll
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.xml
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\obj\Debug\Test_Word_Plugin.Properties.Resources.resources
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\obj\Debug\Test Word Plugin.csproj.GenerateResource.Cache
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\obj\Debug\Test Word Plugin.pdb
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\bin\Debug\Test Word Plugin.dll
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\bin\Debug\Test Word Plugin.dll.manifest
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\obj\Debug\Test Word Plugin.dll
+D:\visual studio projects\Test Word Plugin\Test Word Plugin\obj\Debug\Test Word Plugin.csprojResolveAssemblyReference.cache
