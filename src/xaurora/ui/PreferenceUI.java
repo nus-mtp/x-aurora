@@ -44,8 +44,8 @@ public class PreferenceUI extends Application{
     UserPreference preferences = new UserPreference();
     Stage stage;
     
-    public static void main() {
-        launch();
+    public static void main(String[] args) {
+        launch(args);
     }
      
     @Override
