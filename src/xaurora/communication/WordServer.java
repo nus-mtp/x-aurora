@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import xaurora.system.PrefixMatcher;
+
 public class WordServer implements Runnable{
 	ServerSocket server = null;
 	Socket client = null;
@@ -27,6 +29,7 @@ public class WordServer implements Runnable{
 		
 		while (true) {
 			receiveMessage();
+			
 		}
 	}
 
@@ -45,7 +48,8 @@ public class WordServer implements Runnable{
 			contentData += String.valueOf(content[i]);
 		}
 		
-		if (contentData!="") System.out.println("Word Plugin Message : "+contentData);
+		if (contentData!="") 
+			System.out.println("Word Plugin Message : "+contentData);
 		out.print(genOutput(contentData));
 		out.flush();
 		in.close();
@@ -62,9 +66,10 @@ public class WordServer implements Runnable{
 		String res = new String();
 		if (input.equalsIgnoreCase("Request to Connect")) 
 			res = "200";
-		else 
-			res = "Received";
-		
+		else {
+			res = "Received\n";
+			res += PrefixMatcher.getResult(input);
+		}
 		return res;
 	}
 }

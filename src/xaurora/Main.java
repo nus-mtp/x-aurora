@@ -1,7 +1,10 @@
 package xaurora;
-
 import xaurora.communication.*;
+
 import xaurora.security.Security;
+
+import xaurora.ui.LoginUI;
+
 
 public class Main {
 	public static void main(String[] args){
@@ -13,6 +16,9 @@ public class Main {
 		
 		chromeSvrThread.start();
 		wordSvrThread.start();
-		
+
+                
+        LoginUI.main();
+
 	}
 }

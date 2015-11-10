@@ -21,8 +21,8 @@ public class LoginUI extends Application{
     PreferenceUI preferenceUI = new PreferenceUI();
     private Stage stage;
     
-    public static void main(String[] args) {
-        launch(args);
+    public static void main() {
+        launch();
     }
      
     @Override
