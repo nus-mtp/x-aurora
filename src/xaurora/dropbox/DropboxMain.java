@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import xaurora.io.DataFileIO;
 import xaurora.util.UserProfile;
 
 import com.dropbox.core.DbxClient;
@@ -28,6 +29,8 @@ public class DropboxMain {
 
 	public static void startCall(){
 		client  = DropboxAuth.Auth();
+		currentUser = user.get(currentUserIndex);
+		DataFileIO.instanceOf().setDirectory(currentUser.getPath());
 		ifExpired();
 	}
 
@@ -35,10 +38,10 @@ public class DropboxMain {
 		currentUserIndex = index;
 	}
 
-	public static UserProfile getCurrentUser(){
+	public UserProfile getCurrentUser(){
 		while (user.isEmpty()){
 		}
-		currentUser = user.get(currentUserIndex);
+		
 		return currentUser;
 	}
 
