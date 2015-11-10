@@ -1,11 +1,16 @@
 package xaurora;
+
 import xaurora.communication.*;
 
-import java.util.*;
 public class Main {
 	public static void main(String[] args){
-		BrowserServer server = new BrowserServer(6789);
-		Thread serverThread = new Thread(server);
-		serverThread.start();
+		ChromeServer chromeSvr = new ChromeServer(6789);
+		WordServer wordSvr = new WordServer(23333);
+		
+		Thread chromeSvrThread = new Thread(chromeSvr);
+		Thread wordSvrThread = new Thread(wordSvr);
+		
+		chromeSvrThread.start();
+		wordSvrThread.start();
 	}
 }
