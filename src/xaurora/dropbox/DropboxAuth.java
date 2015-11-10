@@ -22,7 +22,7 @@ public class DropboxAuth {
 	static int index;
 	static DbxClient client;
 	
-	public void setAccessToken (String url){
+	public static void setAccessToken (String url){
 		
 		for (int i = 0; i< DropboxMain.user.size(); i++){
 			UserProfile demo = DropboxMain.user.get(i);

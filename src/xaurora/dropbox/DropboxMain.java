@@ -1,6 +1,7 @@
 package xaurora.dropbox;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -214,6 +215,23 @@ public class DropboxMain {
 				}
 			}
 			expiredFiles.clear();
+		}
+	}
+	
+	private void moveDirectory(String path){
+		File dir1 = new File(currentUser.getPath());
+		File newPath = new File(path);
+		try {
+			newPath.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(dir1.isDirectory()) {
+		    File[] content = dir1.listFiles();
+		    for(int i = 0; i < content.length; i++) {
+		        content[i].renameTo(new File(path, content[i].getName()));
+		    }
 		}
 	}
 }
