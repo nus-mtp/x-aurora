@@ -1,20 +1,20 @@
-package xaurora.dropbox;
+package xaurora.util;
 
-public class userProfile {
+public class UserProfile {
 
-	private static final String APP_KEY = "4tpptik431fwlqo";
+	private final String APP_KEY = "4tpptik431fwlqo";
 	
-	private static final String APP_SECRET = "xe5robnc898oy37";
+	private final String APP_SECRET = "xe5robnc898oy37";
 	
-	private static String accessToken;	
-	private static String userName;	
-	private static String emailAddress;	
-	private static String storage;
-	private static String path;
-	private static String userID;
-	private static boolean current;
+	private String accessToken;	
+	private String userName;	
+	private String emailAddress;	
+	private String storage;
+	private String path;
+	private String userID;
+	private boolean current;
 	
-	userProfile(){	
+	public UserProfile(){	
 		accessToken = null;
 		userName = null;
 		emailAddress = null;

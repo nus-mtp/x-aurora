@@ -1,7 +1,11 @@
 package xaurora.dropbox;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Locale;
+
+import xaurora.util.UserProfile;
 
 import com.dropbox.core.DbxAccountInfo;
 import com.dropbox.core.DbxClient;
@@ -21,7 +25,7 @@ public class DropboxAuth {
 	public static void setAccessToken (String url){
 		
 		for (int i = 0; i< DropboxMain.user.size(); i++){
-			userProfile demo = DropboxMain.user.get(i);
+			UserProfile demo = DropboxMain.user.get(i);
 			if (demo.getAccessToken()==null){
 				index = i;
 				userID = parseUserID(url);
@@ -57,15 +61,25 @@ public class DropboxAuth {
 	public static void setUserProfile() throws DbxException{
 		DbxAccountInfo account = client.getAccountInfo();
 
-		userProfile user = new userProfile();
+		UserProfile user = new UserProfile();
 		user.setUserID(userID);
 		user.setAccessToken(accessToken);
 		user.setUserName(account.displayName);
 		user.setEmail(account.email);
 		user.setStorage(formulateStorage(bytesToGB(account.quota.normal),bytesToGB(account.quota.total)));
-		DropboxMain.user.set(index, user);
-		DropboxMain.setCurrentIndex(index);;
+		
+		File f = new File("/" + userID + "/");
+		try {
+			f.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String path = f.getAbsolutePath();
+		user.setPath(path);
 		user.setCurrent();
+		DropboxMain.user.set(index, user);
+		DropboxMain.setCurrentIndex(index);
 		System.out.println(user.toString());
 		
 	}
