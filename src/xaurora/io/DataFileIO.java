@@ -95,9 +95,12 @@ public class DataFileIO {
 			}
 			Security c = Security.getInstance();
 			byte[] decrypted = c.decrypt(data.getBytes("UTF-8"));
+			for(int i = 0;i<decrypted.length;i++){
+				System.out.println((char) decrypted[i]);
+			}
 			String output = "";
 			for(int i = 0;i<decrypted.length;i++){
-				output+=String.valueOf(decrypted[i]);
+				output+=String.valueOf((char)decrypted[i]);
 			}
 			content.add(output);
 		} catch (IOException e){
