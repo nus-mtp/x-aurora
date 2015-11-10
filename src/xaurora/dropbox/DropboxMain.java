@@ -20,13 +20,14 @@ public class DropboxMain {
 
 	private static int currentUserIndex;
 	private static DbxClient client = null;
-	private ArrayList<String> metaData = null;
+	private static ArrayList<String> metaData = null;
 	private static UserProfile currentUser = null;
-	private File[] fList = null;
-	private ArrayList<File> expiredFiles = null;
+	private static File[] fList = null;
+	private static ArrayList<File> expiredFiles = null;
 
 	public static void startCall(){
 		client  = DropboxAuth.Auth();
+		ifExpired();
 	}
 
 	public static void setCurrentIndex(int index){
@@ -47,7 +48,7 @@ public class DropboxMain {
 		return false;
 	}
 
-	public void getAllMetaData(){
+	public static void getAllMetaData(){
 		DbxEntry.WithChildren listing = null;
 		try {
 			listing = client.getMetadataWithChildren("/");
@@ -61,7 +62,7 @@ public class DropboxMain {
 		}
 	}
 
-	public void getAllLocalFile(){
+	public static void getAllLocalFile(){
 		// .............list file
 		File directory = new File(currentUser.getPath());
 
@@ -69,7 +70,7 @@ public class DropboxMain {
 		fList = directory.listFiles();
 	}
 
-	public void sync(){
+	public static void sync(){
 		getAllMetaData();
 		getAllLocalFile();
 		for (int i = 0; i < metaData.size(); i++){
@@ -80,7 +81,7 @@ public class DropboxMain {
 		}
 	}
 
-	private void checkLocalFiles(File f){
+	private static void checkLocalFiles(File f){
 
 		boolean isUploaded = false;
 		String fileName = f.getName();
@@ -119,7 +120,7 @@ public class DropboxMain {
 		}
 	}
 
-	private void checkOnlineFiles(String metaData){
+	private static void checkOnlineFiles(String metaData){
 		boolean isDownloaded = false;
 		for (int i = 0; i < fList.length; i++){
 			if (compareFileName(fList[i], metaData)){
@@ -150,7 +151,7 @@ public class DropboxMain {
 		}
 	}
 
-	private String getLastModified (String meta){
+	private static String getLastModified (String meta){
 		String[] parts = meta.split("=");
 		int index = parts[5].lastIndexOf('"');
 		String time = parts[5].substring(1, index-4);
@@ -164,7 +165,7 @@ public class DropboxMain {
 		return dateFormat.format(d);
 	}
 
-	private int compareTime(File f, String meta){
+	private static int compareTime(File f, String meta){
 		String localFile = convertToUTC(f.lastModified());
 		String onlineFile = getLastModified(meta);
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -180,7 +181,7 @@ public class DropboxMain {
 		return local.compareTo(online);
 	}
 
-	private String getFileName(String meta){
+	private static String getFileName(String meta){
 		String[] parts = meta.split("=");
 		int first = parts[0].lastIndexOf('/');
 		int last = parts[0].lastIndexOf('"');
@@ -188,11 +189,11 @@ public class DropboxMain {
 		return name;
 	}
 
-	private boolean compareFileName (File f, String meta){
+	private static boolean compareFileName (File f, String meta){
 		return f.getName().equals(getFileName(meta));
 	}
 
-	private void ifExpired(){
+	private static void ifExpired(){
 		sync();
 		expiredFiles = null;
 		for (int i = 0; i < fList.length; i++){
