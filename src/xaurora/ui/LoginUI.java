@@ -16,14 +16,18 @@ import javafx.stage.Stage;
 
 public class LoginUI extends Application{
     
-    private static final String loginPage = "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
+    private static final String loginPage = 
+            "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
+    PreferenceUI preferenceUI = new PreferenceUI();
+    private Stage stage;
     
     public static void main(String[] args) {
         launch(args);
     }
      
     @Override
-    public void start(Stage stage){
+    public void start(Stage primaryStage){
+        stage = primaryStage;
         stage.setTitle("x-aurora");      
         Scene loginScene = createLoginScene();
         stage.setScene(loginScene);
@@ -31,7 +35,7 @@ public class LoginUI extends Application{
         stage.show();
     }
     
-    private Scene createLoginScene(){
+    public Scene createLoginScene(){
         BorderPane borderPane = new BorderPane();
         HBox title = createTitle();
         GridPane grid = createLoginForm();
@@ -113,6 +117,7 @@ public class LoginUI extends Application{
         Label warning = new Label("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
         Button skipButton = new Button("Skip login");;
+        skipButton.setOnAction(event -> {stage.setScene(preferenceUI.createPreferenceScene());});
         hbox.getChildren().addAll(warning, skipButton);
         
         return hbox;
