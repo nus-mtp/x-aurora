@@ -400,8 +400,8 @@ public class PreferenceUI extends Application{
         ChoiceBox cb2 = new ChoiceBox();
         cb2.setItems(FXCollections.observableArrayList("one sentence", "two sentence", "three words", "one paragraph"));
         cb2.setValue(preferences.getPreviewTextLength());
-        Label label3 = new Label("Used space: " + preferences.getUsedSpace() + "/20.0 GB");
-        Label label4 = new Label("Used percentage: " + preferences.getUsedPercentage() + "%");  
+        Label label3 = new Label("Used space: " + "2.0/20.0 GB");
+        Label label4 = new Label("Used percentage: " + "10%");  
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
                new PieChart.Data("Used Space", 10), new PieChart.Data("FreeSpace", 90));
         PieChart pieChart = new PieChart(pieChartData);

@@ -34,9 +34,7 @@ public class UserPreference {
     //Storage Pane
     private int maxTextSizeStored;
     private String previewTextLength;
-    private float usedSpace;
-    private float usedPercentage;
-    private static final int numPreferences = 20;
+    private static final int numPreferences = 18;
 
     public void initPreferences(){
         //System Pane
@@ -63,12 +61,10 @@ public class UserPreference {
         //Storage Pane
         maxTextSizeStored = 100;
         previewTextLength = "one sentence";
-        usedSpace = 2;
-        usedPercentage = 10;
     }
     
     public void readPreferences() {
-        String filename = "settings.txt";
+        String filename = "preferences.txt";
 
         try {
             FileReader fileReader = new FileReader(filename);
@@ -101,8 +97,6 @@ public class UserPreference {
             //Storage Pane
             maxTextSizeStored = Integer.valueOf(settings[16]);
             previewTextLength = settings[17];
-            usedSpace = Float.valueOf(settings[18]);
-            usedPercentage = Float.valueOf(settings[19]);
 
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
@@ -113,7 +107,7 @@ public class UserPreference {
     }
 
     public void writePreferences() {
-        String filename = "settings.txt";
+        String filename = "preferences.txt";
 
         try {
             FileWriter fileWriter = new FileWriter(filename);
@@ -153,10 +147,6 @@ public class UserPreference {
             bufferedWriter.write(String.valueOf(maxTextSizeStored));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(previewTextLength));
-            bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(usedSpace));
-            bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(usedPercentage));
             bufferedWriter.close();
         } catch (IOException ex) {
             System.out.println("Error writing file " + filename);
@@ -235,14 +225,6 @@ public class UserPreference {
         return previewTextLength;
     }
 
-    public float getUsedSpace() {
-        return usedSpace;
-    }
-
-    public float getUsedPercentage() {
-        return usedPercentage;
-    }
-
     public static int getNumPreferences() {
         return numPreferences;
     }
@@ -317,13 +299,5 @@ public class UserPreference {
 
     public void setPreviewTextLength(String previewTextLength) {
         this.previewTextLength = previewTextLength;
-    }
-
-    public void setUsedSpace(float usedSpace) {
-        this.usedSpace = usedSpace;
-    }
-
-    public void setUsedPercentage(float usedPercentage) {
-        this.usedPercentage = usedPercentage;
     }
 }
