@@ -36,6 +36,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import static javafx.scene.layout.BorderPane.setMargin;
 import javafx.scene.layout.GridPane;
@@ -84,14 +85,15 @@ public class PreferenceUI extends Application{
     @Override
     public void start(Stage stage){
         stage.setTitle("x-aurora");      
-        Scene scene = createScene();
-        stage.setScene(scene);
+        Scene preferenceScene = createPreferenceScene();
+        stage.setScene(preferenceScene);
         stage.show();
     }
     
-    private Scene createScene(){
+    public Scene createPreferenceScene(){    
         BorderPane border = new BorderPane();
-        
+        AnchorPane anchor = new AnchorPane();
+                
         TabPane tabs = new TabPane();
         Tab tabSetting = new Tab("Setting");
         tabSetting.setContent(createSettingPane());
@@ -103,6 +105,8 @@ public class PreferenceUI extends Application{
         tabDataManaging.setContent(createDataManagingPane());
         tabs.getTabs().addAll(tabSetting, tabTutorial, tabAboutUs, tabDataManaging);
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tabs.setTabMinHeight(44);
+        tabs.setPrefSize(600, 400);
         
         Image image = new Image("File:dropbox.png");
         ImageView imageView = new ImageView(image);
@@ -111,9 +115,13 @@ public class PreferenceUI extends Application{
         Label email = new Label("user@example.com");
         email.setGraphic(imageView);
         
-        border.setCenter(tabs);
+        anchor.getChildren().addAll(tabs, email);
+        AnchorPane.setTopAnchor(email, 0.0);
+        AnchorPane.setRightAnchor(email, 0.0);
         
-        Scene scene = new Scene(border, 550, 400);
+        //border.setCenter(tabs);
+        border.setCenter(anchor);
+        Scene scene = new Scene(border, 600, 400);
         return scene;
     }
     
@@ -382,7 +390,7 @@ public class PreferenceUI extends Application{
         TableColumn UrlCol = new TableColumn("Website URL");
         UrlCol.setMinWidth(400);
         TableColumn toggleCol = new TableColumn("Enable/Disable");
-        toggleCol.setMinWidth(100);
+        toggleCol.setMinWidth(150);
         TableColumn deleteCol = new TableColumn("Delete");
         deleteCol.setPrefWidth(50);
         deleteCol.setMinWidth(50);
@@ -396,7 +404,7 @@ public class PreferenceUI extends Application{
         urlField.setPromptText("add url of websites to block");
         urlField.setMinWidth(400);
         Button addButton = new Button("Add to blocked list");
-        addButton.setMinWidth(150);
+        addButton.setMinWidth(200);
         HBox hbox = new HBox();
         hbox.getChildren().addAll(urlField, addButton);
 
@@ -472,7 +480,6 @@ public class PreferenceUI extends Application{
     
     private void readSettings(){
         String filename = "settings.txt";
-        String line = null;
         
         try{
             FileReader fileReader = new FileReader(filename);
