@@ -8,7 +8,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
-
+import xaurora.dropbox.*;
 import xaurora.io.DataFileIO;
 import xaurora.io.IDGenerator;
 
@@ -31,13 +31,24 @@ public class SimpleServer implements Runnable{
 
 		while (true) {
 			String text = receiveMessage();
-			outputToFile(text);
+			if(isLogin(text)){
+				DropboxAuth.setAccessToken(getURL(text));
+			} else{
+				outputToFile(text);
+			}
 		}
 	}
-
-	private void outputToFile(String text) {
+	private static boolean isLogin(String text){
+		
+		
+		return getURL(text).contains("access_token=")&&getURL(text).contains("www.dropbox.com");
+	}
+	private static String getURL(String text){
 		String[] data = text.split("\n");
-		byte[] id = IDGenerator.instanceOf().GenerateID(data[0], TYPE_FULL_TEXT);
+		return data[0];
+	}
+	private void outputToFile(String text) {
+		byte[] id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
 		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
 	}
 
