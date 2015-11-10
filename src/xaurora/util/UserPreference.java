@@ -10,6 +10,8 @@ import java.util.Arrays;
 import javafx.scene.paint.Color;
 
 public class UserPreference {
+
+
     //System Pane
     private boolean isRunOnStartUp;
     private boolean isHideInToolbar;
@@ -300,4 +302,5 @@ public class UserPreference {
     public void setPreviewTextLength(String previewTextLength) {
         this.previewTextLength = previewTextLength;
     }
+
 }
