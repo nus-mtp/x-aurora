@@ -1,5 +1,6 @@
 package xaurora.ui;
 
+import java.io.File;
 import static java.lang.System.exit;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -31,6 +32,7 @@ import javafx.scene.layout.BorderPane;
 import static javafx.scene.layout.BorderPane.setMargin;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import xaurora.util.UserPreference;
 
@@ -40,13 +42,15 @@ import xaurora.util.UserPreference;
  */
 public class PreferenceUI extends Application{          
     UserPreference preferences = new UserPreference();
+    Stage stage;
     
     public static void main(String[] args) {
         launch(args);
     }
      
     @Override
-    public void start(Stage stage){
+    public void start(Stage primaryStage){
+        stage = primaryStage;
         stage.setTitle("x-aurora");      
         Scene preferenceScene = createPreferenceScene();
         stage.setScene(preferenceScene);
@@ -381,17 +385,21 @@ public class PreferenceUI extends Application{
         spinner.setEditable(true);
         spinner.setPrefWidth(70);
         spinner.increment(preferences.getNumMatchingTextDisplay()-1);
+        spinner.valueProperty().addListener((obs, oldValue, newValue) -> {preferences.setNumMatchingTextDisplay((int) newValue);});
 
         CheckBox checkbox = new CheckBox();
         checkbox.setSelected(preferences.isShowTextSource());
+        checkbox.setOnAction(event -> {preferences.setIsShowTextSource(!preferences.isShowTextSource());});
         
         ColorPicker boxColorPicker = new ColorPicker();
         boxColorPicker.setValue(preferences.getBoxColour());
         boxColorPicker.setStyle("-fx-color-label-visible: false;");
+        boxColorPicker.setOnAction(event -> {preferences.setBoxColour(boxColorPicker.getValue());});
         
         ColorPicker textColorPicker = new ColorPicker();
         textColorPicker.setValue(preferences.getTextColour());
         textColorPicker.setStyle("-fx-color-label-visible: false;");
+        textColorPicker.setOnAction(event -> {preferences.setTextColour(textColorPicker.getValue());});
         
         Slider transparency = new Slider();
         transparency.setMin(0);
@@ -400,6 +408,7 @@ public class PreferenceUI extends Application{
         transparency.setShowTickMarks(true);
         transparency.setMajorTickUnit(50);
         transparency.setValue(preferences.getBoxTransparency());
+        transparency.valueProperty().addListener((obs, oldValue, newValue) -> {preferences.setBoxTransparency((double) newValue);});
       
         grid.add(label1, 0, 0);
         grid.add(label2, 0, 1);
@@ -456,18 +465,28 @@ public class PreferenceUI extends Application{
         pathField.setEditable(false);
         pathField.setMinWidth(300);
         pathField.setText(preferences.getDataPath());
-        Button pathButton = new Button("Browse");
+        Button browseButton = new Button("Browse");
+        browseButton.setOnAction(event -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            File selectedDirectory = directoryChooser.showDialog(stage);
+            pathField.setText(selectedDirectory.getAbsolutePath());
+            preferences.setDataPath(selectedDirectory.getAbsolutePath());
+        });
+                
+        Label label2 = new Label("Store preview text as caches to improve matching speed");
         CheckBox checkbox = new CheckBox();
         checkbox.setSelected(preferences.isShowPreviewText());
-        Label label2 = new Label("Store preview text as caches to improve matching speed");
+        checkbox.setOnAction(event -> {preferences.setIsShowPreviewText(!preferences.isShowPreviewText());});
+        
         Label label3 = new Label("Clear caches after ");
         ChoiceBox cb = new ChoiceBox();
         cb.setItems(FXCollections.observableArrayList("device is off", "one day", "one week", "never"));
         cb.setValue(preferences.getClearCachesTime());
+        cb.setOnAction(event -> {preferences.setClearCachesTime((String) cb.getSelectionModel().getSelectedItem());});     
         
         grid.add(label1, 0, 0);
         grid.add(pathField, 0, 1);
-        grid.add(pathButton, 1, 1);
+        grid.add(browseButton, 1, 1);
         grid.add(label2, 0, 2);
         grid.add(checkbox, 1, 2);
         grid.add(label3, 0, 3);
@@ -486,13 +505,18 @@ public class PreferenceUI extends Application{
         Label label1 = new Label("Store single text size of at most");
         ChoiceBox cb1 = new ChoiceBox();
         cb1.setItems(FXCollections.observableArrayList("100MB", "500MB", "1GB", "unlimited"));
-        cb1.setValue(preferences.getMaxTextSizeStored() + "MB");
+        cb1.setValue(preferences.getMaxTextSizeStored());
+        cb1.setOnAction(event -> {preferences.setMaxTextSizeStored((String) cb1.getSelectionModel().getSelectedItem());});     
+        
         Label label2 = new Label("Preview text length");
         ChoiceBox cb2 = new ChoiceBox();
         cb2.setItems(FXCollections.observableArrayList("one sentence", "two sentence", "three words", "one paragraph"));
         cb2.setValue(preferences.getPreviewTextLength());
+        cb2.setOnAction(event -> {preferences.setPreviewTextLength((String) cb2.getSelectionModel().getSelectedItem());});     
+        
         Label label3 = new Label("Used space: " + "2.0/20.0 GB");
         Label label4 = new Label("Used percentage: " + "10%");  
+        
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
                new PieChart.Data("Used Space", 10), new PieChart.Data("FreeSpace", 90));
         PieChart pieChart = new PieChart(pieChartData);

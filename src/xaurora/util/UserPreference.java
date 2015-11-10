@@ -27,14 +27,14 @@ public class UserPreference {
     private boolean isShowTextSource;
     private Color boxColour;
     private Color textColour;
-    private int boxTransparency;
+    private double boxTransparency;
     //Blocked List Pane
     //Path Pane
     private String dataPath;
     private boolean isShowPreviewText;
     private String clearCachesTime;
     //Storage Pane
-    private int maxTextSizeStored;
+    private String maxTextSizeStored;
     private String previewTextLength;
     private static final int numPreferences = 18;
 
@@ -61,7 +61,7 @@ public class UserPreference {
         isShowPreviewText = true;
         clearCachesTime = "device is off";
         //Storage Pane
-        maxTextSizeStored = 100;
+        maxTextSizeStored = "100MB";
         previewTextLength = "one sentence";
     }
     
@@ -90,14 +90,14 @@ public class UserPreference {
             isShowTextSource = Boolean.valueOf(settings[9]);
             boxColour = Color.valueOf(settings[10]);
             textColour = Color.valueOf(settings[11]);
-            boxTransparency = Integer.valueOf(settings[12]);;
+            boxTransparency = Double.valueOf(settings[12]);;
             //Blocked List Pane
             //Path Pane
             dataPath = settings[13];
             isShowPreviewText = Boolean.valueOf(settings[14]);
             clearCachesTime = settings[15];
             //Storage Pane
-            maxTextSizeStored = Integer.valueOf(settings[16]);
+            maxTextSizeStored = settings[16];
             previewTextLength = settings[17];
 
             bufferedReader.close();
@@ -203,7 +203,7 @@ public class UserPreference {
         return textColour;
     }
 
-    public int getBoxTransparency() {
+    public double getBoxTransparency() {
         return boxTransparency;
     }
 
@@ -219,7 +219,7 @@ public class UserPreference {
         return clearCachesTime;
     }
 
-    public int getMaxTextSizeStored() {
+    public String getMaxTextSizeStored() {
         return maxTextSizeStored;
     }
 
@@ -279,7 +279,7 @@ public class UserPreference {
         this.textColour = textColour;
     }
 
-    public void setBoxTransparency(int boxTransparency) {
+    public void setBoxTransparency(double boxTransparency) {
         this.boxTransparency = boxTransparency;
     }
 
@@ -295,7 +295,7 @@ public class UserPreference {
         this.clearCachesTime = clearCachesTime;
     }
 
-    public void setMaxTextSizeStored(int maxTextSizeStored) {
+    public void setMaxTextSizeStored(String maxTextSizeStored) {
         this.maxTextSizeStored = maxTextSizeStored;
     }
 
