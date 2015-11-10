@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package xaurora.ui;
 
 import java.io.BufferedReader;
@@ -43,40 +38,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import xaurora.util.UserPreference;
 
 /**
  *
  * @author Lee
  */
 public class PreferenceUI extends Application{          
-    
-    //System Pane
-    private boolean runOnStartUp;
-    private boolean hideInToolbar;
-    //Hotkeys Pane
-    private String[] extendWordHotkey;
-    private String[] reduceWordHotkey;
-    private String[] extendSentenceHotkey;
-    private String[] reduceSentenceHotkey;
-    private String[] extendParagraphHotkey;
-    private String[] reduceParagraphHotkey;
-    //Text Editor Pane
-    private int numMatchingTextDisplay;
-    private boolean showTextSource;
-    private Color boxColour;
-    private Color textColour;
-    private int boxTransparency;
-    //Blocked List Pane
-    //Path Pane
-    private String dataPath;
-    private boolean showPreviewText;
-    private String clearCachesTime;
-    //Storage Pane
-    private int maxTextSizeStored;
-    private String previewTextLength;
-    private float usedSpace;
-    private float usedPercentage;
-    private static final int numSettings = 20;
+    UserPreference preferences = new UserPreference();
     
     public static void main(String[] args) {
         launch(args);
@@ -126,7 +95,7 @@ public class PreferenceUI extends Application{
     }
     
     private BorderPane createSettingPane(){
-        readSettings();
+        preferences.readPreferences();
         BorderPane border = new BorderPane();
         
         TabPane tabs = new TabPane();
@@ -149,12 +118,12 @@ public class PreferenceUI extends Application{
         HBox hbox = new HBox();
         Button okButton = new Button("OK");
         okButton.setPrefWidth(70);
-        okButton.setOnAction(event -> {writeSettings(); exit(0);});
+        okButton.setOnAction(event -> {preferences.writePreferences(); exit(0);});
         Button cancelButton = new Button("Cancel");
         cancelButton.setPrefWidth(70);
         cancelButton.setOnAction(event -> {exit(1);});
         Button applyButton = new Button("Apply");
-        applyButton.setOnAction(event -> {writeSettings();});
+        applyButton.setOnAction(event -> {preferences.writePreferences();});
         applyButton.setPrefWidth(70);
         hbox.getChildren().addAll(okButton, cancelButton, applyButton);
         hbox.setAlignment(Pos.CENTER_RIGHT);
@@ -166,35 +135,6 @@ public class PreferenceUI extends Application{
 
         return border;
     } 
-    
-    private void initSettings(){
-    //System Pane
-    runOnStartUp = true;
-    hideInToolbar = true;
-    //Hotkeys Pane
-    extendWordHotkey = new String[]{"Ctrl","Alt","Z"};
-    reduceWordHotkey = new String[]{"Ctrl","Alt","X"};
-    extendSentenceHotkey = new String[]{"Ctrl","Alt","C"};
-    reduceSentenceHotkey = new String[]{"Ctrl","Alt","V"};
-    extendParagraphHotkey = new String[]{"Ctrl","Alt","B"};
-    reduceParagraphHotkey = new String[]{"Ctrl","Alt","N"};
-    //Text Editor Pane
-    numMatchingTextDisplay = 5;
-    showTextSource = true;
-    boxColour = Color.WHITE;
-    textColour = Color.BLACK;
-    boxTransparency = 0;
-    //Blocked List Pane
-    //Path Pane
-    dataPath = "C:/User/Desktop";
-    showPreviewText = true;
-    clearCachesTime = "device is off";
-    //Storage Pane
-    maxTextSizeStored = 100;
-    previewTextLength = "one sentence";
-    usedSpace = 2;
-    usedPercentage = 10;
-    }
     
     private BorderPane createTutorialPane(){
         BorderPane border = new BorderPane();
@@ -262,9 +202,9 @@ public class PreferenceUI extends Application{
         Label label1 = new Label("Run on start up");
         Label label2 = new Label("Hide in toolbar when close");
         CheckBox checkbox1 = new CheckBox();
-        checkbox1.setSelected(runOnStartUp);
+        checkbox1.setSelected(preferences.isRunOnStartUp());
         CheckBox checkbox2 = new CheckBox();
-        checkbox2.setSelected(hideInToolbar);
+        checkbox2.setSelected(preferences.isHideInToolbar());
         grid.add(label1, 0, 0);
         grid.add(checkbox1, 1, 0);
         grid.add(label2, 0, 1);
@@ -306,12 +246,12 @@ public class PreferenceUI extends Application{
         for (int i=0; i < labels.length; i++){
             String[] hotkey;
             switch(i){
-                case 0: hotkey = extendWordHotkey; break;
-                case 1: hotkey = reduceWordHotkey; break;
-                case 2: hotkey = extendSentenceHotkey; break;
-                case 3: hotkey = reduceSentenceHotkey; break;
-                case 4: hotkey = extendParagraphHotkey; break;
-                case 5: hotkey = reduceParagraphHotkey; break; 
+                case 0: hotkey = preferences.getExtendWordHotkey(); break;
+                case 1: hotkey = preferences.getReduceWordHotkey(); break;
+                case 2: hotkey = preferences.getExtendSentenceHotkey(); break;
+                case 3: hotkey = preferences.getReduceSentenceHotkey(); break;
+                case 4: hotkey = preferences.getExtendParagraphHotkey(); break;
+                case 5: hotkey = preferences.getReduceParagraphHotkey(); break; 
                 default: hotkey = new String[3];    
             }
             boxes[2*i].setValue(hotkey[0]);
@@ -349,17 +289,17 @@ public class PreferenceUI extends Application{
         spinner.setValueFactory(svf);
         spinner.setEditable(true);
         spinner.setPrefWidth(70);
-        spinner.increment(numMatchingTextDisplay-1);
+        spinner.increment(preferences.getNumMatchingTextDisplay()-1);
 
         CheckBox checkbox = new CheckBox();
-        checkbox.setSelected(showTextSource);
+        checkbox.setSelected(preferences.isShowTextSource());
         
         ColorPicker boxColorPicker = new ColorPicker();
-        boxColorPicker.setValue(boxColour);
+        boxColorPicker.setValue(preferences.getBoxColour());
         boxColorPicker.setStyle("-fx-color-label-visible: false;");
         
         ColorPicker textColorPicker = new ColorPicker();
-        textColorPicker.setValue(textColour);
+        textColorPicker.setValue(preferences.getTextColour());
         textColorPicker.setStyle("-fx-color-label-visible: false;");
         
         Slider transparency = new Slider();
@@ -368,7 +308,7 @@ public class PreferenceUI extends Application{
         transparency.setShowTickLabels(true);
         transparency.setShowTickMarks(true);
         transparency.setMajorTickUnit(50);
-        transparency.setValue(boxTransparency);
+        transparency.setValue(preferences.getBoxTransparency());
       
         grid.add(label1, 0, 0);
         grid.add(label2, 0, 1);
@@ -424,15 +364,15 @@ public class PreferenceUI extends Application{
         TextField pathField = new TextField();
         pathField.setEditable(false);
         pathField.setMinWidth(300);
-        pathField.setText(dataPath);
+        pathField.setText(preferences.getDataPath());
         Button pathButton = new Button("Browse");
         CheckBox checkbox = new CheckBox();
-        checkbox.setSelected(showPreviewText);
+        checkbox.setSelected(preferences.isShowPreviewText());
         Label label2 = new Label("Store preview text as caches to improve matching speed");
         Label label3 = new Label("Clear caches after ");
         ChoiceBox cb = new ChoiceBox();
         cb.setItems(FXCollections.observableArrayList("device is off", "one day", "one week", "never"));
-        cb.setValue(clearCachesTime);
+        cb.setValue(preferences.getClearCachesTime());
         
         grid.add(label1, 0, 0);
         grid.add(pathField, 0, 1);
@@ -455,13 +395,13 @@ public class PreferenceUI extends Application{
         Label label1 = new Label("Store single text size of at most");
         ChoiceBox cb1 = new ChoiceBox();
         cb1.setItems(FXCollections.observableArrayList("100MB", "500MB", "1GB", "unlimited"));
-        cb1.setValue(maxTextSizeStored + "MB");
+        cb1.setValue(preferences.getMaxTextSizeStored() + "MB");
         Label label2 = new Label("Preview text length");
         ChoiceBox cb2 = new ChoiceBox();
         cb2.setItems(FXCollections.observableArrayList("one sentence", "two sentence", "three words", "one paragraph"));
-        cb2.setValue(previewTextLength);
-        Label label3 = new Label("Used space: " + usedSpace + "/20.0 GB");
-        Label label4 = new Label("Used percentage: " + usedPercentage + "%");  
+        cb2.setValue(preferences.getPreviewTextLength());
+        Label label3 = new Label("Used space: " + preferences.getUsedSpace() + "/20.0 GB");
+        Label label4 = new Label("Used percentage: " + preferences.getUsedPercentage() + "%");  
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
                new PieChart.Data("Used Space", 10), new PieChart.Data("FreeSpace", 90));
         PieChart pieChart = new PieChart(pieChartData);
@@ -476,82 +416,5 @@ public class PreferenceUI extends Application{
         grid.add(label4, 1, 4);
         
         return grid;
-    }
-    
-    private void readSettings(){
-        String filename = "settings.txt";
-        
-        try{
-            FileReader fileReader = new FileReader(filename);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String[] settings = new String[numSettings];
-            for (int i=0; i < numSettings; i++){
-                settings[i] = bufferedReader.readLine();
-            }
-            //System Pane
-            runOnStartUp = Boolean.valueOf(settings[0]);
-            hideInToolbar = Boolean.valueOf(settings[1]);
-            //Hotkeys Pane
-            extendWordHotkey = settings[2].substring(1, settings[2].length()-1).split(",\\s+");
-            reduceWordHotkey = settings[3].substring(1, settings[3].length()-1).split(",\\s+");
-            extendSentenceHotkey = settings[4].substring(1, settings[4].length()-1).split(",\\s+");
-            reduceSentenceHotkey = settings[5].substring(1, settings[5].length()-1).split(",\\s+");
-            extendParagraphHotkey = settings[6].substring(1, settings[6].length()-1).split(",\\s+");
-            reduceParagraphHotkey = settings[7].substring(1, settings[7].length()-1).split(",\\s+");
-            //Text Editor Pane
-            numMatchingTextDisplay = Integer.valueOf(settings[8]);
-            showTextSource = Boolean.valueOf(settings[9]);
-            boxColour = Color.valueOf(settings[10]);
-            textColour = Color.valueOf(settings[11]);
-            boxTransparency = Integer.valueOf(settings[12]);;
-            //Blocked List Pane
-            //Path Pane
-            dataPath = settings[13];
-            showPreviewText = Boolean.valueOf(settings[14]);
-            clearCachesTime = settings[15];
-            //Storage Pane
-            maxTextSizeStored = Integer.valueOf(settings[16]);
-            previewTextLength = settings[17];
-            usedSpace = Float.valueOf(settings[18]);
-            usedPercentage = Float.valueOf(settings[19]);
-            
-            bufferedReader.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("File " + filename + " not found");
-        } catch (IOException ex) {
-            System.out.println("Error reading file " + filename);
-        }
-    }
-    
-    private void writeSettings(){
-        String filename = "settings.txt";
-        
-        try{
-            FileWriter fileWriter = new FileWriter(filename);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(String.valueOf(runOnStartUp)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(hideInToolbar)); bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(extendWordHotkey)); bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(reduceWordHotkey)); bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(extendSentenceHotkey)); bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(reduceSentenceHotkey)); bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(extendParagraphHotkey)); bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(reduceParagraphHotkey)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(numMatchingTextDisplay)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(showTextSource)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(boxColour)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(textColour)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(boxTransparency)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(dataPath)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(showPreviewText)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(clearCachesTime)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(maxTextSizeStored)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(previewTextLength)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(usedSpace)); bufferedWriter.newLine();
-            bufferedWriter.write(String.valueOf(usedPercentage));
-            bufferedWriter.close();
-        } catch (IOException ex) {
-            System.out.println("Error writing file " + filename);
-        }
     }
 }
