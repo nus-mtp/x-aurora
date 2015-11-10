@@ -1,6 +1,7 @@
 package xaurora.communication;
 
 import java.io.BufferedReader;
+import java.util.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -68,7 +69,10 @@ public class WordServer implements Runnable{
 			res = "200";
 		else {
 			res = "Received\n";
-			res += PrefixMatcher.getResult(input);
+			ArrayList<String> result = PrefixMatcher.getResult(input);
+			for(int i = 0;i<result.size();i++){
+				res+=result.get(i);
+			}
 		}
 		return res;
 	}

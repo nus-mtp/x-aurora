@@ -18,7 +18,7 @@ public class Security {
 	public static byte[] encrypt(byte[] content){
 		try {
 			IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
-			SecretKeySpec skeySpec = new SecretKeySpec("XauroraXaurora12".getBytes("UTF-8"), "AES/CBC/PKCS5PADDING");
+			SecretKeySpec skeySpec = new SecretKeySpec("XauroraXaurora12".getBytes("UTF-8"), "AES");
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 			cipher.init(Cipher.ENCRYPT_MODE, skeySpec,iv);
 			//System.out.println(cipher.doFinal(content));
@@ -33,7 +33,7 @@ public class Security {
 	public static byte[] decrypt(byte[] content){
 		try {
 			IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
-			SecretKeySpec skeySpec = new SecretKeySpec("XauroraXaurora12".getBytes("UTF-8"), "AES/CBC/PKCS5PADDING");
+			SecretKeySpec skeySpec = new SecretKeySpec("XauroraXaurora12".getBytes("UTF-8"), "AES");
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 			cipher.init(Cipher.DECRYPT_MODE, skeySpec,iv);
 			//System.out.println(c.doFinal(content));
