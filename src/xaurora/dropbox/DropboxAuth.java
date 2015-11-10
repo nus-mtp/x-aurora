@@ -30,6 +30,8 @@ public class DropboxAuth {
 				index = i;
 				userID = parseUserID(url);
 				accessToken = parseAccessToken(url);
+				Auth();
+				DropboxMain.startCall();
 				break;
 			}
 		}
@@ -47,7 +49,7 @@ public class DropboxAuth {
 		return token[0];	
 	}
 	
-	public static DbxClient Auth() throws DbxException{
+	public static DbxClient Auth(){
 
 		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
 				Locale.getDefault().toString());
@@ -58,8 +60,21 @@ public class DropboxAuth {
 		return client;
 	}
 	
-	public static void setUserProfile() throws DbxException{
-		DbxAccountInfo account = client.getAccountInfo();
+	public boolean isConnectionEstablised(){
+		if (client != null){
+			return true;
+		}
+		return false;
+	}
+	
+	public static void setUserProfile(){
+		DbxAccountInfo account = null;
+		try {
+			account = client.getAccountInfo();
+		} catch (DbxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		UserProfile user = new UserProfile();
 		user.setUserID(userID);
@@ -67,16 +82,7 @@ public class DropboxAuth {
 		user.setUserName(account.displayName);
 		user.setEmail(account.email);
 		user.setStorage(formulateStorage(bytesToGB(account.quota.normal),bytesToGB(account.quota.total)));
-		
-		File f = new File("/" + userID + "/");
-		try {
-			f.createNewFile();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String path = f.getAbsolutePath();
-		user.setPath(path);
+		user.setPath("/" + userID + "/");
 		user.setCurrent();
 		DropboxMain.user.set(index, user);
 		DropboxMain.setCurrentIndex(index);

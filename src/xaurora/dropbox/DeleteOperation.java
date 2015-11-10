@@ -5,8 +5,13 @@ import com.dropbox.core.DbxException;
 
 public class DeleteOperation {
 
-	public void DeleteSingleFile(String fileName, DbxClient client) throws DbxException{
+	public static void DeleteSingleFile(String fileName, DbxClient client){
 		String filePath = "/" + fileName;
-		client.delete(filePath);
+		try {
+			client.delete(filePath);
+		} catch (DbxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

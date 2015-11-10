@@ -15,12 +15,12 @@ public class UserProfile {
 	private boolean current;
 	
 	public UserProfile(){	
-		accessToken = null;
-		userName = null;
-		emailAddress = null;
-		storage = null;
-		path = null;
-		userID = null;
+		accessToken = "";
+		userName = "";
+		emailAddress = "";
+		storage = "";
+		path = "/";
+		userID = "";
 		current = false;
 	}
 	
