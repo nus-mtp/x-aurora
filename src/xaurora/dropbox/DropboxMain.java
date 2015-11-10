@@ -15,11 +15,12 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 
 public class DropboxMain {
-	public static final ArrayList<UserProfile> user = null;
+	public static ArrayList<UserProfile> user = null;
 	
 	private static int currentUserIndex;
 	private static DbxClient client;
-	public static void startCall() throws DbxException{
+	private ArrayList<String> metaData = null;
+	public static void startCall(){
 		client  = DropboxAuth.Auth();
 	}
 
@@ -28,17 +29,63 @@ public class DropboxMain {
 	}
 	
 	public static UserProfile getCurrentUser(){
+		while (!user.isEmpty()){
+			
+		}
 		return user.get(currentUserIndex);
 	}
 	
+	public boolean isConnectedEstablised(){
+		if (client != null){
+			return true;
+		}
+		return false;
+	}
 	
 	public void getAllMetaData() throws DbxException{
 		DbxEntry.WithChildren listing = client.getMetadataWithChildren("/");
 		System.out.println("Files in the root path:");
+		metaData = null;
 		for (DbxEntry child : listing.children) {
-			System.out.println("	" + child.name + ": " + child.toString());
+			metaData.add(child.toString());
 		}
 	}
+	
+	private void checkLocalFiles(File f){
+		try {
+			getAllMetaData();
+		} catch (DbxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		boolean isUploaded = false;
+		String fileName = f.getName();
+		for (int i = 0; i < metaData.size(); i++){
+			if (compareFileName(f,metaData.get(i))){
+				int compareTime = compareTime(f,metaData.get(i));
+				if (compareTime == 0){
+					isUploaded = true;
+				} else if (compareTime > 0){
+					DeleteOperation.DeleteSingleFile(fileName, client);
+					UploadOperation.UploadSingleFile(fileName, client);
+					isUploaded = true;
+				} else if (compareTime < 0){
+					if(f.delete()){
+		    			System.out.println(fileName + " is deleted!");
+		    		}else{
+		    			System.out.println("Delete operation is failed.");
+		    		}
+					DownloadOperation.DownloadSingleFile(fileName,client);
+					isUploaded = true;
+				}
+			}
+		}
+		if (!isUploaded){
+			UploadOperation.UploadSingleFile(fileName, client);
+		}
+	}
+	
+	
 	
 	private String getLastModified (String meta){
 		String[] parts = meta.split("=");
@@ -54,12 +101,18 @@ public class DropboxMain {
 		return dateFormat.format(d);
 	}
 	
-	private int compareTime(File f, String meta) throws ParseException{
+	private int compareTime(File f, String meta){
 		String localFile = convertToUTC(f.lastModified());
 		String onlineFile = getLastModified(meta);
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date local = format.parse(localFile);
-		Date online = format.parse(onlineFile);
+		Date local = null, online = null;
+		try {
+			local = format.parse(localFile);
+			online = format.parse(onlineFile);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return local.compareTo(online);
 	}
