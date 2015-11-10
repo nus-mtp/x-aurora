@@ -4,7 +4,7 @@ import xaurora.dropbox.*;
 import xaurora.security.*;
 import java.util.*;
 public class DataFileIO {
-	private String syncDirectory = "";
+	private String syncDirectory = "\\local_data\\";
 	private static DataFileIO instance = null;
 	private DataFileIO(){
 		
@@ -109,7 +109,7 @@ public class DataFileIO {
 	}
 	
 	private static String getExtension(File f) {
-        String ext = null;
+        String ext = "";
         String s = f.getName();
         int i = s.lastIndexOf('.');
 
