@@ -59,7 +59,7 @@ public class DropboxAuth {
 		return client;
 	}
 	
-	public boolean isConnectedEstablised(){
+	public boolean isConnectionEstablised(){
 		if (client != null){
 			return true;
 		}
