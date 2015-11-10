@@ -302,5 +302,5 @@ public class UserPreference {
     public void setPreviewTextLength(String previewTextLength) {
         this.previewTextLength = previewTextLength;
     }
->>>>>>> cddd6f55378b1c1fdcdaab00c9597cc6c00b406a
+
 }
