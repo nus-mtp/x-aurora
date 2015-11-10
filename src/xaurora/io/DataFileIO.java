@@ -1,5 +1,6 @@
 package xaurora.io;
 import java.io.*;
+import xaurora.security.*;
 public class DataFileIO {
 	private String syncDirectory = "";
 	private static DataFileIO instance = null;
@@ -32,7 +33,9 @@ public class DataFileIO {
 			try{
 				dstFile.createNewFile();
 				FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
-				fos.write(content);
+				Security c = Security.getInstance();
+				
+				fos.write(c.encrypt(content));
 				fos.close();
 			} catch(IOException e){
 				
