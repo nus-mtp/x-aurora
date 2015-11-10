@@ -12,11 +12,11 @@ import xaurora.dropbox.*;
 import xaurora.io.DataFileIO;
 import xaurora.io.IDGenerator;
 
-public class SimpleServer implements Runnable{
+public class BrowserServer implements Runnable{
 	ServerSocket server = null;
 	Socket client = null;
 	private static final int TYPE_FULL_TEXT = 0;
-	public SimpleServer(int port) {
+	public BrowserServer(int port) {
 		try{
 			server = new ServerSocket(6789);
 			client = server.accept();

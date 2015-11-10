@@ -19,6 +19,9 @@ public class DataFileIO {
 		this.syncDirectory = path;
 		return true;
 	}
+	public String getDirectory(){
+		return this.syncDirectory;
+	}
 	public void createDataFile(byte[] filename,byte[] content){
 		String dstpath = this.syncDirectory+String.valueOf(filename+".txt");
 		File dstFile = new File(dstpath);
