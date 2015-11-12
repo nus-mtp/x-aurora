@@ -31,6 +31,7 @@ public class DropboxMain {
 		client  = DropboxAuth.Auth();
 		currentUser = user.get(currentUserIndex);
 		DataFileIO.instanceOf().setDirectory(currentUser.getPath());
+		//naming convention
 		ifExpired();
 	}
 
@@ -98,6 +99,7 @@ public class DropboxMain {
 		}
 		for (int i = 0; i < list.size(); i++){
 			if (compareFileName(f,list.get(i).toString())){
+				//why the program breaks all the time
 				int compareTime = compareTime(f,list.get(i).toString());
 				if (compareTime == 0){
 					isUploaded = true;
