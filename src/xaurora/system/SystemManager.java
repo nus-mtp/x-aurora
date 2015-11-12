@@ -29,7 +29,8 @@ public class SystemManager {
     public void login(boolean isLogin) {
         this.isLogin = isLogin;
         if (this.isLogin) {
-            this.io.setDirectory(DropboxMain.getCurrentUser().getPath());
+        	this.io.setDirectory(UNSYNC_DATA_PATH);
+            //this.io.setDirectory(DropboxMain.getCurrentUser().getPath());
         } else {
             this.io.setDirectory(UNSYNC_DATA_PATH);
         }
