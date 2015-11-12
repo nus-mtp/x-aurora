@@ -19,20 +19,20 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 
 public class DropboxMain {
-	public static ArrayList<UserProfile> user = null;
+	public static ArrayList<UserProfile> user = new ArrayList<UserProfile>();
 
-	private static int currentUserIndex;
+	protected static int currentUserIndex;
 	private static DbxClient client = null;
-	private static ArrayList<String> metaData = null;
+	private static ArrayList<String> metaData = new ArrayList<String>();
 	private static UserProfile currentUser = null;
-	private static File[] fList = null;
-	private static ArrayList<File> expiredFiles = null;
+	private static File[] fList;
+	private static ArrayList<File> expiredFiles = new ArrayList<File>();
 
 	public static void startCall(){
 		client  = DropboxAuth.Auth();
 		currentUser = user.get(currentUserIndex);
 		DataFileIO.instanceOf().setDirectory(currentUser.getPath());
-		ifExpired();
+		sync();
 	}
 
 	public static void setCurrentIndex(int index){
@@ -61,7 +61,7 @@ public class DropboxMain {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		metaData = null;
+		metaData = new ArrayList<String>();
 		for (DbxEntry child : listing.children) {
 			metaData.add(child.toString());
 		}
@@ -78,11 +78,14 @@ public class DropboxMain {
 	private static void sync(){
 		getAllMetaData();
 		getAllLocalFile();
-		for (int i = 0; i < metaData.size(); i++){
-			checkOnlineFiles(metaData.get(i));
-		}
-		for (int j = 0; j < fList.length; j++){
-			checkLocalFiles(fList[j]);
+		if (!metaData.isEmpty() && fList != null){
+			for (int i = 0; i < metaData.size(); i++){
+				checkOnlineFiles(metaData.get(i));
+			}
+			for (int j = 0; j < fList.length; j++){
+				checkLocalFiles(fList[j]);
+			}
+			ifExpired();
 		}
 	}
 
@@ -142,9 +145,11 @@ public class DropboxMain {
 				break;
 			}
 		}
+		
 		if (!isDownloaded){
 			DownloadOperation.DownloadSingleFile(getFileName(metaData), client);
 		}
+		
 	}
 
 	private static String getLastModified (String meta){
@@ -190,7 +195,6 @@ public class DropboxMain {
 	}
 
 	private static void ifExpired(){
-		sync();
 		expiredFiles = null;
 		for (int i = 0; i < fList.length; i++){
 			long ts = System.currentTimeMillis();

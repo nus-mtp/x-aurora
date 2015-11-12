@@ -1,10 +1,6 @@
 package xaurora.util;
 
 public class UserProfile {
-
-	private final String APP_KEY = "4tpptik431fwlqo";
-	
-	private final String APP_SECRET = "xe5robnc898oy37";
 	
 	private String accessToken;	
 	private String userName;	
@@ -12,8 +8,7 @@ public class UserProfile {
 	private String storage;
 	private String path;
 	private String userID;
-	private boolean current;
-	
+
 	public UserProfile(){	
 		accessToken = "";
 		userName = "";
@@ -21,7 +16,15 @@ public class UserProfile {
 		storage = "";
 		path = "/";
 		userID = "";
-		current = false;
+	}
+	
+	public UserProfile(String token, String name, String email, String storage, String path, String id){
+		this.accessToken = token;
+		this.userName = name;
+		this.emailAddress = email;
+		this.storage = storage;
+		this.path = path;
+		this.userID = id;
 	}
 	
 	public void setAccessToken(String token){
@@ -71,21 +74,11 @@ public class UserProfile {
 	public String getUserID(){
 		return userID;
 	}
-	
-	public void setCurrent(){
-		current = true;
-	}
-	
-	public String getCurrent(){
-		if (current == true){
-			return "User is current account";
-		}
-		return "User is not current account";
-	}
+
 	
 	public String toString(){
 		String userInfo = "UserName: " + userName + "\nEmail: " + emailAddress + "\nUserID: " + userID + 
-				"\nStorage: " + storage + "\nLocal file is stored at: " + storage + "\n" + getCurrent() + "\n";
+				"\nStorage: " + storage + "\nLocal file is stored at: " + path;// + "\n" + getCurrent() + "\n";
 		return userInfo;
 	}
 

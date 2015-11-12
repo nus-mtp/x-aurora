@@ -15,10 +15,9 @@ public class DropboxAuth {
 	final static String APP_KEY = "4tpptik431fwlqo";
 	final static String APP_SECRET = "xe5robnc898oy37";
 	
-	static String accessToken;
+	static String accessToken = "";
 	static String userID;
 	static int index;
-	static DbxClient client;
 	
 	public static void setAccessToken (String url){
 		boolean userAvailable = false;
@@ -33,9 +32,11 @@ public class DropboxAuth {
 				break;
 			}
 		}
+		
 		if (!userAvailable){
-			UserProfile newUser = new UserProfile();
 			index = DropboxMain.user.size();
+			UserProfile ram = new UserProfile();
+			DropboxMain.user.add(ram);
 			userID = parseUserID(url);
 			accessToken = parseAccessToken(url);
 			DropboxMain.startCall();
@@ -47,7 +48,7 @@ public class DropboxAuth {
 		return elements[3];	
 	}
 	
-	private static String parseAccessToken(String url){
+	protected static String parseAccessToken(String url){
 		String[] parts = url.split("=");
 		String[] token = parts[1].split("&");
 		
@@ -60,12 +61,12 @@ public class DropboxAuth {
 				Locale.getDefault().toString());
 
 		// Now use the access token to make Dropbox API calls.
-        client = new DbxClient(config, accessToken);
-		setUserProfile();
+		DbxClient client = new DbxClient(config, accessToken);
+		setUserProfile(client);
 		return client;
 	}
 	
-	private static void setUserProfile(){
+	protected static void setUserProfile(DbxClient client){
 		DbxAccountInfo account = null;
 		try {
 			account = client.getAccountInfo();
@@ -81,18 +82,18 @@ public class DropboxAuth {
 		user.setEmail(account.email);
 		user.setStorage(formulateStorage(bytesToGB(account.quota.normal),bytesToGB(account.quota.total)));
 		user.setPath("/" + userID + "/");
-		user.setCurrent();
+		//user.setCurrent();
 		DropboxMain.user.set(index, user);
 		DropboxMain.setCurrentIndex(index);
-		System.out.println(user.toString());
+		//System.out.println(user.toString());
 		
 	}
 	
-	private static String formulateStorage (String used, String total){
+	protected static String formulateStorage (String used, String total){
 		return used + "GB is used out of " + total + "GB";
 	}
 	
-	private static String bytesToGB(long quota){		
+	protected static String bytesToGB(long quota){		
 		double GB = (double) quota / (1024.0*1024.0*1024.0);
 		DecimalFormat df = new DecimalFormat("#.##");
 		
