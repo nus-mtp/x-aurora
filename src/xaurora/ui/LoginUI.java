@@ -45,11 +45,7 @@ public class LoginUI extends Application{
         borderPane.setTop(title);
         borderPane.setCenter(grid);
         borderPane.setBottom(hbox);
-<<<<<<< HEAD
         //magic number
-=======
-        
->>>>>>> 07bf9569151ae3dcce0c479b503fbd63adf3543a
         Scene scene = new Scene(borderPane, 500, 300);
         return scene;
     }
@@ -89,8 +85,8 @@ public class LoginUI extends Application{
         
         Button loginButton = new Button("Login to Dropbox");
         loginButton.setOnAction(event -> {
+        	SystemManager.getInstance().login(true);
             getHostServices().showDocument(loginPage);
-            SystemManager.getInstance().login(true);
         });
         grid.add(loginButton, 1, 0);
         

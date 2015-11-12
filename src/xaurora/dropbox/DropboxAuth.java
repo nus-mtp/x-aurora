@@ -13,7 +13,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 
 public class DropboxAuth {
-
+	//unclear declaration
 	final static String APP_KEY = "4tpptik431fwlqo";
 	final static String APP_SECRET = "xe5robnc898oy37";
 	
@@ -36,19 +36,20 @@ public class DropboxAuth {
 			}
 		}
 	}
-	
+	//why you need to set it to public?
 	public static String parseUserID(String url){
+		//magin string magic number
 		String[] elements = url.split("=");
 		return elements[3];	
 	}
-	
+	//why public
 	public static String parseAccessToken(String url){
 		String[] parts = url.split("=");
 		String[] token = parts[1].split("&");
 		
 		return token[0];	
 	}
-	
+	//why public?
 	public static DbxClient Auth(){
 		//magic String
 		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
@@ -59,7 +60,7 @@ public class DropboxAuth {
 		setUserProfile();
 		return client;
 	}
-	
+	//why it is non-static?
 	public boolean isConnectionEstablised(){
 		if (client != null){
 			return true;
