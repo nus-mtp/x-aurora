@@ -1,0 +1,18 @@
+true
+true
+[Ctrl, Alt, Z]
+[Shift, Ctrl, X]
+[Shift, Ctrl, C]
+[Shift, Ctrl, V]
+[Shift, Ctrl, B]
+[Shift, Ctrl, N]
+5
+true
+0xffffffff
+0x000000ff
+0.0
+C:\Users\Lee\Documents
+true
+device is off
+100MB
+one sentence

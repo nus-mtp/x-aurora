@@ -1,4 +1,3 @@
-
 package xaurora.ui;
 
 import javafx.application.Application;
@@ -41,9 +40,11 @@ public class LoginUI extends Application{
         HBox title = createTitle();
         GridPane grid = createLoginForm();
         HBox hbox = createSkipLoginBar();
+        
         borderPane.setTop(title);
         borderPane.setCenter(grid);
         borderPane.setBottom(hbox);
+        
         Scene scene = new Scene(borderPane, 500, 300);
         return scene;
     }
@@ -80,7 +81,10 @@ public class LoginUI extends Application{
         grid.add(dropboxView, 0, 0);
         
         Button loginButton = new Button("Login to Dropbox");
-        loginButton.setOnAction(event -> {SystemManager.getInstance().login(true);getHostServices().showDocument(loginPage);});
+        loginButton.setOnAction(event -> {
+            getHostServices().showDocument(loginPage);
+            SystemManager.getInstance().login(true);
+        });
         grid.add(loginButton, 1, 0);
         
         /*****
@@ -117,7 +121,7 @@ public class LoginUI extends Application{
         
         Label warning = new Label("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
-        Button skipButton = new Button("Skip login");;
+        Button skipButton = new Button("Skip login");
         skipButton.setOnAction(event -> {
             SystemManager.getInstance().login(false);
             stage.setScene(preferenceUI.createPreferenceScene());

@@ -1,5 +1,9 @@
 package xaurora.io;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import xaurora.dropbox.*;
 import xaurora.security.*;
 import java.util.*;
@@ -82,19 +86,11 @@ public class DataFileIO {
 	}
 	private void readFileContent(ArrayList<String> content, File f) {
 		try{
-			InputStream in = new FileInputStream(f);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String data = "";
-			int temp = 0;
-			while (true){
-				temp = br.read();
-				if(temp == -1){
-					break;
-				}
-				data+=String.valueOf(temp);
-			}
+			Path path = Paths.get(f.getAbsolutePath());
+			byte[] data = Files.readAllBytes(path);
+			
 			Security c = Security.getInstance();
-			byte[] decrypted = c.decrypt(data.getBytes("UTF-8"));
+			byte[] decrypted = c.decrypt(data);
 			for(int i = 0;i<decrypted.length;i++){
 				System.out.println((char) decrypted[i]);
 			}
