@@ -5,11 +5,7 @@
  */
 
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Tab;
-import javafx.scene.input.MouseButton;
-import javafx.stage.Stage;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.loadui.testfx.GuiTest;

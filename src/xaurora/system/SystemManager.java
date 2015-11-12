@@ -12,7 +12,6 @@ public class SystemManager {
 
     public boolean updateDirectory(String dir) {
         return this.io.setDirectory(dir);
-
     }
 
     private SystemManager() {
@@ -29,8 +28,7 @@ public class SystemManager {
     public void login(boolean isLogin) {
         this.isLogin = isLogin;
         if (this.isLogin) {
-        	this.io.setDirectory(UNSYNC_DATA_PATH);
-            //this.io.setDirectory(DropboxMain.getCurrentUser().getPath());
+            this.io.setDirectory(UNSYNC_DATA_PATH);
         } else {
             this.io.setDirectory(UNSYNC_DATA_PATH);
         }
