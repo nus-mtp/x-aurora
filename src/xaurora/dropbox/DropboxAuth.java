@@ -1,7 +1,5 @@
 package xaurora.dropbox;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
@@ -23,26 +21,33 @@ public class DropboxAuth {
 	static DbxClient client;
 	
 	public static void setAccessToken (String url){
-		
+		boolean userAvailable = false;
 		for (int i = 0; i< DropboxMain.user.size(); i++){
 			UserProfile demo = DropboxMain.user.get(i);
 			if (demo.getAccessToken()==null){
+				userAvailable = true;
 				index = i;
 				userID = parseUserID(url);
 				accessToken = parseAccessToken(url);
-				Auth();
 				DropboxMain.startCall();
 				break;
 			}
 		}
+		if (!userAvailable){
+			UserProfile newUser = new UserProfile();
+			index = DropboxMain.user.size();
+			userID = parseUserID(url);
+			accessToken = parseAccessToken(url);
+			DropboxMain.startCall();
+		}
 	}
 	
-	public static String parseUserID(String url){
+	protected static String parseUserID(String url){
 		String[] elements = url.split("=");
 		return elements[3];	
 	}
 	
-	public static String parseAccessToken(String url){
+	private static String parseAccessToken(String url){
 		String[] parts = url.split("=");
 		String[] token = parts[1].split("&");
 		
@@ -60,14 +65,7 @@ public class DropboxAuth {
 		return client;
 	}
 	
-	public boolean isConnectionEstablised(){
-		if (client != null){
-			return true;
-		}
-		return false;
-	}
-	
-	public static void setUserProfile(){
+	private static void setUserProfile(){
 		DbxAccountInfo account = null;
 		try {
 			account = client.getAccountInfo();
@@ -90,11 +88,11 @@ public class DropboxAuth {
 		
 	}
 	
-	public static String formulateStorage (String used, String total){
+	private static String formulateStorage (String used, String total){
 		return used + "GB is used out of " + total + "GB";
 	}
 	
-	public static String bytesToGB(long quota){		
+	private static String bytesToGB(long quota){		
 		double GB = (double) quota / (1024.0*1024.0*1024.0);
 		DecimalFormat df = new DecimalFormat("#.##");
 		
