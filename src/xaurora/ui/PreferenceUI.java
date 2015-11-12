@@ -92,27 +92,33 @@ public class PreferenceUI extends Application{
         return scene;
     }
     
-    private BorderPane createSettingPane(){
+    public BorderPane createSettingPane(){
         preferences.readPreferences();
         BorderPane border = new BorderPane();
         
         TabPane tabs = new TabPane();
         Tab tabSystem = new Tab("System");
+        tabSystem.setId("System");
         tabSystem.setContent(createSystemPane());
         Tab tabHotkeys = new Tab("Hotkeys");
+        tabHotkeys.setId("Hotkeys");
         tabHotkeys.setContent(createHotkeysPane());
         Tab tabTextEditor = new Tab("Text Editor");
+        tabTextEditor.setId("TextEditor");
         tabTextEditor.setContent(createTextEditorPane());
         Tab tabBlockedList = new Tab("Blocked List");
+        tabBlockedList.setId("BlockedList");
         tabBlockedList.setContent(createBlockedListPane());
         Tab tabPath = new Tab("Path");
+        tabPath.setId("Path");
         tabPath.setContent(createPathPane());
         Tab tabStorage = new Tab("Storage");
+        tabStorage.setId("Storage");
         tabStorage.setContent(createStoragePane());
         tabs.getTabs().addAll(tabSystem, tabHotkeys, tabTextEditor, tabBlockedList, tabPath, tabStorage);
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         //tabs.setSide(Side.LEFT);
-        
+
         HBox hbox = new HBox();
         Button okButton = new Button("OK");
         okButton.setPrefWidth(70);
@@ -200,9 +206,11 @@ public class PreferenceUI extends Application{
         Label label1 = new Label("Run on start up");
         Label label2 = new Label("Hide in toolbar when close");
         CheckBox checkbox1 = new CheckBox();
+        checkbox1.setId("checkbox1");
         checkbox1.setSelected(preferences.isRunOnStartUp());
         checkbox1.setOnAction(event -> {preferences.setIsRunOnStartUp(!preferences.isRunOnStartUp());});
         CheckBox checkbox2 = new CheckBox();
+        checkbox2.setId("checkbox2");
         checkbox2.setSelected(preferences.isHideInToolbar());
         checkbox2.setOnAction(event -> {preferences.setIsHideInToolbar(!preferences.isHideInToolbar());});
         grid.add(label1, 0, 0);
