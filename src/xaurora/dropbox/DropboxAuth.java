@@ -50,7 +50,7 @@ public class DropboxAuth {
 	}
 	
 	public static DbxClient Auth(){
-
+		//magic String
 		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
 				Locale.getDefault().toString());
 
@@ -91,13 +91,15 @@ public class DropboxAuth {
 	}
 	
 	public static String formulateStorage (String used, String total){
+		//Magic String
 		return used + "GB is used out of " + total + "GB";
 	}
 	
-	public static String bytesToGB(long quota){		
+	public static String bytesToGB(long quota){	
+		//Magic Numbers
 		double GB = (double) quota / (1024.0*1024.0*1024.0);
 		DecimalFormat df = new DecimalFormat("#.##");
-		
+		//Magic Strings
 		return df.format(GB);		
 	}
 }

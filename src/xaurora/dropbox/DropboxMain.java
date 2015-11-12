@@ -19,7 +19,7 @@ import com.dropbox.core.DbxException;
 
 public class DropboxMain {
 	public static ArrayList<UserProfile> user = null;
-
+	//Not effective and unsafe declarations which can cause null pointer exception.
 	private static int currentUserIndex;
 	private static DbxClient client = null;
 	private static ArrayList<String> metaData = null;

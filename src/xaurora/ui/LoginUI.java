@@ -32,6 +32,7 @@ public class LoginUI extends Application{
         stage.setTitle("x-aurora");      
         Scene loginScene = createLoginScene();
         stage.setScene(loginScene);
+        //magic string
         loginScene.getStylesheets().add("style.css");
         stage.show();
     }
@@ -44,15 +45,17 @@ public class LoginUI extends Application{
         borderPane.setTop(title);
         borderPane.setCenter(grid);
         borderPane.setBottom(hbox);
+        //magic number
         Scene scene = new Scene(borderPane, 500, 300);
         return scene;
     }
     
     private HBox createTitle(){
         HBox hbox = new HBox();
+        //magic number
         hbox.setPadding(new Insets(15, 10, 15, 10));
         hbox.setSpacing(20);
-        
+        //magic string
         Label title = new Label("x-aurora: simplify copy and paste");
         hbox.getChildren().add(title);
         hbox.setAlignment(Pos.CENTER);
@@ -62,6 +65,7 @@ public class LoginUI extends Application{
     
     private GridPane createLoginForm(){
         GridPane grid = new GridPane();
+        //magic number
         grid.setHgap(50);
         grid.setVgap(10);
         grid.setPadding(new Insets(10, 10, 10, 10));
@@ -114,7 +118,7 @@ public class LoginUI extends Application{
         hbox.setPadding(new Insets(15, 10, 15, 10));
         hbox.setSpacing(20);
         hbox.setAlignment(Pos.CENTER_RIGHT);
-        
+        //magic string
         Label warning = new Label("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
         Button skipButton = new Button("Skip login");;

@@ -14,12 +14,15 @@ public class Main {
 		Thread chromeSvrThread = new Thread(chromeSvr);
 		Thread wordSvrThread = new Thread(wordSvr);
 		
+		//Establish connection between browser/editor and logic
 		chromeSvrThread.start();
 		wordSvrThread.start();
+		
 		SystemManager sa = SystemManager.getInstance();
         sa.login(false);
         //LoginUI.main(null);
-		Security s = Security.getInstance();
+        //Testing code
+		/*Security s = Security.getInstance();
 		try{
 			s.encrypt("abcdefg123423kva sdjfkjw".getBytes("UTF-8"));
 			for(int i =0;i<s.decrypt(s.encrypt("abcdefg123423kva sdjfkjw".getBytes("UTF-8"))).length;i++){
@@ -28,7 +31,7 @@ public class Main {
 			}
 		} catch(Exception e){
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 }
