@@ -60,7 +60,7 @@ public class PreferenceUI extends Application{
     public Scene createPreferenceScene(){    
         BorderPane border = new BorderPane();
         AnchorPane anchor = new AnchorPane();
-                
+               //Magic Strings
         TabPane tabs = new TabPane();
         Tab tabSetting = new Tab("Setting");
         tabSetting.setContent(createSettingPane());
@@ -91,7 +91,8 @@ public class PreferenceUI extends Application{
         Scene scene = new Scene(border, 600, 400);
         return scene;
     }
-    
+    //Labels and Buttons can be put into array or other data structures instead of hard coding
+    //them 1 by 1
     public BorderPane createSettingPane(){
         preferences.readPreferences();
         BorderPane border = new BorderPane();

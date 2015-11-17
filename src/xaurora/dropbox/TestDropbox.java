@@ -1,13 +1,9 @@
 package xaurora.dropbox;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import org.junit.Test;
 
 import xaurora.util.UserProfile;
-
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxRequestConfig;
 
 import static org.junit.Assert.*;
 
@@ -22,6 +18,7 @@ public class TestDropbox {
 	String userID1 = DropboxAuth.parseUserID(url1);
 	String id2 = "29232429";
 	String userID2 = DropboxAuth.parseUserID(url2);
+	
 	@Test
 	public void testParseUserID() {
 		System.out.println("@Test parseUserID(): " + userID1 + " = " + id1);

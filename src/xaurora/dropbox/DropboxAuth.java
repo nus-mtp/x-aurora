@@ -11,7 +11,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 
 public class DropboxAuth {
-
+	//unclear declaration
 	final static String APP_KEY = "4tpptik431fwlqo";
 	final static String APP_SECRET = "xe5robnc898oy37";
 	
@@ -90,13 +90,15 @@ public class DropboxAuth {
 	}
 	
 	protected static String formulateStorage (String used, String total){
+		//Magic String
 		return used + "GB is used out of " + total + "GB";
 	}
 	
 	protected static String bytesToGB(long quota){		
+		//Magic String
 		double GB = (double) quota / (1024.0*1024.0*1024.0);
 		DecimalFormat df = new DecimalFormat("#.##");
-		
+		//Magic String
 		return df.format(GB);		
 	}
 }
