@@ -19,15 +19,11 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 
 public class DropboxMain {
-<<<<<<< HEAD
+
 	public static ArrayList<UserProfile> user = new ArrayList<UserProfile>();
 
 	protected static int currentUserIndex;
-=======
-	public static ArrayList<UserProfile> user = null;
-	//Not effective and unsafe declarations which can cause null pointer exception.
-	private static int currentUserIndex;
->>>>>>> origin/master
+
 	private static DbxClient client = null;
 	private static ArrayList<String> metaData = new ArrayList<String>();
 	private static UserProfile currentUser = null;
@@ -38,12 +34,9 @@ public class DropboxMain {
 		client  = DropboxAuth.Auth();
 		currentUser = user.get(currentUserIndex);
 		DataFileIO.instanceOf().setDirectory(currentUser.getPath());
-<<<<<<< HEAD
+
 		sync();
-=======
-		//naming convention
-		ifExpired();
->>>>>>> origin/master
+
 	}
 
 	public static void setCurrentIndex(int index){
