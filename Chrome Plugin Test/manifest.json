@@ -1,13 +1,14 @@
 {
-    "name": "2333",
-    "version": "0.2",
+    "name": "X-Aurora Browser Plugin for Chrome",
+    "version": "1.0",
     "manifest_version": 2,
-    "description": "X-aurora Browser Test Extractor",
+    "description":  
+        "X-aurora Browser Test Extractor for Chrome. It can extract out pure text contents in most not blocked websites.",
     "content_scripts" : [
-        {"js": ["content.js"], "matches": ["<all_urls>"]}
+        {"js": ["extractor.js"], "matches": ["<all_urls>"]}
     ],
     "background": { 
-        "scripts": ["background.js"]
+        "scripts": ["variables.js","connector.js","main.js"]
     },
     "permissions": ["tabs"]
 }
