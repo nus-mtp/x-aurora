@@ -21,18 +21,7 @@ public class Main {
 		
 		SystemManager sa = SystemManager.getInstance();
         sa.login(false);
-        //LoginUI.main(null);
-        //Testing code
-		/*Security s = Security.getInstance();
-		try{
-			s.encrypt("abcdefg123423kva sdjfkjw".getBytes("UTF-8"));
-			for(int i =0;i<s.decrypt(s.encrypt("abcdefg123423kva sdjfkjw".getBytes("UTF-8"))).length;i++){
-				System.out.print("abcdefg123423kva sdjfkjw".getBytes("UTF-8")[i]);
-				System.out.print((char)s.decrypt(s.encrypt("abcdefg123423kva sdjfkjw".getBytes("UTF-8")))[i]);
-			}
-		} catch(Exception e){
-			e.printStackTrace();
-		}*/
+        
 	}
 
 }
