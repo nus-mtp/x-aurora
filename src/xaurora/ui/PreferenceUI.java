@@ -2,10 +2,9 @@ package xaurora.ui;
 
 import java.io.File;
 import static java.lang.System.exit;
+import java.util.ArrayList;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -22,9 +21,12 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -34,7 +36,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import xaurora.util.BlockedPage;
 import xaurora.util.UserPreference;
+import xaurora.util.BrowsedPage;
 
 /**
  *
@@ -60,7 +65,6 @@ public class PreferenceUI extends Application{
     public Scene createPreferenceScene(){    
         BorderPane border = new BorderPane();
         AnchorPane anchor = new AnchorPane();
-               //Magic Strings
         TabPane tabs = new TabPane();
         Tab tabSetting = new Tab("Setting");
         tabSetting.setContent(createSettingPane());
@@ -91,8 +95,7 @@ public class PreferenceUI extends Application{
         Scene scene = new Scene(border, 600, 400);
         return scene;
     }
-    //Labels and Buttons can be put into array or other data structures instead of hard coding
-    //them 1 by 1
+
     public BorderPane createSettingPane(){
         preferences.readPreferences();
         BorderPane border = new BorderPane();
@@ -128,12 +131,10 @@ public class PreferenceUI extends Application{
         cancelButton.setPrefWidth(70);
         cancelButton.setOnAction(event -> {exit(1);});
         Button applyButton = new Button("Apply");
-        applyButton.setOnAction(event -> {preferences.writePreferences();});
         applyButton.setPrefWidth(70);
+        applyButton.setOnAction(event -> {preferences.writePreferences();});
         hbox.getChildren().addAll(okButton, cancelButton, applyButton);
         hbox.setAlignment(Pos.CENTER_RIGHT);
-        border.setCenter(tabs);
-        border.setBottom(hbox);
         
         border.setCenter(tabs);
         border.setBottom(hbox);
@@ -181,17 +182,48 @@ public class PreferenceUI extends Application{
     private BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
         TableView table = new TableView();
-        TableColumn contentCol = new TableColumn("Content");
+        TableColumn urlCol = new TableColumn("Url");
+        TableColumn titleCol = new TableColumn("Title");
         TableColumn lengthCol = new TableColumn("Length");
-        TableColumn sourceCol = new TableColumn("Source");
         TableColumn deviceCol = new TableColumn("Device");
         TableColumn timeCol = new TableColumn("Time");
-        TableColumn statusCol = new TableColumn("Status");
         TableColumn deleteCol = new TableColumn("Delete");
-        table.getColumns().addAll(contentCol, lengthCol, sourceCol, 
-                deviceCol, timeCol, statusCol, deleteCol);
+        table.getColumns().addAll(urlCol, titleCol, lengthCol, deviceCol, timeCol, deleteCol);
         table.setEditable(false);
         
+        ObservableList<BrowsedPage> browsedPages = FXCollections.observableArrayList();
+        //ArrayList<browsedPage> browsedList = getBrowsedList(); //from database
+        table.setItems(browsedPages);
+        
+        Callback<TableColumn<BrowsedPage, Boolean>, TableCell<BrowsedPage, Boolean>> deleteCellFactory = 
+                new Callback<TableColumn<BrowsedPage, Boolean>, TableCell<BrowsedPage, Boolean>>(){
+            @Override
+            public TableCell call(TableColumn<BrowsedPage, Boolean> param) {
+                final TableCell<BrowsedPage, Boolean> cell =  new TableCell<BrowsedPage, Boolean>(){
+                    Button deleteButton = new Button("X");
+                    
+                    @Override
+                    public void updateItem(Boolean item, boolean isEmpty){
+                        super.updateItem(item, isEmpty);
+                        if (isEmpty){
+                            setGraphic(null);
+                            setText(null);
+                        }else{
+                            setGraphic(deleteButton);
+                            setText(null);
+                            deleteButton.setOnAction(event -> {
+                                BrowsedPage page = getTableView().getItems().get(getIndex());
+                                browsedPages.remove(page);
+                                //signal database to delete 
+                            });
+                        }
+                    }
+                };
+                return cell;        
+            }
+        };
+        
+        deleteCol.setCellFactory(deleteCellFactory);
         border.setCenter(table);
         
         return border;
@@ -214,6 +246,7 @@ public class PreferenceUI extends Application{
         checkbox2.setId("checkbox2");
         checkbox2.setSelected(preferences.isHideInToolbar());
         checkbox2.setOnAction(event -> {preferences.setIsHideInToolbar(!preferences.isHideInToolbar());});
+        
         grid.add(label1, 0, 0);
         grid.add(checkbox1, 1, 0);
         grid.add(label2, 0, 1);
@@ -362,7 +395,6 @@ public class PreferenceUI extends Application{
             preferences.setReduceParagraphHotkey(hotkey);
         });
        
-        
         for (int i=0; i < labels.length; i++){
             grid.add(labels[i], 0, i);
             grid.add(boxes[2*i], 1, i);
@@ -382,11 +414,12 @@ public class PreferenceUI extends Application{
         grid.setPadding(new Insets(10, 10, 10, 10));
         grid.setAlignment(Pos.CENTER);
         
-        Label label1 = new Label("Number of matching text displayed");
-        Label label2 = new Label("Show source of text");
-        Label label3 = new Label("Box Colour");
-        Label label4 = new Label("Text Colour");
-        Label label5 = new Label("Box Transparency");
+        Label[] labels = new Label[5];
+        labels[0] = new Label("Number of matching text displayed");
+        labels[1] = new Label("Show source of text");
+        labels[2] = new Label("Box Colour");
+        labels[3] = new Label("Text Colour");
+        labels[4] = new Label("Box Transparency");
         
         Spinner spinner = new Spinner();
         SpinnerValueFactory svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20);
@@ -419,11 +452,9 @@ public class PreferenceUI extends Application{
         transparency.setValue(preferences.getBoxTransparency());
         transparency.valueProperty().addListener((obs, oldValue, newValue) -> {preferences.setBoxTransparency((double) newValue);});
       
-        grid.add(label1, 0, 0);
-        grid.add(label2, 0, 1);
-        grid.add(label3, 0, 2);
-        grid.add(label4, 0, 3);
-        grid.add(label5, 0, 4);
+        for (int i=0; i < labels.length; i++){
+            grid.add(labels[i], 0, i);
+        }
         grid.add(spinner, 1, 0);
         grid.add(checkbox, 1, 1);
         grid.add(boxColorPicker, 1, 2);
@@ -435,30 +466,105 @@ public class PreferenceUI extends Application{
     
     private BorderPane createBlockedListPane(){
         BorderPane border = new BorderPane();
-        TableView table = new TableView();
-        TableColumn UrlCol = new TableColumn("Website URL");
-        UrlCol.setMinWidth(400);
+        TableView table = new TableView();      
+        TableColumn urlCol = new TableColumn("Website URL");
+        urlCol.setCellValueFactory(new PropertyValueFactory<>("url"));
+        urlCol.setMinWidth(200);
         TableColumn toggleCol = new TableColumn("Enable/Disable");
-        toggleCol.setMinWidth(150);
+        toggleCol.setCellValueFactory(new PropertyValueFactory<>("isEnabled"));
+        toggleCol.setMinWidth(100);
         TableColumn deleteCol = new TableColumn("Delete");
-        deleteCol.setPrefWidth(50);
+        deleteCol.setCellValueFactory(new PropertyValueFactory<>("X"));
         deleteCol.setMinWidth(50);
-        table.getColumns().addAll(UrlCol, toggleCol, deleteCol);
+        table.getColumns().addAll(urlCol, toggleCol, deleteCol);
         table.setEditable(false);
         
-        //ToggleButton toggleButton = new ToggleButton("Enable");
-        //toggleCol.setGraphic(toggleButton);
+        ObservableList<BlockedPage> blockedPages = FXCollections.observableArrayList();
+        ArrayList<BlockedPage> blockedList = preferences.getBlockedList();
+        blockedPages.addAll(blockedList);
+        table.setItems(blockedPages);
+        
+        Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> toggleCellFactory = 
+                new Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>>(){
+            @Override
+            public TableCell call(TableColumn<BlockedPage, Boolean> param) {
+                final TableCell<BlockedPage, Boolean> cell =  new TableCell<BlockedPage, Boolean>(){
+                    ToggleButton toggleButton = new ToggleButton();
+                    
+                    @Override
+                    public void updateItem(Boolean item, boolean isEmpty){
+                        super.updateItem(item, isEmpty);
+                        if (isEmpty){
+                            setGraphic(null);
+                            setText(null);
+                        }else{
+                            toggleButton.setText("Enabled");
+                            toggleButton.setSelected(blockedList.get(getIndex()).getIsEnabled());
+                            setGraphic(toggleButton);
+                            setText(null);
+                            toggleButton.setOnAction(event -> {
+                                BlockedPage blockedPage = getTableView().getItems().get(getIndex());
+                                blockedPage.setIsEnabled(!blockedPage.getIsEnabled());
+                                blockedList.set(getIndex(), blockedPage);
+                                preferences.setBlockedList(blockedList);
+                            });
+                        }
+                    }
+                };
+                return cell;        
+            }
+        };
+        
+        Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> deleteCellFactory = 
+                new Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>>(){
+            @Override
+            public TableCell call(TableColumn<BlockedPage, Boolean> param) {
+                final TableCell<BlockedPage, Boolean> cell =  new TableCell<BlockedPage, Boolean>(){
+                    Button deleteButton = new Button("X");
+                    
+                    @Override
+                    public void updateItem(Boolean item, boolean isEmpty){
+                        super.updateItem(item, isEmpty);
+                        if (isEmpty){
+                            setGraphic(null);
+                            setText(null);
+                        }else{
+                            setGraphic(deleteButton);
+                            setText(null);
+                            deleteButton.setOnAction(event -> {
+                                BlockedPage blockedPage = getTableView().getItems().get(getIndex());
+                                blockedPages.remove(blockedPage);
+                                blockedList.remove(blockedPage);
+                                preferences.setBlockedList(blockedList);
+                            });
+                        }
+                    }
+                };
+                return cell;        
+            }
+        };
+        
+        toggleCol.setCellFactory(toggleCellFactory);
+        deleteCol.setCellFactory(deleteCellFactory);
         
         TextField urlField = new TextField();
         urlField.setPromptText("add url of websites to block");
         urlField.setMinWidth(400);
         Button addButton = new Button("Add to blocked list");
         addButton.setMinWidth(200);
+        addButton.setOnAction(event -> {
+            BlockedPage page = new BlockedPage(urlField.getText(), true);
+            blockedPages.add(page);
+            blockedList.add(page);
+            preferences.setBlockedList(blockedList);
+            urlField.clear();
+        });
+        
         HBox hbox = new HBox();
         hbox.getChildren().addAll(urlField, addButton);
-
         border.setCenter(table);
         border.setBottom(hbox);
+        
         return border;
     }
     

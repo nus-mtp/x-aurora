@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 import xaurora.dropbox.*;
 import xaurora.io.DataFileIO;
 import xaurora.io.IDGenerator;
@@ -14,6 +15,7 @@ public class ChromeServer implements Runnable{
 	ServerSocket server = null;
 	Socket client = null;
 	int port = 0;
+	boolean isTextContent = false;
 	private static final int TYPE_FULL_TEXT = 0;
 	
 	public ChromeServer(int inputedPort) {
@@ -30,14 +32,12 @@ public class ChromeServer implements Runnable{
 		}
 
 		while (true) {
+			isTextContent = false;
 			String text = receiveMessage();
 			if(isLogin(text)){
 				DropboxAuth.setAccessToken(getURL(text));
 			} else{
-				if(!text.equalsIgnoreCase("Request to Connect")) {
-					outputToFile(text);
-					//something
-				}
+				if (isTextContent) outputToFile(text);
 			}
 		}
 	}
@@ -49,10 +49,8 @@ public class ChromeServer implements Runnable{
 		return data[0];
 	}
 	private void outputToFile(String text) {
-		String id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
-		
+		byte[] id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
 		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
-		System.out.println(String.valueOf(text));
 	}
 
 	private String receiveMessage() {
@@ -75,15 +73,15 @@ public class ChromeServer implements Runnable{
 		for (int i=0; i<7; i++){
 			line = in.readLine();
 		}
+		int comCode = Integer.parseInt(in.readLine());
 		
 		char[] content = new char[length];
 		in.read(content);
 		for (int i = 0; i < content.length; i++) {
 			contentData += String.valueOf(content[i]);
 		}
+		out.print(genOutput(contentData,comCode));
 		
-		if (contentData!="") //System.out.println("Chrome Plugin Message : "+contentData);
-		out.print(genOutput(contentData));
 		out.flush();
 		in.close();
 		out.close();
@@ -95,12 +93,31 @@ public class ChromeServer implements Runnable{
 		return contentData;
 	}
 	
-	private String genOutput(String input){
+	private String genOutput(String input, int commCode){
 		String res = new String();
-		if (input.equalsIgnoreCase("Request to Connect")) 
-			res = "200";
-		else 
-			res = "Received";
+		
+		// Block list shall be merged to one string like:
+		String dummyBlocklist = "chrome://\ngoogle.com\nwikipedia.org\n";
+		
+		switch (commCode) {
+		case CommunicationCode.CONNECTION_REQUEST: {
+			res = Integer.toString(CommunicationCode.ALL_OK);
+			break;
+		}
+		case CommunicationCode.CONNECTION_REQUEST_WITH_BLOCKLIST :{
+			res = Integer.toString(CommunicationCode.BLOCK_LIST);
+			res = res + "\n" + dummyBlocklist;
+			break;
+		}
+		case CommunicationCode.SEND_TEXT :{
+			isTextContent = true;
+			res = Integer.toString(CommunicationCode.RECEIVED);
+			break;
+		}
+		default:{
+			break;
+		}
+		}
 		
 		return res;
 	}

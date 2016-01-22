@@ -1,7 +1,13 @@
+/* 
+    CLASS Extractor
+    
+    Extract text from webpage and send them to Connector.
+*/
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse({extracted: document.body.innerText});
 });
 
+/*
 // Get the text within an element
 // Doesn't do any normalising, returns a string
 // of text as found.
@@ -31,3 +37,4 @@ function getText(element) {
   }
   return text.join('');
 }
+*/
