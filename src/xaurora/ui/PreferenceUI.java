@@ -181,15 +181,13 @@ public class PreferenceUI extends Application{
     private BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
         TableView table = new TableView();
-        TableColumn contentCol = new TableColumn("Content");
+        TableColumn urlCol = new TableColumn("Url");
+        TableColumn titleCol = new TableColumn("Title");
         TableColumn lengthCol = new TableColumn("Length");
-        TableColumn sourceCol = new TableColumn("Source");
         TableColumn deviceCol = new TableColumn("Device");
         TableColumn timeCol = new TableColumn("Time");
-        TableColumn statusCol = new TableColumn("Status");
         TableColumn deleteCol = new TableColumn("Delete");
-        table.getColumns().addAll(contentCol, lengthCol, sourceCol, 
-                deviceCol, timeCol, statusCol, deleteCol);
+        table.getColumns().addAll(urlCol, titleCol, lengthCol, deviceCol, timeCol, deleteCol);
         table.setEditable(false);
         
         border.setCenter(table);
