@@ -16,11 +16,20 @@ import xaurora.system.SystemManager;
 
 public class LoginUI extends Application{
     
-    private static final String loginPage = 
-            "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
     PreferenceUI preferenceUI = new PreferenceUI();
     private Stage stage;
+    private static final String stageTitle = "x-aurora";
+    private static final String name = "x-aurora: simplify copy and paste";
+    private static final String styleSheets = "style.css";
+    private static final int sceneWidth = 500;
+    private static final int sceneHeight = 300;
+    private static final int topOffset = 15;
+    private static final int rightOffset = 10;
+    private static final int bottomOffset = 15;
+    private static final int leftOffset = 10;  
+    private static final String loginPage = "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
     
+   
     public static void main(String[] args) {
         launch(args);
     }
@@ -28,11 +37,10 @@ public class LoginUI extends Application{
     @Override
     public void start(Stage primaryStage){
         stage = primaryStage;
-        stage.setTitle("x-aurora");      
+        stage.setTitle(stageTitle);      
         Scene loginScene = createLoginScene();
         stage.setScene(loginScene);
-        //magic string
-        loginScene.getStylesheets().add("style.css");
+        loginScene.getStylesheets().add(styleSheets);
         stage.show();
     }
     
@@ -45,18 +53,18 @@ public class LoginUI extends Application{
         borderPane.setTop(title);
         borderPane.setCenter(grid);
         borderPane.setBottom(hbox);
-        //magic number
-        Scene scene = new Scene(borderPane, 500, 300);
+        
+        Scene scene = new Scene(borderPane, sceneWidth, sceneHeight);
         return scene;
     }
     
     private HBox createTitle(){
         HBox hbox = new HBox();
-        //magic number
-        hbox.setPadding(new Insets(15, 10, 15, 10));
+        hbox.setPadding(new Insets(topOffset, rightOffset, bottomOffset, leftOffset));
         hbox.setSpacing(20);
-        //magic string
-        Label title = new Label("x-aurora: simplify copy and paste");
+        
+        Label title = new Label();
+        title.setText(name);
         hbox.getChildren().add(title);
         hbox.setAlignment(Pos.CENTER);
         
@@ -65,18 +73,11 @@ public class LoginUI extends Application{
     
     private GridPane createLoginForm(){
         GridPane grid = new GridPane();
-        //magic number
         grid.setHgap(50);
         grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setPadding(new Insets(topOffset, rightOffset, bottomOffset, leftOffset));
         grid.setAlignment(Pos.CENTER);
-        /*****
-        Image auroraIcon = new Image("File:Aurora.png");
-        ImageView auroraView = new ImageView(auroraIcon);
-        auroraView.setFitHeight(200);
-        auroraView.setFitWidth(300);
-        grid.add(auroraView, 0, 0, 3, 2);
-        *****/
+
         Image dropboxIcon = new Image("File:dropbox.png");
         ImageView dropboxView = new ImageView(dropboxIcon);
         dropboxView.setFitHeight(140);
@@ -85,44 +86,21 @@ public class LoginUI extends Application{
         
         Button loginButton = new Button("Login to Dropbox");
         loginButton.setOnAction(event -> {
-        	SystemManager.getInstance().login(true);
             getHostServices().showDocument(loginPage);
+            SystemManager.getInstance().login(true);
         });
         grid.add(loginButton, 1, 0);
-        
-        /*****
-        TextField usernameTextField = new TextField();
-        usernameTextField.setPromptText("Email");
-        grid.add(usernameTextField, 2, 0, 2, 1);
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
-        grid.add(passwordField, 2, 1, 2, 1);
-       
-        CheckBox remember = new CheckBox("remember me");
-        grid.add(remember, 2, 2);
-        Button login = new Button("Login");
-        grid.add(login, 3, 2);
-       
-        Hyperlink forgotPassword = new Hyperlink();
-        forgotPassword.setText("forgot password?");
-        grid.add(forgotPassword, 2, 3);
-        Hyperlink register = new Hyperlink();
-        register.setText("register");
-        String registerUrl = "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
-        register.setOnAction(event -> {getHostServices().showDocument(registerUrl);});
-        grid.add(register, 3, 3);
-        *****/
         
         return grid;
     }
     
     private HBox createSkipLoginBar(){
         HBox hbox = new HBox();
-        hbox.setPadding(new Insets(15, 10, 15, 10));
+        hbox.setPadding(new Insets(topOffset, rightOffset, bottomOffset, leftOffset));
         hbox.setSpacing(20);
         hbox.setAlignment(Pos.CENTER_RIGHT);
-        //magic string
-        Label warning = new Label("Cross device copy paste will not be available without loggin in");
+        Label warning = new Label();
+        warning.setText("Cross device copy paste will not be available without loggin in");
         warning.setWrapText(true);
         Button skipButton = new Button("Skip login");
         skipButton.setOnAction(event -> {

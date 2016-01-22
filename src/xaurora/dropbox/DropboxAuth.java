@@ -1,7 +1,5 @@
 package xaurora.dropbox;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
@@ -17,58 +15,58 @@ public class DropboxAuth {
 	final static String APP_KEY = "4tpptik431fwlqo";
 	final static String APP_SECRET = "xe5robnc898oy37";
 	
-	static String accessToken;
+	static String accessToken = "";
 	static String userID;
 	static int index;
-	static DbxClient client;
 	
 	public static void setAccessToken (String url){
-		
+		boolean userAvailable = false;
 		for (int i = 0; i< DropboxMain.user.size(); i++){
 			UserProfile demo = DropboxMain.user.get(i);
 			if (demo.getAccessToken()==null){
+				userAvailable = true;
 				index = i;
 				userID = parseUserID(url);
 				accessToken = parseAccessToken(url);
-				Auth();
 				DropboxMain.startCall();
 				break;
 			}
 		}
+		
+		if (!userAvailable){
+			index = DropboxMain.user.size();
+			UserProfile ram = new UserProfile();
+			DropboxMain.user.add(ram);
+			userID = parseUserID(url);
+			accessToken = parseAccessToken(url);
+			DropboxMain.startCall();
+		}
 	}
-	//why you need to set it to public?
-	public static String parseUserID(String url){
-		//magin string magic number
+	
+	protected static String parseUserID(String url){
 		String[] elements = url.split("=");
 		return elements[3];	
 	}
-	//why public
-	public static String parseAccessToken(String url){
+	
+	protected static String parseAccessToken(String url){
 		String[] parts = url.split("=");
 		String[] token = parts[1].split("&");
 		
 		return token[0];	
 	}
-	//why public?
+	
 	public static DbxClient Auth(){
-		//magic String
+
 		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
 				Locale.getDefault().toString());
 
 		// Now use the access token to make Dropbox API calls.
-        client = new DbxClient(config, accessToken);
-		setUserProfile();
+		DbxClient client = new DbxClient(config, accessToken);
+		setUserProfile(client);
 		return client;
 	}
-	//why it is non-static?
-	public boolean isConnectionEstablised(){
-		if (client != null){
-			return true;
-		}
-		return false;
-	}
 	
-	public static void setUserProfile(){
+	protected static void setUserProfile(DbxClient client){
 		DbxAccountInfo account = null;
 		try {
 			account = client.getAccountInfo();
@@ -84,23 +82,23 @@ public class DropboxAuth {
 		user.setEmail(account.email);
 		user.setStorage(formulateStorage(bytesToGB(account.quota.normal),bytesToGB(account.quota.total)));
 		user.setPath("/" + userID + "/");
-		user.setCurrent();
+		//user.setCurrent();
 		DropboxMain.user.set(index, user);
 		DropboxMain.setCurrentIndex(index);
-		System.out.println(user.toString());
+		//System.out.println(user.toString());
 		
 	}
 	
-	public static String formulateStorage (String used, String total){
+	protected static String formulateStorage (String used, String total){
 		//Magic String
 		return used + "GB is used out of " + total + "GB";
 	}
 	
-	public static String bytesToGB(long quota){	
-		//Magic Numbers
+	protected static String bytesToGB(long quota){		
+		//Magic String
 		double GB = (double) quota / (1024.0*1024.0*1024.0);
 		DecimalFormat df = new DecimalFormat("#.##");
-		//Magic Strings
+		//Magic String
 		return df.format(GB);		
 	}
 }
