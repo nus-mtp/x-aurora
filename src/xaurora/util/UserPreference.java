@@ -6,12 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import javafx.scene.paint.Color;
 
 public class UserPreference {
-
-
     //System Pane
     private boolean isRunOnStartUp;
     private boolean isHideInToolbar;
@@ -29,6 +28,7 @@ public class UserPreference {
     private Color textColour;
     private double boxTransparency;
     //Blocked List Pane
+    private ArrayList<BlockedPage> blockedList;
     //Path Pane
     private String dataPath;
     private boolean isShowPreviewText;
@@ -36,7 +36,7 @@ public class UserPreference {
     //Storage Pane
     private String maxTextSizeStored;
     private String previewTextLength;
-    private static final int numPreferences = 18;
+    private static final int numPreferences = 19;
 
     public void initPreferences(){
         //System Pane
@@ -56,6 +56,7 @@ public class UserPreference {
         textColour = Color.BLACK;
         boxTransparency = 0;
         //Blocked List Pane
+        blockedList = new ArrayList<BlockedPage>();
         //Path Pane
         dataPath = "C:/User/Desktop";
         isShowPreviewText = true;
@@ -75,30 +76,38 @@ public class UserPreference {
             for (int i = 0; i < numPreferences; i++) {
                 settings[i] = bufferedReader.readLine();
             }
+            
+            int index = 0;
             //System Pane
-            isRunOnStartUp = Boolean.valueOf(settings[0]);
-            isHideInToolbar = Boolean.valueOf(settings[1]);
+            isRunOnStartUp = Boolean.valueOf(settings[index++]);
+            isHideInToolbar = Boolean.valueOf(settings[index++]);
             //Hotkeys Pane
-            extendWordHotkey = settings[2].substring(1, settings[2].length() - 1).split(",\\s+");
-            reduceWordHotkey = settings[3].substring(1, settings[3].length() - 1).split(",\\s+");
-            extendSentenceHotkey = settings[4].substring(1, settings[4].length() - 1).split(",\\s+");
-            reduceSentenceHotkey = settings[5].substring(1, settings[5].length() - 1).split(",\\s+");
-            extendParagraphHotkey = settings[6].substring(1, settings[6].length() - 1).split(",\\s+");
-            reduceParagraphHotkey = settings[7].substring(1, settings[7].length() - 1).split(",\\s+");
+            extendWordHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceWordHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendSentenceHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceSentenceHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendParagraphHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceParagraphHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             //Text Editor Pane
-            numMatchingTextDisplay = Integer.valueOf(settings[8]);
-            isShowTextSource = Boolean.valueOf(settings[9]);
-            boxColour = Color.valueOf(settings[10]);
-            textColour = Color.valueOf(settings[11]);
-            boxTransparency = Double.valueOf(settings[12]);;
+            numMatchingTextDisplay = Integer.valueOf(settings[index++]);
+            isShowTextSource = Boolean.valueOf(settings[index++]);
+            boxColour = Color.valueOf(settings[index++]);
+            textColour = Color.valueOf(settings[index++]);
+            boxTransparency = Double.valueOf(settings[index++]);;
             //Blocked List Pane
+            String[] s = settings[index++].split("\\s+");
+            blockedList = new ArrayList<BlockedPage>();
+            for (int i=0; i < s.length; i+=2){
+                BlockedPage page = new BlockedPage(s[i], Boolean.valueOf(s[i+1]));
+                blockedList.add(page);
+            }
             //Path Pane
-            dataPath = settings[13];
-            isShowPreviewText = Boolean.valueOf(settings[14]);
-            clearCachesTime = settings[15];
+            dataPath = settings[index++];
+            isShowPreviewText = Boolean.valueOf(settings[index++]);
+            clearCachesTime = settings[index++];
             //Storage Pane
-            maxTextSizeStored = settings[16];
-            previewTextLength = settings[17];
+            maxTextSizeStored = settings[index++];
+            previewTextLength = settings[index++];
 
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
@@ -140,6 +149,11 @@ public class UserPreference {
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(boxTransparency));
             bufferedWriter.newLine();
+            for (int i=0; i < blockedList.size(); i++){
+                BlockedPage page = blockedList.get(i);
+                bufferedWriter.write(page.getUrl() + " " + String.valueOf(page.getIsEnabled()) + " ");
+            }
+            bufferedWriter.newLine();         
             bufferedWriter.write(String.valueOf(dataPath));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isShowPreviewText));
@@ -205,6 +219,10 @@ public class UserPreference {
 
     public double getBoxTransparency() {
         return boxTransparency;
+    }
+    
+    public ArrayList<BlockedPage> getBlockedList(){
+        return blockedList;
     }
 
     public String getDataPath() {
@@ -281,6 +299,10 @@ public class UserPreference {
 
     public void setBoxTransparency(double boxTransparency) {
         this.boxTransparency = boxTransparency;
+    }
+    
+    public void setBlockedList(ArrayList<BlockedPage> blockedList){
+        this.blockedList = blockedList;
     }
 
     public void setDataPath(String dataPath) {
