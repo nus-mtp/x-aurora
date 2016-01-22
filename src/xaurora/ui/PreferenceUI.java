@@ -39,6 +39,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import xaurora.util.BlockedPage;
 import xaurora.util.UserPreference;
+import xaurora.util.BrowsedPage;
 
 /**
  *
@@ -190,6 +191,39 @@ public class PreferenceUI extends Application{
         table.getColumns().addAll(urlCol, titleCol, lengthCol, deviceCol, timeCol, deleteCol);
         table.setEditable(false);
         
+        ObservableList<BrowsedPage> browsedPages = FXCollections.observableArrayList();
+        //ArrayList<browsedPage> browsedList = getBrowsedList(); //from database
+        table.setItems(browsedPages);
+        
+        Callback<TableColumn<BrowsedPage, Boolean>, TableCell<BrowsedPage, Boolean>> deleteCellFactory = 
+                new Callback<TableColumn<BrowsedPage, Boolean>, TableCell<BrowsedPage, Boolean>>(){
+            @Override
+            public TableCell call(TableColumn<BrowsedPage, Boolean> param) {
+                final TableCell<BrowsedPage, Boolean> cell =  new TableCell<BrowsedPage, Boolean>(){
+                    Button deleteButton = new Button("X");
+                    
+                    @Override
+                    public void updateItem(Boolean item, boolean isEmpty){
+                        super.updateItem(item, isEmpty);
+                        if (isEmpty){
+                            setGraphic(null);
+                            setText(null);
+                        }else{
+                            setGraphic(deleteButton);
+                            setText(null);
+                            deleteButton.setOnAction(event -> {
+                                BrowsedPage page = getTableView().getItems().get(getIndex());
+                                browsedPages.remove(page);
+                                //signal database to delete 
+                            });
+                        }
+                    }
+                };
+                return cell;        
+            }
+        };
+        
+        deleteCol.setCellFactory(deleteCellFactory);
         border.setCenter(table);
         
         return border;
