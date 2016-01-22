@@ -34,7 +34,10 @@ public class ChromeServer implements Runnable{
 			if(isLogin(text)){
 				DropboxAuth.setAccessToken(getURL(text));
 			} else{
-				outputToFile(text);
+				if(!text.equalsIgnoreCase("Request to Connect")) {
+					outputToFile(text);
+					//something
+				}
 			}
 		}
 	}
@@ -46,8 +49,10 @@ public class ChromeServer implements Runnable{
 		return data[0];
 	}
 	private void outputToFile(String text) {
-		byte[] id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
+		String id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
+		
 		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
+		System.out.println(String.valueOf(text));
 	}
 
 	private String receiveMessage() {

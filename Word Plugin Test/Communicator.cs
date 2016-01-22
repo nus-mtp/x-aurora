@@ -51,7 +51,7 @@ namespace Test_Word_Plugin
                 }
                 catch (SocketException)
                 {
-                    Messenger.message("SocketException : Cannot Connect to Background");
+                    //Messenger.message("SocketException : Cannot Connect to Background");
                 }
                 catch (Exception e)
                 {

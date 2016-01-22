@@ -1,4 +1,5 @@
 package xaurora.io;
+import java.math.BigInteger;
 import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,16 +24,25 @@ public class IDGenerator {
 		return sdf.format(cal.getTime());
 	}
 	
-	public byte[] GenerateID(String url,int type){
+	public String GenerateID(String url,int type){
 		String output = url+getNow()+type;
+		System.out.println(output);
 		byte[] id = output.getBytes();
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.reset();
+			md.update(output.getBytes());
 			byte[] newID = md.digest(id);
-			return newID;
+			BigInteger bigInt = new BigInteger(1,newID);
+			String hashID = bigInt.toString(16);
+			while(hashID.length()<32){
+				hashID = "0"+hashID;
+			}
+			return hashID;
+			//return id;
 		} catch (NoSuchAlgorithmException e){
 			// SHOW ERROR LOG MESSAGE
-			return id;
+			return id.toString();
 		}
 		
 	}

@@ -8,7 +8,7 @@ import xaurora.dropbox.*;
 import xaurora.security.*;
 import java.util.*;
 public class DataFileIO {
-	private String syncDirectory = "\\local_data\\";
+	private String syncDirectory = "";//"\\local_data\\";
 	private static DataFileIO instance = null;
 	private DataFileIO(){
 		
@@ -30,8 +30,9 @@ public class DataFileIO {
 	public String getDirectory(){
 		return this.syncDirectory;
 	}
-	public void createDataFile(byte[] filename,byte[] content){
-		String dstpath = this.syncDirectory+String.valueOf(filename+".txt");
+	public void createDataFile(String id,byte[] content){
+		String dstpath = this.syncDirectory+new String(id)+".txt";
+		System.out.println(dstpath);
 		File dstFile = new File(dstpath);
 		if(dstFile.exists()){
 			System.err.println("ERROR MESSAGE: MD5 COLLISION");

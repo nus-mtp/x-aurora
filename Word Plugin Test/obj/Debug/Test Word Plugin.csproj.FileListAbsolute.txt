@@ -20,3 +20,20 @@ C:\Users\Lee\Documents\NetBeansProjects\x-aurora\Word Plugin Test\obj\Debug\Test
 C:\Users\Lee\Documents\NetBeansProjects\x-aurora\Word Plugin Test\obj\Debug\Test Word Plugin.csproj.GenerateResource.Cache
 C:\Users\Lee\Documents\NetBeansProjects\x-aurora\Word Plugin Test\obj\Debug\Test Word Plugin.dll
 C:\Users\Lee\Documents\NetBeansProjects\x-aurora\Word Plugin Test\obj\Debug\Test Word Plugin.pdb
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Test Word Plugin.dll
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Test Word Plugin.pdb
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Test Word Plugin.dll.manifest
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Test Word Plugin.vsto
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.dll
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.Office.Tools.v4.0.Framework.dll
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.Office.Tools.Word.dll
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.VisualStudio.Tools.Applications.Runtime.dll
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.VisualStudio.Tools.Applications.Runtime.xml
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.Office.Tools.v4.0.Framework.xml
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.Office.Tools.Word.xml
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.xml
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\obj\Debug\Test Word Plugin.csprojResolveAssemblyReference.cache
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\obj\Debug\Test_Word_Plugin.Properties.Resources.resources
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\obj\Debug\Test Word Plugin.csproj.GenerateResource.Cache
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\obj\Debug\Test Word Plugin.dll
+E:\study\study2015sem1\CS3283\x-aurora\Word Plugin Test\obj\Debug\Test Word Plugin.pdb
