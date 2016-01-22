@@ -36,6 +36,7 @@ public class UserPreference {
     //Storage Pane
     private String maxTextSizeStored;
     private String previewTextLength;
+    
     private static final int numPreferences = 19;
 
     public void initPreferences(){
@@ -199,6 +200,32 @@ public class UserPreference {
 
     public String[] getReduceParagraphHotkey() {
         return reduceParagraphHotkey;
+    }
+    
+    public String[] getAllHotkeys(){
+        String[] hotkeys = null;
+        
+        String[] ewh = getExtendWordHotkey();
+        String[] rwh = getReduceWordHotkey();
+        String[] esh = getExtendSentenceHotkey();
+        String[] rsh = getReduceSentenceHotkey();
+        String[] eph = getExtendParagraphHotkey();
+        String[] rph = getReduceParagraphHotkey();
+        
+        for (int i=0; i < 6; i++){
+            String[] hk = null;
+            switch(i){
+                case 0: hk = ewh; break;
+                case 1: hk = rwh; break;
+                case 2: hk = esh; break;
+                case 3: hk = rsh; break;
+                case 4: hk = eph; break;
+                case 5: hk = rph; break; 
+            }
+            hotkeys[i] = hk[0] + " " + hk[1] + " " + hk[2];
+        }
+        
+        return hotkeys;
     }
 
     public int getNumMatchingTextDisplay() {
