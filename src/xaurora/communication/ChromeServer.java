@@ -49,7 +49,7 @@ public class ChromeServer implements Runnable{
 		return data[0];
 	}
 	private void outputToFile(String text) {
-		byte[] id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
+		String id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
 		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
 	}
 
