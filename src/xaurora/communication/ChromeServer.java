@@ -112,6 +112,8 @@ public class ChromeServer implements Runnable{
 		case CommunicationCode.SEND_TEXT :{
 			isTextContent = true;
 			res = Integer.toString(CommunicationCode.RECEIVED);
+			
+			WordServer.pushContent(input);
 			break;
 		}
 		default:{

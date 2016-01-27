@@ -1,0 +1,11 @@
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.dll
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.pdb
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.dll.manifest
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.vsto
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.dll
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.xml
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.csprojResolveAssemblyReference.cache
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.Properties.Resources.resources
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.csproj.GenerateResource.Cache
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.dll
+c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.pdb
