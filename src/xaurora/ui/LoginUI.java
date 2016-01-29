@@ -40,7 +40,7 @@ public class LoginUI extends Application{
         stage.setTitle(stageTitle);      
         Scene loginScene = createLoginScene();
         stage.setScene(loginScene);
-        loginScene.getStylesheets().add(styleSheets);
+        //loginScene.getStylesheets().add(styleSheets);
         stage.show();
     }
     
