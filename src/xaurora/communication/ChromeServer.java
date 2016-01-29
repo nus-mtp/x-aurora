@@ -48,6 +48,13 @@ public class ChromeServer implements Runnable{
 		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
 	}
 
+	/*
+		Method receiveMessage()
+		Output: String
+		
+		This method accepts incoming Chrome Plugin connection request.
+		And get the content data of the incoming message.
+	*/
 	private String receiveMessage() {
 		String contentData = "";
 		try {
@@ -58,8 +65,10 @@ public class ChromeServer implements Runnable{
 		String line = "";
 		int length = 0;
 		
+		// Skip Header
 		for (int i=0; i<4; i++){
 			line = in.readLine();
+			// Get length
 			if (i==3){
 				String[] data = line.split(":");
 				length = Integer.parseInt(data[1].trim());
@@ -68,16 +77,22 @@ public class ChromeServer implements Runnable{
 		for (int i=0; i<7; i++){
 			line = in.readLine();
 		}
+		
+		// read communication code
 		int comCode = Integer.parseInt(in.readLine());
 		
-		char[] content = new char[length];
+		// read content data
+		char[] content = new char[length-String.valueOf(comCode).length()-("\n").length()]; //cut the length of communication code
 		in.read(content);
 		for (int i = 0; i < content.length; i++) {
 			contentData += String.valueOf(content[i]);
 		}
-		out.print(genOutput(contentData,comCode));
 		
+		// Generate Output
+		out.print(genOutput(contentData,comCode));
 		out.flush();
+		
+		// Reset communication socket
 		in.close();
 		out.close();
 		client.close();
@@ -88,12 +103,22 @@ public class ChromeServer implements Runnable{
 		return contentData;
 	}
 	
+	/*
+		Method genOutput(String, int)
+		Output: String
+		
+		This method reads a String which is communication content data,
+		and an integer which is communication code.
+		According to communication code and content data, generate
+		response contents, and return it.
+	*/
 	private String genOutput(String input, int commCode){
 		String res = new String();
 		
 		// Block list shall be merged to one string like:
 		String dummyBlocklist = "chrome://\ngoogle.com\nwikipedia.org\n";
 		
+		// According to Communication code, generate response.
 		switch (commCode) {
 		case CommunicationCode.CONNECTION_REQUEST: {
 			res = Integer.toString(CommunicationCode.ALL_OK);

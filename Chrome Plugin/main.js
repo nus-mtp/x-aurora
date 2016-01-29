@@ -8,7 +8,8 @@ chrome.tabs.onUpdated.addListener(function(tabId , changeInfo) {
 // call connector to load.
 connector.onLoad();
 
-
+// Utility functions
+// Check whether website is in block list
 function isInBlkList(tarUrl){
     for (var j=0; j< blkList.length; j=j+1){
         if (contains(tarUrl, blkList[j])) return true;    
@@ -16,6 +17,7 @@ function isInBlkList(tarUrl){
     return false;
 }
 
+// Check whether website is in duplicate list
 function isInDupList(tarUrl){
     for (var j=0; j< dupList.length; j=j+1){
         if (dupList[j] == tarUrl) return true;    
@@ -23,8 +25,17 @@ function isInDupList(tarUrl){
     return false;
 }
 
+// Check whether a String x contains a substring y
 function contains(orig, targ){
     var result = orig.indexOf(targ);
     if (result > -1) return true;
     else return false;
+}
+
+function encode_utf8(s) {
+  return unescape(encodeURIComponent(s));
+}
+
+function decode_utf8(s) {
+  return decodeURIComponent(escape(s));
 }

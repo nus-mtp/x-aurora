@@ -15,6 +15,7 @@ public class WordServer implements Runnable{
 	Socket client = null;
 	int port = 0;
 	
+	// Dummy Database For Sprint 1
 	static List<String> recData;
 	
 	public WordServer(int myPort) {
@@ -37,26 +38,43 @@ public class WordServer implements Runnable{
 		}
 	}
 
+	/*
+		Method receiveMessage()
+		Output: String
+		
+		This method accepts incoming Word Plugin connection request.
+		And get the content data of the incoming message.
+	*/
 	private String receiveMessage() {
 		String contentData = "";
 		try {
+		// Get input and output Stream
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				client.getInputStream()));
 		PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 
+		// Get data length
 		int length = Integer.parseInt(in.readLine());
 		
+		// Get data content
 		char[] content = new char[length];
 		in.read(content);
 		for (int i = 0; i < content.length; i++) {
 			contentData += String.valueOf(content[i]);
 		}
+		
+		// Debug use
 		if (contentData!="") 
 			System.out.println("Word Plugin Message : "+contentData);
+		
+		// Split message to get communication code
 		String[] parts = contentData.split("\n");
 		
+		// Generate response to connection request
 		out.print(genOutput(parts, Integer.parseInt(parts[0])));
 		out.flush();
+		
+		// Reset Socket
 		in.close();
 		out.close();
 		client.close();
@@ -67,6 +85,15 @@ public class WordServer implements Runnable{
 		return contentData;
 	}
 	
+	/*
+		Method genOutput(String, int)
+		Output: String
+		
+		This method reads a String which is communication content data,
+		and an integer which is communication code.
+		According to communication code and content data, generate
+		response contents, and return it.
+	*/
 	private String genOutput(String[] input, int commCode){
 		String res = new String();
 		String[] dummyHotKeys;
@@ -108,6 +135,7 @@ public class WordServer implements Runnable{
 		return res;
 	}
 	
+	// push things into dummy database
 	public static void pushContent(String input){
 		recData.add(input);
 	}
