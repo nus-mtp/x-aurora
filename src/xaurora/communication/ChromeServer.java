@@ -32,7 +32,7 @@ public class ChromeServer implements Runnable{
 		}
 
 		while (true) {
-	
+			isTextContent = false;
 			String text = receiveMessage();
 			if (isTextContent) outputToFile(text);
 			
