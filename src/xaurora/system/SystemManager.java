@@ -37,6 +37,8 @@ public class SystemManager {
             this.io.setDirectory(UNSYNC_DATA_PATH);
         }
     }
+    //Description: check whether the Internet is available by trying to ping the dropbox host
+    //post-condition: return true if response is obtain by pinging the dropbox host, else return false
     public boolean isNetAccessible(){
     	boolean result = false;
     	try {
