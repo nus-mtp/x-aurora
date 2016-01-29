@@ -8,7 +8,14 @@ import xaurora.dropbox.*;
 import xaurora.security.*;
 import java.util.*;
 public class DataFileIO {
-	private String syncDirectory = "";//"\\local_data\\";
+	private static final String DEFAULT_SYNC_DIRECTORY = "\\local_data";
+	private static final String DEFAULT_FILE_EXTENSION = ".txt";
+	private static final String TEXT_FILE_TYPE = "txt";
+	private static final String ERR_MSG_MD5_COLLISION = "ERROR MESSAGE: MD5 COLLISION";
+	private static final int INDEX_ZERO = 0;
+	private static final String NEW_EMPTY_STRING = "";
+	private static final char FILE_EXTENSION_DELIMITER = '.';
+	private String syncDirectory = DEFAULT_SYNC_DIRECTORY;
 	private static DataFileIO instance = null;
 	private DataFileIO(){
 		
@@ -31,12 +38,12 @@ public class DataFileIO {
 		return this.syncDirectory;
 	}
 	public void createDataFile(String id,byte[] content){
-		String dstpath = this.syncDirectory+new String(id)+".txt";
+		String dstpath = this.syncDirectory+new String(id)+DEFAULT_FILE_EXTENSION;
 		System.out.println(dstpath);
 		File dstFile = new File(dstpath);
 		if(dstFile.exists()){
-			System.err.println("ERROR MESSAGE: MD5 COLLISION");
-			System.exit(1);
+			System.err.println(ERR_MSG_MD5_COLLISION);
+			
 		} else {
 			try{
 				dstFile.createNewFile();
@@ -70,13 +77,13 @@ public class DataFileIO {
 			if(f.exists()){
 				if(f.isDirectory()){
 					File[] subDir = f.listFiles();
-					for(int i = 0;i<subDir.length;i++){
+					for(int i = INDEX_ZERO;i<subDir.length;i++){
 						s.push(subDir[i]);
 					}
 					
 				} else {
 					
-					if(getExtension(f).equals("txt")) {
+					if(getExtension(f).equals(TEXT_FILE_TYPE)) {
 						readFileContent(content, f);
 						
 						
@@ -92,11 +99,11 @@ public class DataFileIO {
 			
 			Security c = Security.getInstance();
 			byte[] decrypted = c.decrypt(data);
-			for(int i = 0;i<decrypted.length;i++){
+			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				System.out.println((char) decrypted[i]);
 			}
-			String output = "";
-			for(int i = 0;i<decrypted.length;i++){
+			String output = NEW_EMPTY_STRING;
+			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				output+=String.valueOf((char)decrypted[i]);
 			}
 			content.add(output);
@@ -106,11 +113,11 @@ public class DataFileIO {
 	}
 	
 	private static String getExtension(File f) {
-        String ext = "";
+        String ext = NEW_EMPTY_STRING;
         String s = f.getName();
-        int i = s.lastIndexOf('.');
+        int i = s.lastIndexOf(FILE_EXTENSION_DELIMITER);
 
-        if (i > 0 &&  i < s.length() - 1) {
+        if (i > INDEX_ZERO &&  i < s.length() - 1) {
             ext = s.substring(i+1).toLowerCase();
         }
         return ext;

@@ -8,6 +8,7 @@ import java.util.Calendar;
 public class IDGenerator {
 	private static IDGenerator instance = null;
 	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+	private static final String HASH_TYPE = "MD5";
 	private IDGenerator(){
 		
 	}
@@ -29,7 +30,7 @@ public class IDGenerator {
 		System.out.println(output);
 		byte[] id = output.getBytes();
 		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
+			MessageDigest md = MessageDigest.getInstance(HASH_TYPE);
 			md.reset();
 			md.update(output.getBytes());
 			byte[] newID = md.digest(id);

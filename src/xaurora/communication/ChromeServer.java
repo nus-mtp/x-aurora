@@ -32,22 +32,14 @@ public class ChromeServer implements Runnable{
 		}
 
 		while (true) {
-			isTextContent = false;
+	
 			String text = receiveMessage();
-			
 			if (isTextContent) outputToFile(text);
-			/*
-			if(isLogin(text)){
-				DropboxAuth.setAccessToken(getURL(text));
-			} else{
-				if (isTextContent) outputToFile(text);
-			}
-			*/
+			
+
 		}
 	}
-	private static boolean isLogin(String text){
-		return getURL(text).contains("access_token=")&&getURL(text).contains("www.dropbox.com");
-	}
+
 	private static String getURL(String text){
 		String[] data = text.split("\n");
 		return data[0];
