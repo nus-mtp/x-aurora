@@ -7,7 +7,7 @@ import xaurora.io.DataFileIO;
 
 public class SystemManager {
 	private static final String HOST_DROPBOX = "www.dropbox.com";
-	private static final String COMMAND_PING = "ping -c 1 ";
+	private static final String COMMAND_PING = "ping ";
     private static final String UNSYNC_DATA_PATH = "\\local_data\\";
     private static final int    INTERNAL_SUCCESS = 0;
     private boolean isLogin;

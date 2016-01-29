@@ -13,12 +13,12 @@ public class Main {
 		System.out.println("a");
 		SystemManager sa = SystemManager.getInstance();
 		System.out.println("Hello");
-		if(sa.isNetAccessible()){
+                if(sa.isNetAccessible()){
 			
 			ChromeServer chromeSvr = new ChromeServer(6789);
 			Thread chromeSvrThread = new Thread(chromeSvr);
 			chromeSvrThread.start();
-		}
+                }
 		WordServer wordSvr = new WordServer(23333);
 		Thread wordSvrThread = new Thread(wordSvr);
 		
