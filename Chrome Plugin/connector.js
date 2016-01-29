@@ -45,9 +45,9 @@ var connector = {
         request.open('PUSH', 'http://127.0.0.1:'+serverPort, true); 
         if (sending != 1){
             if (getBlkList == 0) {
-                request.send(CONNECTION_REQUEST_WITH_BLOCKLIST);
+                request.send(CONNECTION_REQUEST_WITH_BLOCKLIST+"\n\n");
             } else {
-                request.send(CONNECTION_REQUEST);
+                request.send(CONNECTION_REQUEST+"\n\n");
             }
         }
         request.timeout = 3000;

@@ -44,6 +44,7 @@ public class SystemManager {
     		try {
 				result = (pingProcess.waitFor() == INTERNAL_SUCCESS);
 				System.out.println(result);
+				pingProcess.destroy();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
