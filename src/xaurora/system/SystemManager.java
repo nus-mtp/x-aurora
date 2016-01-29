@@ -43,7 +43,7 @@ public class SystemManager {
     		Process pingProcess = java.lang.Runtime.getRuntime().exec(COMMAND_PING+HOST_DROPBOX);
     		try {
 				result = (pingProcess.waitFor() == INTERNAL_SUCCESS);
-				System.out.println(result);
+				//System.out.println(result);
 				pingProcess.destroy();
 			} catch (InterruptedException e) {
 				e.printStackTrace();

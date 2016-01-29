@@ -13,7 +13,7 @@ private static final int PORT_PLUGIN = 23333;
 
 	public static void main(String[] args){
 		SystemManager sa = SystemManager.getInstance();
-		System.out.println(sa.isNetAccessible());
+		//System.out.println(sa.isNetAccessible());
 		if(sa.isNetAccessible()){
 			
 			ChromeServer chromeSvr = new ChromeServer(PORT_BROWSER);

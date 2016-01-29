@@ -34,8 +34,9 @@ public class ChromeServer implements Runnable{
 		while (true) {
 	
 			String text = receiveMessage();
-			outputToFile(text);
+			if (isTextContent) outputToFile(text);
 			
+
 		}
 	}
 
