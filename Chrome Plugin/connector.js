@@ -3,7 +3,7 @@ var connector = {
     // Method onLoad()
     // Creating an interval action of generating connection request.
     onLoad: function(){
-        setInterval(function(){ connector.getConnection(); },3000); 
+        setInterval(function(){ connector.getConnection(); },DEFAULT_TIME_OUT); 
     },
     
     //Method getConnection()
@@ -12,9 +12,9 @@ var connector = {
         
         // Response Check
         request.addEventListener('readystatechange', function(e) {
-            if( this.readyState === 4 ) {
+            if( this.readyState === CONNECTION_STATUS_COMPLETE ) {
                 
-                // Get response code
+                // Get response
                 var resp = request.responseText.split("\n");
                 var respCode = resp[0];
                 
@@ -24,7 +24,7 @@ var connector = {
                     console.log("Connection is ALIVE!"); // Console message.
                 } else if (respCode == BLOCK_LIST) {
                     serverStat = "connected";
-                    getBlkList = 1;
+                    getBlkList = true;
                     
                     for (var i=1; i<(resp.length-1); i++){
                         currURL = resp[i];
@@ -43,14 +43,14 @@ var connector = {
         
         // Send Connection Response
         request.open('PUSH', 'http://127.0.0.1:'+serverPort, true); 
-        if (sending != 1){
-            if (getBlkList == 0) {
-                request.send(CONNECTION_REQUEST_WITH_BLOCKLIST);
+        if (!sending){
+            if (getBlkList == false) {
+                request.send(CONNECTION_REQUEST_WITH_BLOCKLIST+"\n\n");
             } else {
-                request.send(CONNECTION_REQUEST);
+                request.send(CONNECTION_REQUEST+"\n\n");
             }
         }
-        request.timeout = 3000;
+        request.timeout = DEFAULT_TIME_OUT;
     },
     
     // Method pushText(int tabid, String tabUrl, int timeOutCount)
@@ -72,24 +72,34 @@ var connector = {
                 // Extract Text
                 chrome.tabs.sendMessage(tabid, {action: "getDOM"}, function(response) {
                     
-                    sending = 1; // Set system status to sending texts, which will not generate regular connection request.
+                    sending = true; // Set system status to sending texts, which will not generate regular connection request.
                     
                     console.log("getting text from : "+tabUrl); // Console message.
                     var contentText = response.extracted;
+                    
+                    // Open port and send message.
                     var request = new XMLHttpRequest();
                     console.log("Sending Texts!"); // Console message.
                     request.open('PUSH', 'http://127.0.0.1:'+dataPort, true);
+                    
+                    //contentText = encode_utf8(contentText);
                     request.send(SEND_TEXT+"\n"+tabUrl+"\n"+contentText);
 
                     // Upon received response, do actions according to response.
                     request.addEventListener('readystatechange', function(e) {
-                        if( this.readyState === 4 ) {
+                        if( this.readyState === CONNECTION_STATUS_COMPLETE ) {
+                            
+                            // if successfully send out contents:
+                            // Add the url in to duplicate list
                             if  (request.responseText == RECEIVED) {
                                 console.log("Adding Url:" + tabUrl + " to duplicated list."); // Console message.
                                 dupList.push(tabUrl);
-                                sending = 0;
+                                sending = false;
                                 console.log("Sending Complete!"); // Console message.
                             }
+                            
+                            // if cannot send successfully:
+                            // if not exceed max retry count then retry sending
                             else if (timeOutCount <= MAX_TIME_OUT_COUNT){
                                 console.log("Sending Error!"); // Console message.
                                 if (serverStat == "connected") {
@@ -98,8 +108,9 @@ var connector = {
                                     console.log("Timeout:"+timeOutCount+" for URL:"+tabUrl) // Console message.
                                     textExtractor.pushText(tabid,tabUrl,timeOutCount+1);
                                 }
+                            // if exceed retry limit then give up.
                             } else {
-                                sending = 0;
+                                sending = false;
                             }
                         }
                     });
@@ -108,14 +119,3 @@ var connector = {
         }
     },
 };
-
-
-/*
-function encode_utf8(s) {
-  return unescape(encodeURIComponent(s));
-}
-
-function decode_utf8(s) {
-  return decodeURIComponent(escape(s));
-}
-*/

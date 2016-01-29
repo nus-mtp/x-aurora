@@ -1,0 +1,14 @@
+Configuration for Chrome Plugin:
+
+Chrome Menu - More Tools - Extensions - Check "Developer Mode" - Load unpacked extensions
+Select the folder that the extensions are in and check "enable".
+
+
+
+Configuration for Word Plugin:
+
+Require Visual Studio 2012 or above.
+Require Microsoft Word 2010 or above.
+Not sure if can run on Word 2016.
+
+Straightly use Visual Studio to open up XAuroraWordPlugin.sln and run should be ok.
