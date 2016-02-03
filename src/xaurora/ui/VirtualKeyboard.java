@@ -78,16 +78,14 @@ public class VirtualKeyboard {
       for (int k = 0; k < key[row].length; k++) {
         hbox.getChildren().add(createKeyButton(key[row][k], codes[row][k], target));
       }
-    }
-
-    final Button spaceBar = createKeyButton(" ", KeyCode.SPACE, target);
-    spaceBar.setMaxWidth(Double.POSITIVE_INFINITY);
-    HBox.setHgrow(spaceBar, Priority.ALWAYS);
-
-    final HBox bottomRow = new HBox(5);
-    bottomRow.setAlignment(Pos.CENTER);
-    bottomRow.getChildren().addAll(spaceBar, cursorLeft, cursorUpDown, cursorRight);
-    root.getChildren().add(bottomRow);    
+      
+      if (row == key.length-1){
+        final Button spaceBar = createKeyButton(" ", KeyCode.SPACE, target);
+        spaceBar.setMaxWidth(Double.POSITIVE_INFINITY);
+        HBox.setHgrow(spaceBar, Priority.ALWAYS);
+        hbox.getChildren().addAll(spaceBar, cursorLeft, cursorUpDown, cursorRight);
+      }
+    }   
   }
   
   /**
