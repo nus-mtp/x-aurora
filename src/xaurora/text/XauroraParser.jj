@@ -1,0 +1,133 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+}
+
+PARSER_BEGIN(XauroraParser)
+package xaurora.text;
+
+public class XauroraParser
+{
+  public static void main(String args []) throws ParseException
+  {
+    XauroraParser parser = new XauroraParser(System.in);
+    while (true)
+    {
+      System.out.println("Reading from standard input...");
+      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
+      try
+      {
+        
+      }
+      catch (Exception e)
+      {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        XauroraParser.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+
+PARSER_END(XauroraParser)
+
+SKIP :
+{
+  "\r"
+| "\t"
+| "`"
+| "~"
+| "#"
+| "$"
+| "%"
+| "^"
+| "&"
+| "*"
+| "("
+| ")"
+| "+"
+| "="
+| "{"
+| "}"
+| "["
+| "]"
+| "|"
+| "\\"
+| ":"
+| ";"
+| "\""
+| "\'"
+| "<"
+| ">"
+| ","
+| "/"
+}
+
+
+TOKEN : /* OPERATORS */
+{
+< MINUS : "-" >
+
+}
+
+TOKEN :
+{
+  < INTEGER_LITERAL : <DECIMAL_LITERAL>|< FLOATING_POINT_LITERAL >>
+| < DECIMAL_LITERAL:["1"-"9"] (["0"-"9"])*>
+| < FLOATING_POINT_LITERAL : (<DECIMAL_LITERAL >"."< DECIMAL_LITERAL >)>
+}
+
+TOKEN:
+{
+  < NUMBERS : (<MINUS >)?< INTEGER_LITERAL >>
+}
+
+TOKEN:
+{
+  < WORD_TERMINATOR: " " >
+}
+
+TOKEN :
+{
+ < SENTENCE_TERMINATOR : ((".")+|("!"|"?")(("!")*("?")*)*)(< WORD_TERMINATOR >)?>
+}
+
+TOKEN :
+{
+  < PARAGRAPH_TERMINATOR :"\n" >
+}
+
+TOKEN :
+{
+  < CHARACTERS : ["A"-"Z"]|["a"-"z"] >
+}
+
+TOKEN :
+{
+  < EMAIL : (<CHARACTERS >)+"@"(<CHARACTERS >)+("."(<CHARACTERS >)+)+ >
+}
+
+TOKEN :
+{
+  < WORDS : (~[" ",",","@","\n",".","?","!"])+ >
+}
+
+TOKEN :
+{
+< SENTENCE : ((< WORDS >)(< WORD_TERMINATOR >< WORDS >)+)*< SENTENCE_TERMINATOR >>
+}
+
+TOKEN :
+{
+  <PARAGRAPH : (< SENTENCE >)*< PARAGRAPH_TERMINATOR >>
+}
+
