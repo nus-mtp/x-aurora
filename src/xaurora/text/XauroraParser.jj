@@ -16,11 +16,11 @@ public class XauroraParser
     XauroraParser parser = new XauroraParser(System.in);
     while (true)
     {
-      System.out.println("Reading from standard input...");
-      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
+      
+	  
       try
       {
-        
+      	System.out.println(parser.parseWords());  
       }
       catch (Exception e)
       {
@@ -113,7 +113,7 @@ TOKEN :
 
 TOKEN :
 {
-  < EMAIL : (<CHARACTERS >)+"@"(<CHARACTERS >)+("."(<CHARACTERS >)+)+ >
+  < EMAIL : (<CHARACTERS >(< DECIMAL_LITERAL >)*)+"@"(<CHARACTERS >|< DECIMAL_LITERAL >)+("."(<CHARACTERS >|< DECIMAL_LITERAL >)+)+ >
 }
 
 TOKEN :
@@ -131,3 +131,15 @@ TOKEN :
   <PARAGRAPH : (< SENTENCE >)*< PARAGRAPH_TERMINATOR >>
 }
 
+String parseWords():
+{
+  Token emailInput;
+  Token numberInput;}{	emailInput = < EMAIL >
+	{
+	  return emailInput.image;	}
+|  numberInput = < NUMBERS >
+    {      return numberInput.image;
+	}
+|  < WORDS >	{
+  	  return "";	}
+}

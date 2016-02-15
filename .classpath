@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="C:/Users/Owner/Downloads/org.eclipse.jetty.io.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Owner/Downloads/org.eclipse.jetty.server.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Owner/Downloads/org.eclipse.jetty.util.jar"/>
+	<classpathentry kind="lib" path="E:/study/study2015sem1/CS3283/lucene-5.4.1/core/lucene-core-5.4.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
