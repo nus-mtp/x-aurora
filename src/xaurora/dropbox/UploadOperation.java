@@ -5,6 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxEntry;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxWriteMode;
+
 public class UploadOperation {
 
 	public static void UploadSingleFile(String fileName, DbxClient client){

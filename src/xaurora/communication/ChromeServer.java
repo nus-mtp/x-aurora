@@ -9,6 +9,7 @@ import java.net.Socket;
 
 import xaurora.io.DataFileIO;
 import xaurora.io.IDGenerator;
+import xaurora.text.TextIndexer;
 
 public class ChromeServer implements Runnable{
 	ServerSocket server = null;
@@ -33,7 +34,10 @@ public class ChromeServer implements Runnable{
 		while (true) {
 			isTextContent = false;
 			String text = receiveMessage();
-			if (isTextContent) outputToFile(text);
+			if (isTextContent) {
+				outputToFile(text);
+				
+			}
 			
 
 		}
@@ -45,7 +49,7 @@ public class ChromeServer implements Runnable{
 	}
 	private void outputToFile(String text) {
 		String id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
-		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
+		DataFileIO.instanceOf().createDataFile(getURL(text),id, String.valueOf(text).getBytes());
 	}
 
 	/*

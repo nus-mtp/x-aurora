@@ -8,33 +8,9 @@ options
 
 PARSER_BEGIN(XauroraParser)
 package xaurora.text;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.search.IndexSearcher;
-
-import org.apache.lucene.search.Query;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.LockObtainFailedException;
-
 import xaurora.text.TextIndexer;
-import xaurora.io.DataFileIO;
+
 public class XauroraParser
 {
   
@@ -155,15 +131,6 @@ TOKEN :
 
 
 
-/*TOKEN :
-{
-< SENTENCE : ((< WORDS >)(" "< WORDS >)+)*< SENTENCE_TERMINATOR >>
-}*/
-
-/*TOKEN :
-{
-  <PARAGRAPH : (< SENTENCE >)+>
-}*/
 
 
 private void parseEmails(Document doc):
@@ -183,15 +150,6 @@ private void parseEmails(Document doc):
 }
 }
 
-private void parseNumbers(Document doc):
-{
-  Token numberInput;}
-{
-  numberInput = < INTEGER_LITERAL >
-    {
-      TextIndexer.addNumber(doc,numberInput.image);
-      System.out.println(numberInput.image);
-	}}
 private void parseEmailInSentence(Document doc):
 {}
 {

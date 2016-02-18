@@ -3,6 +3,11 @@ package xaurora.dropbox;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
+import com.dropbox.core.DbxAccountInfo;
+import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+
 import xaurora.util.UserProfile;
 
 public class DropboxAuth {

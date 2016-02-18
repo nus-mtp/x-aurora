@@ -1,6 +1,9 @@
 package xaurora.dropboxV2;
 import java.io.PrintWriter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public class FormProtection {
 
 	private static final String antiCsrfTokenName = "anti-csrf-token";

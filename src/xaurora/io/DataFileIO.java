@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import xaurora.security.*;
+import xaurora.text.TextIndexer;
+
 import java.util.*;
 public class DataFileIO {
 	private static final String DEFAULT_SYNC_DIRECTORY = "\\local_data";
@@ -56,9 +58,10 @@ public class DataFileIO {
 	//Description: Generate the file name from an ID and write the data into the text file
 	//pre-condition: a String type id and the data needs to be written into the file
 	//post-condition: nil
-	public void createDataFile(String id,byte[] content){
+	public void createDataFile(String url,String id,byte[] content){
 		String dstpath = this.syncDirectory+new String(id)+DEFAULT_FILE_EXTENSION;
-		System.out.println(dstpath);
+		//Store the data in the lucene indexing system.
+		TextIndexer.getInstance().createIndexDocumentFromWeb(new String(content), url, dstpath);
 		File dstFile = new File(dstpath);
 		if(dstFile.exists()){
 			System.err.println(ERR_MSG_MD5_COLLISION);
@@ -68,8 +71,8 @@ public class DataFileIO {
 				dstFile.createNewFile();
 				FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
 				Security c = Security.getInstance();
-				
-				fos.write(Security.encrypt(content));
+				String overallContent = url+"\n"+new String(content);
+				fos.write(Security.encrypt(overallContent.getBytes()));
 				fos.close();
 			} catch(IOException e){
 				
@@ -136,6 +139,24 @@ public class DataFileIO {
 			e.printStackTrace();
 		}
 	}
+	public void removeDataFile(String filename){
+		Path filePath = Paths.get(filename);
+		try {
+			Files.deleteIfExists(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	private String getUrlFromFile(File f){
+		ArrayList<String> temp = new ArrayList<String>();
+		readFileContent(temp,f);
+		String result = "";
+		if(temp.size()>0){
+			result = temp.get(0);
+		}
+		return result;
+	}
 	//Description: read the file extension from the absolute path of the file
 	//pre-condition: a valid file
 	//post-condition: the file extension of the file.
@@ -149,4 +170,7 @@ public class DataFileIO {
         }
         return ext;
     }
+	private static String getFilename(File f){
+		return f.getName();
+	}
 }

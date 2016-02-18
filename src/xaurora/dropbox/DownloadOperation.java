@@ -5,6 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxEntry;
+import com.dropbox.core.DbxException;
+
 public class DownloadOperation {
 	
 	public static void DownloadSingleFile(String fileName, DbxClient client){
