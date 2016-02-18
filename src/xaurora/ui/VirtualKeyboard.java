@@ -12,12 +12,9 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -32,41 +29,14 @@ public class VirtualKeyboard extends Application{
         final Keyboard keyboard = new Keyboard();
         final Scene scene = new Scene(new Group(keyboard.createNode()));
         stage.setScene(scene);
-        stage.setTitle("Keyboard Example");
+        stage.setTitle("Virtual Keyboard");
         stage.show();
     }
     
     public static void main(final String[] args){
         launch(args);
     }
-
-    public VirtualKeyboard() {
-        /*****
-        // Cursor keys, with graphic instead of text
-        final Button cursorLeft = createCursorKey(KeyCode.LEFT, 15.0, 5.0, 15.0, 15.0, 5.0, 10.0);
-        final Button cursorRight = createCursorKey(KeyCode.RIGHT, 5.0, 5.0, 5.0, 15.0, 15.0, 10.0);
-        final Button cursorUp = createCursorKey(KeyCode.UP, 10.0, 0.0, 15.0, 10.0, 5.0, 10.0);
-        final Button cursorDown = createCursorKey(KeyCode.DOWN, 10.0, 10.0, 15.0, 0.0, 5.0, 0.0);
-        final VBox cursorUpDown = new VBox(2);
-        cursorUpDown.getChildren().addAll(cursorUp, cursorDown);
-
-        final Button spaceBar = createKeyButton(" ", KeyCode.SPACE);
-        spaceBar.setMaxWidth(Double.POSITIVE_INFINITY);
-        HBox.setHgrow(spaceBar, Priority.ALWAYS);
-    }
-    * *****/
-    }
-
-    /*****
-    // Utility method for creating cursor keys:
-    private Button createCursorKey(KeyCode code, Double... points) {
-        Button button = createKey("", code);
-        final Node graphic = PolygonBuilder.create().points(points).build();
-        graphic.setStyle("-fx-fill: -fx-mark-color;");
-        button.setGraphic(graphic);
-        button.setContentDisplay(ContentDisplay.GRAPHIC_ONLY); return button; }
-    ****
-     */
+    
     private class Keyboard {
         private final Key[][] keys;
         final String[][] keyTexts = new String[][]{
@@ -74,7 +44,7 @@ public class VirtualKeyboard extends Application{
             {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"},
             {"a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'"},
             {"shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"},
-            {"ctrl", "meta", "alt", " ", " ", " ", " ", " "}
+            {"ctrl", "meta", "alt", " ", "arrow", "arrow", "arrow", "arrow"}
         };
         final KeyCode[][] keyCodes = new KeyCode[][]{
             {KeyCode.BACK_QUOTE, KeyCode.DIGIT1, KeyCode.DIGIT2, KeyCode.DIGIT3,
@@ -178,30 +148,53 @@ public class VirtualKeyboard extends Application{
             pressedProperty.set(value);
         }
 
-        // Creates a button with mutable text, and registers listener with it
         private Node createNode() {
             final StackPane keyNode = new StackPane();
             keyNode.setFocusTraversable(true);
             installEventHandler(keyNode);
             
-            final Rectangle keyBackground = new Rectangle(20, 20);
+            final Rectangle keyBackground = new Rectangle(30, 30);
             keyBackground.fillProperty().bind(Bindings.when(pressedProperty).then(Color.RED).otherwise(Color.WHITE));
             keyBackground.setStroke(Color.BLACK);
             keyBackground.setStrokeWidth(2);
             keyBackground.setArcWidth(12);
             keyBackground.setArcHeight(12);
-            
+            if (keyCode == KeyCode.SPACE) {
+                keyBackground.setWidth(200);
+            }
+
             final Text keyText = new Text(text);
-            
-            keyNode.getChildren().addAll(keyBackground, keyText);
+            if (text.equals("arrow")) {
+                final Rectangle arrow = new Rectangle(20, 20);
+                Node graphic = null;
+                if (keyCode == KeyCode.LEFT) {
+                    graphic = createGraphic(15.0, 5.0, 15.0, 15.0, 5.0, 10.0);
+                } else if (keyCode == KeyCode.UP) {
+                    graphic = createGraphic(10.0, 0.0, 15.0, 10.0, 5.0, 10.0);
+                } else if (keyCode == KeyCode.DOWN) {
+                    graphic = createGraphic(10.0, 10.0, 15.0, 0.0, 5.0, 0.0);
+                } else if (keyCode == KeyCode.RIGHT) {
+                    graphic = createGraphic(5.0, 5.0, 5.0, 15.0, 15.0, 10.0);
+                }
+                arrow.setClip(graphic);
+                keyNode.getChildren().addAll(keyBackground, arrow);
+            } else {
+                keyNode.getChildren().addAll(keyBackground, keyText);
+            }
             return keyNode;
+        }
+
+        private Node createGraphic(Double... points) {
+            final Node graphic = PolygonBuilder.create().points(points).build();
+            graphic.setStyle("-fx-fill: -fx-mark-color;");
+            return graphic;
         }
 
         private void installEventHandler(final Node keyNode) {
             final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>(){
                 public void handle(final KeyEvent keyEvent){
                     if (keyEvent.getCode() == keyCode){
-                        setPressed(isPressed() && 
+                        setPressed(!isPressed() && 
                                 keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
                         keyEvent.consume();
                     }
