@@ -1,9 +1,5 @@
 package xaurora.dropboxV2;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.PrintWriter;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 public class FormProtection {
 

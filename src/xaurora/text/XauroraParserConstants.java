@@ -11,31 +11,21 @@ public interface XauroraParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int MINUS = 29;
+  int INTEGER_LITERAL = 31;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 30;
+  int DECIMAL_LITERAL = 32;
   /** RegularExpression Id. */
-  int DECIMAL_LITERAL = 31;
+  int FLOATING_POINT_LITERAL = 33;
   /** RegularExpression Id. */
-  int FLOATING_POINT_LITERAL = 32;
-  /** RegularExpression Id. */
-  int NUMBERS = 33;
-  /** RegularExpression Id. */
-  int WORD_TERMINATOR = 34;
+  int TERM_SEPARATOR = 34;
   /** RegularExpression Id. */
   int SENTENCE_TERMINATOR = 35;
   /** RegularExpression Id. */
-  int PARAGRAPH_TERMINATOR = 36;
+  int CHARACTERS = 36;
   /** RegularExpression Id. */
-  int CHARACTERS = 37;
+  int EMAIL = 37;
   /** RegularExpression Id. */
-  int EMAIL = 38;
-  /** RegularExpression Id. */
-  int WORDS = 39;
-  /** RegularExpression Id. */
-  int SENTENCE = 40;
-  /** RegularExpression Id. */
-  int PARAGRAPH = 41;
+  int WORDS = 38;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -71,19 +61,16 @@ public interface XauroraParserConstants {
     "\">\"",
     "\",\"",
     "\"/\"",
+    "\"\\n\"",
     "\"-\"",
     "<INTEGER_LITERAL>",
     "<DECIMAL_LITERAL>",
     "<FLOATING_POINT_LITERAL>",
-    "<NUMBERS>",
     "\" \"",
     "<SENTENCE_TERMINATOR>",
-    "\"\\n\"",
     "<CHARACTERS>",
     "<EMAIL>",
     "<WORDS>",
-    "<SENTENCE>",
-    "<PARAGRAPH>",
   };
 
 }

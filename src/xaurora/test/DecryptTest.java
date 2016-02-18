@@ -24,7 +24,7 @@ public class DecryptTest {
 		File inputFile = new File(PATH_INPUT);
 		Path Inputpath = Paths.get(inputFile.getAbsolutePath());
 		byte[] expecteddata = Files.readAllBytes(Inputpath);
-		byte[] actualData = c.decrypt(c.encrypt(expecteddata));
+		byte[] actualData = Security.decrypt(Security.encrypt(expecteddata));
 		System.out.println(expecteddata.length);
 		System.out.println(actualData.length);
 		

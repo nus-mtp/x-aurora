@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import xaurora.dropbox.*;
 import xaurora.security.*;
 import java.util.*;
 public class DataFileIO {
@@ -70,7 +69,7 @@ public class DataFileIO {
 				FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
 				Security c = Security.getInstance();
 				
-				fos.write(c.encrypt(content));
+				fos.write(Security.encrypt(content));
 				fos.close();
 			} catch(IOException e){
 				
@@ -124,7 +123,7 @@ public class DataFileIO {
 			byte[] data = Files.readAllBytes(path);
 			
 			Security c = Security.getInstance();
-			byte[] decrypted = c.decrypt(data);
+			byte[] decrypted = Security.decrypt(data);
 			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				System.out.println((char) decrypted[i]);
 			}

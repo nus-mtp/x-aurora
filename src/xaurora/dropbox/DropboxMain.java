@@ -14,10 +14,6 @@ import xaurora.io.DataFileIO;
 import xaurora.util.UserProfile;
 import xaurora.dropbox.DropboxAuth;
 
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
-import com.dropbox.core.DbxException;
-
 public class DropboxMain {
 
 	public static ArrayList<UserProfile> user = new ArrayList<UserProfile>();
