@@ -41,8 +41,6 @@ public class VirtualKeyboard extends Application{
     }
 
     public VirtualKeyboard() {
-
-
         /*****
         // Cursor keys, with graphic instead of text
         final Button cursorLeft = createCursorKey(KeyCode.LEFT, 15.0, 5.0, 15.0, 15.0, 5.0, 10.0);
@@ -55,22 +53,8 @@ public class VirtualKeyboard extends Application{
         final Button spaceBar = createKeyButton(" ", KeyCode.SPACE);
         spaceBar.setMaxWidth(Double.POSITIVE_INFINITY);
         HBox.setHgrow(spaceBar, Priority.ALWAYS);
-
-        // build layout
-        for (int row = 0; row < key.length; row++) {
-            HBox hbox = new HBox(5);
-            hbox.setAlignment(Pos.CENTER);
-            root.getChildren().add(hbox);
-
-            for (int k = 0; k < key[row].length; k++) {
-                hbox.getChildren().add(createKeyButton(key[row][k], codes[row][k]));
-            }
-
-            if (row == key.length - 1) {
-                hbox.getChildren().addAll(spaceBar, cursorLeft, cursorUpDown, cursorRight);
-            }
-        }
-        *****/
+    }
+    * *****/
     }
 
     /*****
@@ -144,14 +128,14 @@ public class VirtualKeyboard extends Application{
                 public void handle(final KeyEvent keyEvent){
                     final Key key = lookupKey(keyEvent.getCode());
                     if (key != null){
-                        key.setPressed(keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
+                        key.setPressed(!key.isPressed() && 
+                                keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
                         keyEvent.consume();
                     }
                 }
             };
             
             keyboardNode.setOnKeyPressed(keyEventHandler);
-            keyboardNode.setOnKeyReleased(keyEventHandler);
         }
 
         private Key lookupKey(final KeyCode keyCode) {
@@ -217,14 +201,14 @@ public class VirtualKeyboard extends Application{
             final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>(){
                 public void handle(final KeyEvent keyEvent){
                     if (keyEvent.getCode() == keyCode){
-                        setPressed(keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
+                        setPressed(isPressed() && 
+                                keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
                         keyEvent.consume();
                     }
                 }
             };
             
             keyNode.setOnKeyPressed(keyEventHandler);
-            keyNode.setOnKeyReleased(keyEventHandler);
         }
     }
 }
