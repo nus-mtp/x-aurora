@@ -255,11 +255,11 @@ public class TextIndexer {
 		doc.add(new StringField(field,value,Field.Store.YES));
 	}
 	
-	public void deleteBySource(String host){
+	public void deleteBySource(String field,String inputQuery){
 		Analyzer analyzer = new StandardAnalyzer();
 		
 		try {
-			Query deleteQuery = new QueryParser(FIELD_SOURCE,analyzer).parse(host);
+			Query deleteQuery = new QueryParser(field,analyzer).parse(inputQuery);
 			TopDocs docs = this.searcher.search(deleteQuery, this.searcher.count(deleteQuery));
 			for(int i = 0;i<docs.totalHits;i++){
 				int id = docs.scoreDocs[i].doc;
@@ -275,4 +275,5 @@ public class TextIndexer {
 			e.printStackTrace();
 		}
 	}
+	
 }
