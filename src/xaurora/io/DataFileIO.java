@@ -12,6 +12,8 @@
 
 package xaurora.io;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,13 +23,14 @@ import xaurora.text.TextIndexer;
 
 import java.util.*;
 public class DataFileIO {
-	private static final String DEFAULT_SYNC_DIRECTORY = "\\local_data";
+	private static final String DEFAULT_SYNC_DIRECTORY = "";
 	private static final String DEFAULT_FILE_EXTENSION = ".txt";
 	private static final String TEXT_FILE_TYPE = "txt";
 	private static final String ERR_MSG_MD5_COLLISION = "ERROR MESSAGE: MD5 COLLISION";
 	private static final int INDEX_ZERO = 0;
 	private static final String NEW_EMPTY_STRING = "";
 	private static final char FILE_EXTENSION_DELIMITER = '.';
+	private static final String SOURCE_UNKNOWN = "";
 	private String syncDirectory = DEFAULT_SYNC_DIRECTORY;
 	private static DataFileIO instance = null;
 	private DataFileIO(){
@@ -170,7 +173,98 @@ public class DataFileIO {
         }
         return ext;
     }
-	private static String getFilename(File f){
-		return f.getName();
+	
+	public ArrayList<String> getAllFilenamesFromDirectory(){
+		ArrayList<String> result = new ArrayList<String>();
+		File dir = new File(this.syncDirectory); 
+		Stack<File> s = new Stack<File>();
+		s.push(dir);
+		while (!s.isEmpty()){
+			File f = s.pop();
+			//System.out.println(f.exists());
+			if(f.exists()){
+				if(f.isDirectory()){
+					File[] subDir = f.listFiles();
+					for(int i = INDEX_ZERO;i<subDir.length;i++){
+						s.push(subDir[i]);
+					}
+					
+				} else {
+					result.add(f.getName());
+				}
+			}
+		}
+		return result;
+	}
+	public ArrayList<String> getAllURLFromDirectory(){
+		ArrayList<String> result = new ArrayList<String>();
+		File dir = new File(this.syncDirectory); 
+		Stack<File> s = new Stack<File>();
+		s.push(dir);
+		while (!s.isEmpty()){
+			File f = s.pop();
+			//System.out.println(f.exists());
+			if(f.exists()){
+				if(f.isDirectory()){
+					File[] subDir = f.listFiles();
+					for(int i = INDEX_ZERO;i<subDir.length;i++){
+						s.push(subDir[i]);
+					}
+					
+				} else {
+					result.add(getUrlFromFile(f));
+				}
+			}
+		}
+		return result;
+	}
+	public ArrayList<String> getAllSourceFromDirectory(){
+		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> temp = getAllURLFromDirectory();
+		for(int index = 0;index<temp.size();index++){
+			result.add(getHostFromURL(temp.get(index)));
+		}
+		return result;
+	}
+	public ArrayList<String> getAllFileLengthFromDirectory(){
+		ArrayList<String> result = new ArrayList<String>();
+		File dir = new File(this.syncDirectory); 
+		Stack<File> s = new Stack<File>();
+		s.push(dir);
+		while (!s.isEmpty()){
+			File f = s.pop();
+			//System.out.println(f.exists());
+			if(f.exists()){
+				if(f.isDirectory()){
+					File[] subDir = f.listFiles();
+					for(int i = INDEX_ZERO;i<subDir.length;i++){
+						s.push(subDir[i]);
+					}
+					
+				} else {
+					result.add((double)f.length()/1024.0+ " KB");
+				}
+			}
+		}
+		return result;
+	}
+	public ArrayList<String> getAllCreatedTimeFromDirectory(){
+		ArrayList<String> result = new ArrayList<String>();
+		File dir = new File(this.syncDirectory); 
+		Stack<File> s = new Stack<File>();
+		return result;
+	}
+	private static String getHostFromURL(String url)
+	{
+		String host = SOURCE_UNKNOWN;
+		try
+		{
+			URL sourceURL = new URL(url);
+			host = sourceURL.getHost();
+		}catch (MalformedURLException e) {
+
+			//e.printStackTrace(); log here
+		}
+		return host;
 	}
 }

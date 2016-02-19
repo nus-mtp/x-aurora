@@ -15,7 +15,7 @@ public class XauroraParser
 {
   
   private static XauroraParser instance = null;
-  
+  private static String number = "";
   private XauroraParser()  {	
   }
   public static XauroraParser getInstance()  {	if(instance == null) {
@@ -36,7 +36,7 @@ public class XauroraParser
 	  
       try
       {
-      	
+      	getNumber();
       }
       catch (Exception e)
       {
@@ -98,7 +98,7 @@ SKIP :
 TOKEN :
 {
   < INTEGER_LITERAL :<DECIMAL_LITERAL>|< FLOATING_POINT_LITERAL >>
-| < DECIMAL_LITERAL:(["1"-"9"] (["0"-"9"])*)|"0">
+| < DECIMAL_LITERAL:(["0"-"9"] (["0"-"9"])*)>
 | < FLOATING_POINT_LITERAL : (<DECIMAL_LITERAL >"."< DECIMAL_LITERAL >)>
 }
 
@@ -138,24 +138,62 @@ private void parseEmails(Document doc):
   Token emailInput;
   Token numberInput;
   Token words;}{
+  
     emailInput = < EMAIL >
 	{
 	  TextIndexer.addEmail(doc,emailInput.image);
+	  if(!number.equals(""))	  {		TextIndexer.addNumber(doc,number);
+		System.out.println("1 "+number);
+		number = "";
+	  }
 	  System.out.println(emailInput.image);	}
-|  words = < WORDS >{}
-| 	< TERM_SEPARATOR >{}
-| < CHARACTERS >{}
-| numberInput = < INTEGER_LITERAL >{	TextIndexer.addNumber(doc,numberInput.image);
-    System.out.println(numberInput.image);
+|  words = < WORDS >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		System.out.println("2 "+number);
+		System.out.println(words.image);
+		number = "";
+	  }}
+| 	< TERM_SEPARATOR >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		System.out.println("3 "+number);
+		number = "";
+	  }}
+| < CHARACTERS >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		System.out.println("4 "+number);
+		number = "";
+	  }}
+| "@"<WORDS >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		System.out.println("5 "+number);
+		number = "";
+	  }}
+| numberInput = < INTEGER_LITERAL >{
+  number += numberInput.image;
 }
 }
 
-private void parseEmailInSentence(Document doc):
+
+public void getNumber():{
+  Token numberInput;}{
+  numberInput = < INTEGER_LITERAL >
+{
+	System.out.println(numberInput.image);
+}}
+public void parseEmailInSentence(Document doc):
 {}
 {
-  (parseEmails(doc))*(< SENTENCE_TERMINATOR >)  {
+  (parseEmails(doc))*(< SENTENCE_TERMINATOR >|<EOF>)  {
       }}
 
-void parseEmailInParagraph(Document doc):{}
+/*void parseEmailInParagraph(Document doc):{}
 {
-  (parseEmailInSentence(doc))+  {  }}
+  (parseEmailInSentence(doc))+  {  }}*/

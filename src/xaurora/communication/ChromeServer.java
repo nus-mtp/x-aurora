@@ -33,7 +33,12 @@ public class ChromeServer implements Runnable{
 
 		while (true) {
 			isTextContent = false;
+			long lStartTime = System.currentTimeMillis();
 			String text = receiveMessage();
+			long lEndTime = System.currentTimeMillis();
+			long difference = lEndTime - lStartTime;
+
+			System.out.println("Elapsed milliseconds for receiveMessage : " + difference);
 			if (isTextContent) {
 				outputToFile(text);
 				
@@ -72,6 +77,7 @@ public class ChromeServer implements Runnable{
 		// Skip Header
 		for (int i=0; i<4; i++){
 			line = in.readLine();
+			//System.out.println(line);
 			// Get length
 			if (i==3){
 				String[] data = line.split(":");
@@ -104,6 +110,7 @@ public class ChromeServer implements Runnable{
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+		//System.out.println(contentData);
 		return contentData;
 	}
 	
@@ -120,7 +127,7 @@ public class ChromeServer implements Runnable{
 		String res = new String();
 		
 		// Block list shall be merged to one string like:
-		String dummyBlocklist = "chrome://\ngoogle.com\nwikipedia.org\n";
+		String dummyBlocklist ="";// "chrome://\ngoogle.com\nwikipedia.org\n";
 		
 		// According to Communication code, generate response.
 		switch (commCode) {

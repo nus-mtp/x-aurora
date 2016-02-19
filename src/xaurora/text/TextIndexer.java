@@ -5,12 +5,14 @@ import java.util.List;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -31,9 +33,8 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.FSDirectory;
 
 import xaurora.io.DataFileIO;
 
@@ -46,6 +47,7 @@ public class TextIndexer {
 	private static final String FIELD_EMAIL = "email";
 	private static final String FIELD_FILENAME = "filename";
 	private static final String FIELD_TERMS = "term";
+	private static final String DEFAULT_SYNC_DIRECTORY = "";
 	//656 stop_word sets. Credits from http://www.ranks.nl/stopwords 
 	private static final List<String> stopWords = Arrays.asList("a","able","about","above","abst","accordance",
 											"according","accordingly","across","act","actually","added","adj","affected","affecting",
@@ -106,7 +108,7 @@ public class TextIndexer {
 											"x","y","yes","yet","you","youd","you'll","your","youre","yours","yourself","yourselves","you've","z","zero");
 	private static final CharArraySet stopSet = new CharArraySet(stopWords, true);
 	private static TextIndexer instance = null;
-	
+	private XauroraParser paragraphParser;
 	private Directory storeDirectory;
 	private Analyzer analyzer;
 	private IndexWriterConfig config;
@@ -118,16 +120,15 @@ public class TextIndexer {
 	}
 	
 	private void init(){
-		this.storeDirectory = new RAMDirectory();
-		this.analyzer = new StandardAnalyzer();
-		this.config = new IndexWriterConfig(analyzer);
 		try {
-			this.writer = new IndexWriter(this.storeDirectory,config);
-			this.reader = DirectoryReader.open(this.storeDirectory);
-			this.searcher = new IndexSearcher(this.reader);
-		} catch (IOException e) {
-			e.printStackTrace();
+			File syncDirectory =new File(this.DEFAULT_SYNC_DIRECTORY);
+			this.storeDirectory = FSDirectory.open(Paths.get(syncDirectory.getAbsolutePath()));
+			this.paragraphParser = new XauroraParser(System.in);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
+		
+		
 	}
 	private void terminate(){
 		try {
@@ -145,26 +146,48 @@ public class TextIndexer {
 	
 	public void createIndexDocumentFromWeb(String rawData,String url,String filename)
 	{
+		//System.out.println("Creation Start!\n");
+		this.analyzer = new StandardAnalyzer();
+		this.config = new IndexWriterConfig(analyzer);
+		
+		long lStartTime = System.currentTimeMillis();
 		String[] paragraphs = rawData.split("\n");
-
+		
 		String sourceHost = getHostFromURL(url);
 		try {
-			
-			for(int i = 0;i<paragraphs.length;i++)
+			this.writer = new IndexWriter(this.storeDirectory,config);
+			//System.out.println("LENGTH "+paragraphs.length);
+			for(int i = 1;i<paragraphs.length;i++)
 			{
+				//System.out.println("PARAGRAPH "+paragraphs[i]);
+				if(paragraphs[i].replaceAll("[^\\x00-\\x7F]","").trim().equals(""))
+					continue;
 				String[] sentences = paragraphs[i].split("[.|!|?]+ ");
 				for(int j = 0; j<sentences.length;j++){
 					Document data = new Document();
 					addURL(data,url);
+					//System.out.println("add url done");
 					addSource(data,sourceHost);
+					//System.out.println("add source done");
 					addFilename(data,filename);
+					//System.out.println("add filename done");
 					extractEntityContent(sentences,j,data);
+					//System.out.println("extract Entity done");
+					//System.out.println(j+" "+sentences[j]);
 					extractNumbersAndEmails(sentences, j, data);
+					//System.out.println("add number done");
 					extractTerms(sentences[j],data);
+					//System.out.println("extracted");
 					this.writer.addDocument(data);
+					//System.out.println("ADD document successfully");
 				}
 			}
 			this.writer.commit();
+			long lEndTime = System.currentTimeMillis();
+			long difference = lEndTime - lStartTime;
+
+			System.out.println("Elapsed milliseconds: " + difference);
+			this.writer.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -194,10 +217,10 @@ public class TextIndexer {
 		addContent(data,input);
 	}
 	private void extractNumbersAndEmails(String[] paragraphs, int i, Document data) {
-		InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode(paragraphs[i]).array());
-		XauroraParser paragraphParser = new XauroraParser(is);
+		InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode((paragraphs[i]+". ").replaceAll("[^\\x00-\\x7F]", "")).array());
+		XauroraParser.ReInit(is);
 		try {
-			XauroraParser.parseEmailInParagraph(data);
+			XauroraParser.parseEmailInSentence(data);
 		} catch (xaurora.text.ParseException e) {
 
 			e.printStackTrace();
@@ -255,7 +278,7 @@ public class TextIndexer {
 		doc.add(new StringField(field,value,Field.Store.YES));
 	}
 	
-	public void deleteBySource(String field,String inputQuery){
+	public void deleteByField(String field,String inputQuery){
 		Analyzer analyzer = new StandardAnalyzer();
 		
 		try {

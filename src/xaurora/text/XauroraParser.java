@@ -6,7 +6,7 @@ import xaurora.text.TextIndexer;
 public class XauroraParser implements XauroraParserConstants {
 
   private static XauroraParser instance = null;
-
+  private static String number = "";
   private XauroraParser()
   {
 
@@ -31,7 +31,7 @@ public class XauroraParser implements XauroraParserConstants {
 
       try
       {
-
+        getNumber();
       }
       catch (Exception e)
       {
@@ -57,24 +57,55 @@ public class XauroraParser implements XauroraParserConstants {
     case EMAIL:
       emailInput = jj_consume_token(EMAIL);
           TextIndexer.addEmail(doc,emailInput.image);
+          if(!number.equals(""))
+          {
+                TextIndexer.addNumber(doc,number);
+                System.out.println("1 "+number);
+                number = "";
+          }
           System.out.println(emailInput.image);
       break;
     case WORDS:
       words = jj_consume_token(WORDS);
-
+  if(!number.equals(""))
+          {
+                TextIndexer.addNumber(doc,number);
+                System.out.println("2 "+number);
+                System.out.println(words.image);
+                number = "";
+          }
       break;
     case TERM_SEPARATOR:
       jj_consume_token(TERM_SEPARATOR);
-
+  if(!number.equals(""))
+          {
+                TextIndexer.addNumber(doc,number);
+                System.out.println("3 "+number);
+                number = "";
+          }
       break;
     case CHARACTERS:
       jj_consume_token(CHARACTERS);
-
+  if(!number.equals(""))
+          {
+                TextIndexer.addNumber(doc,number);
+                System.out.println("4 "+number);
+                number = "";
+          }
+      break;
+    case 39:
+      jj_consume_token(39);
+      jj_consume_token(WORDS);
+  if(!number.equals(""))
+          {
+                TextIndexer.addNumber(doc,number);
+                System.out.println("5 "+number);
+                number = "";
+          }
       break;
     case INTEGER_LITERAL:
       numberInput = jj_consume_token(INTEGER_LITERAL);
-        TextIndexer.addNumber(doc,numberInput.image);
-    System.out.println(numberInput.image);
+  number += numberInput.image;
       break;
     default:
       jj_la1[0] = jj_gen;
@@ -83,7 +114,13 @@ public class XauroraParser implements XauroraParserConstants {
     }
   }
 
-  static final private void parseEmailInSentence(Document doc) throws ParseException {
+  static final public void getNumber() throws ParseException {
+  Token numberInput;
+    numberInput = jj_consume_token(INTEGER_LITERAL);
+        System.out.println(numberInput.image);
+  }
+
+  static final public void parseEmailInSentence(Document doc) throws ParseException {
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -92,6 +129,7 @@ public class XauroraParser implements XauroraParserConstants {
       case CHARACTERS:
       case EMAIL:
       case WORDS:
+      case 39:
         ;
         break;
       default:
@@ -100,27 +138,17 @@ public class XauroraParser implements XauroraParserConstants {
       }
       parseEmails(doc);
     }
-    jj_consume_token(SENTENCE_TERMINATOR);
-
-  }
-
-  static final public void parseEmailInParagraph(Document doc) throws ParseException {
-    label_2:
-    while (true) {
-      parseEmailInSentence(doc);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case INTEGER_LITERAL:
-      case TERM_SEPARATOR:
-      case SENTENCE_TERMINATOR:
-      case CHARACTERS:
-      case EMAIL:
-      case WORDS:
-        ;
-        break;
-      default:
-        jj_la1[2] = jj_gen;
-        break label_2;
-      }
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case SENTENCE_TERMINATOR:
+      jj_consume_token(SENTENCE_TERMINATOR);
+      break;
+    case 0:
+      jj_consume_token(0);
+      break;
+    default:
+      jj_la1[2] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
 
   }
@@ -143,10 +171,10 @@ public class XauroraParser implements XauroraParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x80000000,0x80000000,0x80000000,};
+      jj_la1_0 = new int[] {0x80000000,0x80000000,0x1,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x74,0x74,0x7c,};
+      jj_la1_1 = new int[] {0xf4,0xf4,0x8,};
    }
 
   /** Constructor with InputStream. */
@@ -284,7 +312,7 @@ public class XauroraParser implements XauroraParserConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[39];
+    boolean[] la1tokens = new boolean[40];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -301,7 +329,7 @@ public class XauroraParser implements XauroraParserConstants {
         }
       }
     }
-    for (int i = 0; i < 39; i++) {
+    for (int i = 0; i < 40; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

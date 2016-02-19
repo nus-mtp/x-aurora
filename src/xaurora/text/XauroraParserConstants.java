@@ -71,6 +71,7 @@ public interface XauroraParserConstants {
     "<CHARACTERS>",
     "<EMAIL>",
     "<WORDS>",
+    "\"@\"",
   };
 
 }
