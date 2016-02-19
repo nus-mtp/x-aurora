@@ -95,48 +95,64 @@ public class UserPreference {
             //System Pane
             isRunOnStartUp = Boolean.valueOf(settings[index++]);
             isHideInToolbar = Boolean.valueOf(settings[index++]);
+            
             //Hotkeys Pane
             String[] hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendWordHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
                 extendWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
             }
+            
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceWordHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
                 reduceWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
             }
+            
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendSentenceHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
                 extendSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
             }
+            
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceSentenceHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
                 reduceSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
             }
+            
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendParagraphHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
                 extendParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
             }
+            
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceParagraphHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
                 reduceParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
             }
+            
             //Text Editor Pane
             numMatchingTextDisplay = Integer.valueOf(settings[index++]);
             isShowTextSource = Boolean.valueOf(settings[index++]);
             boxColour = Color.valueOf(settings[index++]);
             textColour = Color.valueOf(settings[index++]);
             boxTransparency = Double.valueOf(settings[index++]);;
+            
             //Blocked List Pane
             String[] s = settings[index++].split("\\s+");
             blockedList = new ArrayList<BlockedPage>();
-            for (int i=0; i < s.length; i+=2){
-                BlockedPage page = new BlockedPage(s[i], Boolean.valueOf(s[i+1]));
+            for (int i=0; i < s.length/2; i++){
+                BlockedPage page = new BlockedPage(s[2*i], Boolean.valueOf(s[(2*i)+1]));
                 blockedList.add(page);
             }
+            
             //Path Pane
             dataPath = settings[index++];
             isShowPreviewText = Boolean.valueOf(settings[index++]);
             clearCachesTime = settings[index++];
+            
             //Storage Pane
             maxTextSizeStored = settings[index++];
             previewTextLength = settings[index++];

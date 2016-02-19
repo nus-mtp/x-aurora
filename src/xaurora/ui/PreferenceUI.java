@@ -289,7 +289,7 @@ public class PreferenceUI extends Application{
         HBox[] keyboardBoxes = new HBox[numHotkeys];
         
         for (int i=0; i < numHotkeys; i++){
-            virtualKeyboards[i] = new VirtualKeyboard();
+            virtualKeyboards[i] = new VirtualKeyboard(i);
             keyboardNodes[i] = virtualKeyboards[i].createNode();
             setKeyboardHotkey(virtualKeyboards[i], i);
             keyboardBoxes[i] = new HBox(6);
@@ -322,7 +322,7 @@ public class PreferenceUI extends Application{
     }
     
     private void setKeyboardHotkey(VirtualKeyboard keyboard, int index){
-        KeyCode[] hotkey = new KeyCode[numHotkeys];
+        KeyCode[] hotkey = null;
         switch(index){
             case 0: hotkey = preferences.getExtendWordHotkey(); break;
             case 1: hotkey = preferences.getReduceWordHotkey(); break;
