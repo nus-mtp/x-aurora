@@ -31,7 +31,6 @@ public class XauroraParser implements XauroraParserConstants {
 
       try
       {
-        getNumber();
       }
       catch (Exception e)
       {
@@ -105,12 +104,6 @@ public class XauroraParser implements XauroraParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-  }
-
-  static final public void getNumber() throws ParseException {
-  Token numberInput;
-    numberInput = jj_consume_token(INTEGER_LITERAL);
-        System.out.println(numberInput.image);
   }
 
   static final public void parseEmailInSentence(Document doc) throws ParseException {

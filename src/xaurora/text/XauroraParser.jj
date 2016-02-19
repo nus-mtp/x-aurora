@@ -36,7 +36,6 @@ public class XauroraParser
 	  
       try
       {
-      	getNumber();
       }
       catch (Exception e)
       {
@@ -174,7 +173,7 @@ private void parseEmails(Document doc):
 }
 }
 
-}
+
 public void parseEmailInSentence(Document doc):
 {}
 {
