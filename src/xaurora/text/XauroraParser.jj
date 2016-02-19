@@ -174,13 +174,7 @@ private void parseEmails(Document doc):
 }
 }
 
-
-public void getNumber():{
-  Token numberInput;}{
-  numberInput = < INTEGER_LITERAL >
-{
-	System.out.println(numberInput.image);
-}}
+}
 public void parseEmailInSentence(Document doc):
 {}
 {

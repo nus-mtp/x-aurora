@@ -45,8 +45,9 @@ public class TextIndexer {
 	private static final String FIELD_CONTENT = "content";
 	private static final String FIELD_NUMBER = "number";
 	private static final String FIELD_EMAIL = "email";
-	private static final String FIELD_FILENAME = "filename";
+	public static final String FIELD_FILENAME = "filename";
 	private static final String FIELD_TERMS = "term";
+	private static final String DATAFILE_EXTENSION = ".txt";
 	//656 stop_word sets. Credits from http://www.ranks.nl/stopwords 
 	private static final List<String> stopWords = Arrays.asList("a","able","about","above","abst","accordance",
 											"according","accordingly","across","act","actually","added","adj","affected","affecting",
@@ -123,6 +124,7 @@ public class TextIndexer {
 			
 			this.storeDirectory = FSDirectory.open(Paths.get(DataFileIO.instanceOf().getIndexDirectory()));
 			this.paragraphParser = new XauroraParser(System.in);
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -140,14 +142,14 @@ public class TextIndexer {
 	{
 		//System.out.println("Creation Start!\n");
 		this.analyzer = new StandardAnalyzer();
-		this.config = new IndexWriterConfig(analyzer);
+		this.config = new IndexWriterConfig(this.analyzer);
 		
 		long lStartTime = System.currentTimeMillis();
 		String[] paragraphs = rawData.split("\n");
 		
 		String sourceHost = getHostFromURL(url);
 		try {
-			this.writer = new IndexWriter(this.storeDirectory,config);
+			this.writer = new IndexWriter(this.storeDirectory,this.config);
 			//System.out.println("LENGTH "+paragraphs.length);
 			for(int i = 1;i<paragraphs.length;i++)
 			{
@@ -161,7 +163,7 @@ public class TextIndexer {
 					//System.out.println("add url done");
 					addSource(data,sourceHost);
 					//System.out.println("add source done");
-					addFilename(data,filename);
+					addFilename(data,filename.replace(DATAFILE_EXTENSION, ""));
 					//System.out.println("add filename done");
 					extractEntityContent(sentences,j,data);
 					//System.out.println("extract Entity done");
@@ -233,15 +235,15 @@ public class TextIndexer {
 	}
 	public static void addURL(Document doc,String url)
 	{
-		addStringField(doc,FIELD_URL,url);
+		addTextField(doc,FIELD_URL,url);
 	}
 	public static void addSource(Document doc,String source)
 	{
-		addStringField(doc,FIELD_SOURCE,source);
+		addTextField(doc,FIELD_SOURCE,source);
 	}
 	public static void addFilename(Document doc,String filename)
 	{
-		addStringField(doc,FIELD_FILENAME,filename);
+		addTextField(doc,FIELD_FILENAME,filename);
 	}
 	public static void addContent(Document doc,String content)
 	{
@@ -250,11 +252,11 @@ public class TextIndexer {
 
 	public static void addNumber(Document doc,String number)
 	{
-		addStringField(doc,FIELD_NUMBER,number);
+		addTextField(doc,FIELD_NUMBER,number);
 	}
 	public static void addEmail(Document doc,String email)
 	{
-		addStringField(doc,FIELD_EMAIL,email);
+		addTextField(doc,FIELD_EMAIL,email);
 	}
 	public static void addTerms(Document doc,String term)
 	{
@@ -270,19 +272,29 @@ public class TextIndexer {
 		doc.add(new StringField(field,value,Field.Store.YES));
 	}
 	
-	public void deleteByField(String field,String inputQuery){
-		Analyzer analyzer = new StandardAnalyzer();
-		
+	public synchronized void deleteByField(String field,String inputQuery){
+		System.out.println("HERE");
+		this.analyzer = new StandardAnalyzer();
+		System.out.println("input is "+inputQuery);
 		try {
-			Query deleteQuery = new QueryParser(field,analyzer).parse(inputQuery);
+			this.reader  = DirectoryReader.open(this.storeDirectory);
+			this.searcher = new IndexSearcher(this.reader);
+			
+			Query deleteQuery = new QueryParser(field,this.analyzer).parse(inputQuery.replace(DATAFILE_EXTENSION,""));
+			
 			TopDocs docs = this.searcher.search(deleteQuery, this.searcher.count(deleteQuery));
 			for(int i = 0;i<docs.totalHits;i++){
 				int id = docs.scoreDocs[i].doc;
 				String filename = this.searcher.doc(id).get(FIELD_FILENAME);
 				DataFileIO.instanceOf().removeDataFile(filename);
 			}
+			this.reader.close();
+			this.analyzer = new StandardAnalyzer();
+			this.config = new IndexWriterConfig(this.analyzer);
+			this.writer = new IndexWriter(this.storeDirectory,this.config);
 			this.writer.deleteDocuments(deleteQuery);
-			
+			this.writer.close();
+			System.out.println("DELETE COMPLETE");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

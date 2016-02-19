@@ -19,7 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import xaurora.security.*;
+import xaurora.system.TimeManager;
 import xaurora.text.TextIndexer;
+import xaurora.util.dataFileMetaData;
 
 import java.util.*;
 public class DataFileIO {
@@ -94,6 +96,7 @@ public class DataFileIO {
 				String overallContent = url+"\n"+new String(content);
 				fos.write(Security.encrypt(overallContent.getBytes()));
 				fos.close();
+				System.out.println("lastModified is " + dstFile.lastModified());
 			} catch(IOException e){
 				
 			}
@@ -144,9 +147,6 @@ public class DataFileIO {
 			byte[] data = Files.readAllBytes(path);
 			
 			byte[] decrypted = Security.decrypt(data);
-			for(int i = INDEX_ZERO;i<decrypted.length;i++){
-				System.out.println((char) decrypted[i]);
-			}
 			String output = NEW_EMPTY_STRING;
 			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				output+=String.valueOf((char)decrypted[i]);
@@ -156,8 +156,19 @@ public class DataFileIO {
 			e.printStackTrace();
 		}
 	}
+	public synchronized void autoDbUpdate(){
+		ArrayList<dataFileMetaData> allMetaData = this.getAllMetaData();
+		for(int index = 0; index<allMetaData.size();index++){
+			if(TimeManager.isExpired(allMetaData.get(index).getLastModified())){
+				//System.out.println(allMetaData.get(index).getFilename());
+				
+				TextIndexer.getInstance().deleteByField(TextIndexer.FIELD_FILENAME, allMetaData.get(index).getFilename());
+			}
+		}
+	}
+	
 	public void removeDataFile(String filename){
-		Path filePath = Paths.get(filename);
+		Path filePath = Paths.get(this.syncDirectory+"\\"+filename+DEFAULT_FILE_EXTENSION);
 		try {
 			Files.deleteIfExists(filePath);
 		} catch (IOException e) {
@@ -188,8 +199,8 @@ public class DataFileIO {
         return ext;
     }
 	
-	public ArrayList<String> getAllFilenamesFromDirectory(){
-		ArrayList<String> result = new ArrayList<String>();
+	public ArrayList<dataFileMetaData> getAllMetaData(){
+		ArrayList<dataFileMetaData> result = new ArrayList<dataFileMetaData>();
 		File dir = new File(this.syncDirectory); 
 		Stack<File> s = new Stack<File>();
 		s.push(dir);
@@ -204,81 +215,19 @@ public class DataFileIO {
 					}
 					
 				} else {
-					result.add(f.getName());
+					dataFileMetaData tempEntity = new dataFileMetaData(f.getName(),getUrlFromFile(f));
+					tempEntity.addFileMetaData(f.length(), f.lastModified());
+					result.add(tempEntity);					
 				}
 			}
 		}
 		return result;
 	}
-	public ArrayList<String> getAllURLFromDirectory(){
-		ArrayList<String> result = new ArrayList<String>();
-		File dir = new File(this.syncDirectory); 
-		Stack<File> s = new Stack<File>();
-		s.push(dir);
-		while (!s.isEmpty()){
-			File f = s.pop();
-			//System.out.println(f.exists());
-			if(f.exists()){
-				if(f.isDirectory()){
-					File[] subDir = f.listFiles();
-					for(int i = INDEX_ZERO;i<subDir.length;i++){
-						s.push(subDir[i]);
-					}
-					
-				} else {
-					result.add(getUrlFromFile(f));
-				}
-			}
+	public synchronized void updateIndexingFromFiles(){
+		ArrayList<dataFileMetaData> allMetaData = this.getAllMetaData();
+		ArrayList<String> content = this.getContent();
+		for(int index = 0;index<allMetaData.size();index++){
+			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getURL(), allMetaData.get(index).getFilename());
 		}
-		return result;
-	}
-	public ArrayList<String> getAllSourceFromDirectory(){
-		ArrayList<String> result = new ArrayList<String>();
-		ArrayList<String> temp = getAllURLFromDirectory();
-		for(int index = 0;index<temp.size();index++){
-			result.add(getHostFromURL(temp.get(index)));
-		}
-		return result;
-	}
-	public ArrayList<String> getAllFileLengthFromDirectory(){
-		ArrayList<String> result = new ArrayList<String>();
-		File dir = new File(this.syncDirectory); 
-		Stack<File> s = new Stack<File>();
-		s.push(dir);
-		while (!s.isEmpty()){
-			File f = s.pop();
-			//System.out.println(f.exists());
-			if(f.exists()){
-				if(f.isDirectory()){
-					File[] subDir = f.listFiles();
-					for(int i = INDEX_ZERO;i<subDir.length;i++){
-						s.push(subDir[i]);
-					}
-					
-				} else {
-					result.add((double)f.length()/1024.0+ " KB");
-				}
-			}
-		}
-		return result;
-	}
-	public ArrayList<String> getAllCreatedTimeFromDirectory(){
-		ArrayList<String> result = new ArrayList<String>();
-		File dir = new File(this.syncDirectory); 
-		Stack<File> s = new Stack<File>();
-		return result;
-	}
-	private static String getHostFromURL(String url)
-	{
-		String host = SOURCE_UNKNOWN;
-		try
-		{
-			URL sourceURL = new URL(url);
-			host = sourceURL.getHost();
-		}catch (MalformedURLException e) {
-
-			//e.printStackTrace(); log here
-		}
-		return host;
 	}
 }
