@@ -9,6 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
@@ -277,158 +279,34 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    private GridPane createHotkeysPane(){
-        GridPane grid = new GridPane();
-        grid.setHgap(hGap-20);
-        grid.setVgap(vGap);
-        grid.setPadding(new Insets(topOffset, rightOffset, bottomOffset, leftOffset));
-        grid.setAlignment(Pos.CENTER);
-        
-        Label[] labelHotkeys = new Label[numHotkeys];
-        labelHotkeys[0] = new Label("Extend Words: ");
-        labelHotkeys[1] = new Label("Reduce Words: ");
-        labelHotkeys[2] = new Label("Extend Sentences: ");
-        labelHotkeys[3] = new Label("Reduce Sentences: ");
-        labelHotkeys[4] = new Label("Extend Paragraphs: ");
-        labelHotkeys[5] = new Label("Reduce Paragraphs: ");     
-        
-        ChoiceBox[] choiceboxHotkeys = new ChoiceBox[2*numHotkeys];
-        Label[] plus = new Label[2*numHotkeys];
-        for (int i=0; i < choiceboxHotkeys.length; i++){
-            choiceboxHotkeys[i] = new ChoiceBox();
-            choiceboxHotkeys[i].setItems(FXCollections.observableArrayList("Ctrl", "Alt", "Shift"));
-            plus[i] = new Label("+");
-        }
-
-        TextField[] textFields = new TextField[numHotkeys];
-        for (int i = 0; i < textFields.length; i++) {
-            textFields[i] = new TextField();
-            textFields[i].setMaxWidth(textFieldWidth);
-            textFields[i].setAlignment(Pos.CENTER);
-        }
-        
-        for (int i=0; i < labelHotkeys.length; i++){
-            String[] hotkey;
-            switch(i){
-                case 0: hotkey = preferences.getExtendWordHotkey(); break;
-                case 1: hotkey = preferences.getReduceWordHotkey(); break;
-                case 2: hotkey = preferences.getExtendSentenceHotkey(); break;
-                case 3: hotkey = preferences.getReduceSentenceHotkey(); break;
-                case 4: hotkey = preferences.getExtendParagraphHotkey(); break;
-                case 5: hotkey = preferences.getReduceParagraphHotkey(); break; 
-                default: hotkey = new String[3];    
-            }
-            choiceboxHotkeys[2*i].setValue(hotkey[0]);
-            choiceboxHotkeys[2*i+1].setValue(hotkey[1]);
-            textFields[i].setText(hotkey[2]);
-        }
-
-        choiceboxHotkeys[0].setOnAction(event -> {
-            String[] hotkey = preferences.getExtendWordHotkey();
-            hotkey[0] = (String) choiceboxHotkeys[0].getSelectionModel().getSelectedItem();
-            preferences.setExtendWordHotkey(hotkey);
-        });
-        choiceboxHotkeys[1].setOnAction(event -> {
-            String[] hotkey = preferences.getExtendWordHotkey();
-            hotkey[1] = (String) choiceboxHotkeys[1].getSelectionModel().getSelectedItem();
-            preferences.setExtendWordHotkey(hotkey);
-        });
-        choiceboxHotkeys[2].setOnAction(event -> {
-            String[] hotkey = preferences.getReduceWordHotkey();
-            hotkey[0] = (String) choiceboxHotkeys[2].getSelectionModel().getSelectedItem();
-            preferences.setReduceWordHotkey(hotkey);
-        });
-        choiceboxHotkeys[3].setOnAction(event -> {
-            String[] hotkey = preferences.getReduceWordHotkey();
-            hotkey[1] = (String) choiceboxHotkeys[3].getSelectionModel().getSelectedItem();
-            preferences.setReduceWordHotkey(hotkey);
-        });
-        
-        choiceboxHotkeys[4].setOnAction(event -> {
-            String[] hotkey = preferences.getExtendSentenceHotkey();
-            hotkey[0] = (String) choiceboxHotkeys[4].getSelectionModel().getSelectedItem();
-            preferences.setExtendSentenceHotkey(hotkey);
-        });
-        choiceboxHotkeys[5].setOnAction(event -> {
-            String[] hotkey = preferences.getExtendSentenceHotkey();
-            hotkey[1] = (String) choiceboxHotkeys[5].getSelectionModel().getSelectedItem();
-            preferences.setExtendSentenceHotkey(hotkey);
-        });
-        choiceboxHotkeys[6].setOnAction(event -> {
-            String[] hotkey = preferences.getReduceSentenceHotkey();
-            hotkey[0] = (String) choiceboxHotkeys[6].getSelectionModel().getSelectedItem();
-            preferences.setReduceSentenceHotkey(hotkey);
-        });
-        choiceboxHotkeys[7].setOnAction(event -> {
-            String[] hotkey = preferences.getReduceSentenceHotkey();
-            hotkey[1] = (String) choiceboxHotkeys[7].getSelectionModel().getSelectedItem();
-            preferences.setReduceSentenceHotkey(hotkey);
-        });
-        
-        choiceboxHotkeys[8].setOnAction(event -> {
-            String[] hotkey = preferences.getExtendParagraphHotkey();
-            hotkey[0] = (String) choiceboxHotkeys[8].getSelectionModel().getSelectedItem();
-            preferences.setExtendParagraphHotkey(hotkey);
-        });
-        choiceboxHotkeys[9].setOnAction(event -> {
-            String[] hotkey = preferences.getExtendParagraphHotkey();
-            hotkey[1] = (String) choiceboxHotkeys[9].getSelectionModel().getSelectedItem();
-            preferences.setExtendParagraphHotkey(hotkey);
-        });
-        choiceboxHotkeys[10].setOnAction(event -> {
-            String[] hotkey = preferences.getReduceParagraphHotkey();
-            hotkey[0] = (String) choiceboxHotkeys[10].getSelectionModel().getSelectedItem();
-            preferences.setReduceParagraphHotkey(hotkey);
-        });
-        choiceboxHotkeys[11].setOnAction(event -> {
-            String[] hotkey = preferences.getReduceParagraphHotkey();
-            hotkey[1] = (String) choiceboxHotkeys[11].getSelectionModel().getSelectedItem();
-            preferences.setReduceParagraphHotkey(hotkey);
-        });
-        
-        textFields[0].setOnKeyPressed(key ->{
-            String[] hotkey = preferences.getExtendWordHotkey();
-            hotkey[2] = key.getText().toUpperCase();
-            preferences.setExtendWordHotkey(hotkey);
-        });
-        textFields[1].setOnKeyPressed(key ->{
-            String[] hotkey = preferences.getReduceWordHotkey();
-            hotkey[2] = key.getText().toUpperCase();
-            preferences.setReduceWordHotkey(hotkey);
-        });
-        textFields[2].setOnKeyPressed(key ->{
-            String[] hotkey = preferences.getExtendSentenceHotkey();
-            hotkey[2] = key.getText().toUpperCase();
-            preferences.setExtendSentenceHotkey(hotkey);
-        });
-        textFields[3].setOnKeyPressed(key ->{
-            String[] hotkey = preferences.getReduceSentenceHotkey();
-            hotkey[2] = key.getText().toUpperCase();
-            preferences.setReduceSentenceHotkey(hotkey);
-        });
-        textFields[4].setOnKeyPressed(key ->{
-            String[] hotkey = preferences.getExtendParagraphHotkey();
-            hotkey[2] = key.getText().toUpperCase();
-            preferences.setExtendParagraphHotkey(hotkey);
-        });
-        textFields[5].setOnKeyPressed(key ->{
-            String[] hotkey = preferences.getReduceParagraphHotkey();
-            hotkey[2] = key.getText().toUpperCase();
-            preferences.setReduceParagraphHotkey(hotkey);
-        });
+    private BorderPane createHotkeysPane(){
+        BorderPane border = new BorderPane();
+        border.setPadding(new Insets(10));
+        VirtualKeyboard virtualKeyboard = new VirtualKeyboard();      
+        Node keyboardNode = virtualKeyboard.getKeyboard();
+        keyboardNode.setFocusTraversable(true);
        
-        for (int i=0; i < labelHotkeys.length; i++){
-            grid.add(labelHotkeys[i], 0, i);
-            grid.add(choiceboxHotkeys[2*i], 1, i);
-            grid.add(plus[2*i], 2, i);
-            grid.add(choiceboxHotkeys[2*i+1], 3, i);
-            grid.add(plus[2*i+1], 4, i);
-            grid.add(textFields[i], 5, i);
-        }
-
-        return grid;
+        HBox keyboardBox = new HBox();
+        keyboardBox.getChildren().add(new Group(keyboardNode));
+        keyboardBox.setAlignment(Pos.CENTER);
+        keyboardBox.setFocusTraversable(true);
+        
+        ChoiceBox cbHotkeys = new ChoiceBox();
+        cbHotkeys.setItems(FXCollections.observableArrayList("extend word", "reduce word", "extend sentence",
+                "reduce sentence", "extend paragraph", "reduce paragraph"));
+        cbHotkeys.setValue("extend word");
+        cbHotkeys.setOnAction(event -> {keyboardNode.requestFocus();});
+        border.setOnMouseClicked(event -> {keyboardNode.requestFocus();});
+        
+        HBox hbox = new HBox();
+        hbox.getChildren().add(cbHotkeys);
+        hbox.setAlignment(Pos.CENTER);
+        border.setBottom(hbox);
+        border.setCenter(keyboardBox);
+        
+        return border;
     }
-    
+    /*****
     private String[] getHotkey(int index){
         switch(index){
             case 0: ; return preferences.getExtendWordHotkey();
@@ -451,6 +329,7 @@ public class PreferenceUI extends Application{
             case 5: ; preferences.setReduceParagraphHotkey(hotkey); 
         }
     }
+    ****/
     
     private GridPane createTextEditorPane(){
         GridPane grid = new GridPane();

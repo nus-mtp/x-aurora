@@ -24,9 +24,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class VirtualKeyboard extends Application{
+    Keyboard keyboard;
+    
     @Override
     public void start(final Stage stage){
-        final Keyboard keyboard = new Keyboard();
+        keyboard = new Keyboard();
         final Scene scene = new Scene(new Group(keyboard.createNode()));
         stage.setScene(scene);
         stage.setTitle("Virtual Keyboard");
@@ -35,6 +37,14 @@ public class VirtualKeyboard extends Application{
     
     public static void main(final String[] args){
         launch(args);
+    }
+    
+    public VirtualKeyboard(){
+        keyboard = new Keyboard();
+    }
+    
+    public Node getKeyboard(){
+        return keyboard.createNode();
     }
     
     private class Keyboard {
