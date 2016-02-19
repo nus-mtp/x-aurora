@@ -7,14 +7,13 @@ using Word = Microsoft.Office.Interop.Word;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Word;
 using System.Timers;
+
 using XAuroraWordPlugin;
 
 namespace XAuroraWordPlugin
 {
     public partial class ThisAddIn
     {
-        Communicator comm = new Communicator();
-
         public static Word.Document getCurrDocument()
         {
             return Globals.ThisAddIn.Application.ActiveDocument;
@@ -22,20 +21,22 @@ namespace XAuroraWordPlugin
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            Timer myTimer = new Timer();
+            System.Timers.Timer myTimer = new System.Timers.Timer();
             myTimer.Elapsed += new ElapsedEventHandler(makeConnection);
             myTimer.Interval = 3000;
             myTimer.Enabled = true;
+
+            InputDetector.startHook();
         }
 
         private void makeConnection(object source, System.Timers.ElapsedEventArgs e)
         {
-            comm.connect();
+            Communicator.connect();
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {
-
+            InputDetector.endHook();
         }
 
         #region VSTO generated code
@@ -51,6 +52,8 @@ namespace XAuroraWordPlugin
         }
         
         #endregion
+
+        
     }
 }
 
