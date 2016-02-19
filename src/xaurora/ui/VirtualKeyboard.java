@@ -1,17 +1,14 @@
 package xaurora.ui;
 
 import java.util.List;
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -21,118 +18,105 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.PolygonBuilder;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 
-public class VirtualKeyboard extends Application{
-    Keyboard keyboard;
-    
-    @Override
-    public void start(final Stage stage){
-        keyboard = new Keyboard();
-        final Scene scene = new Scene(new Group(keyboard.createNode()));
-        stage.setScene(scene);
-        stage.setTitle("Virtual Keyboard");
-        stage.show();
+public class VirtualKeyboard {
+
+    private final Key[][] keys;
+    final String[][] keyTexts = new String[][]{
+        {"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="},
+        {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"},
+        {"a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'"},
+        {"shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"},
+        {"ctrl", "meta", "alt", " ", "arrow", "arrow", "arrow", "arrow"}
+    };
+    final KeyCode[][] keyCodes = new KeyCode[][]{
+        {KeyCode.BACK_QUOTE, KeyCode.DIGIT1, KeyCode.DIGIT2, KeyCode.DIGIT3,
+            KeyCode.DIGIT4, KeyCode.DIGIT5, KeyCode.DIGIT6, KeyCode.DIGIT7,
+            KeyCode.DIGIT8, KeyCode.DIGIT9, KeyCode.DIGIT0, KeyCode.SUBTRACT,
+            KeyCode.EQUALS},
+        {KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.T, KeyCode.Y,
+            KeyCode.U, KeyCode.I, KeyCode.O, KeyCode.P, KeyCode.OPEN_BRACKET,
+            KeyCode.CLOSE_BRACKET, KeyCode.BACK_SLASH},
+        {KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.G, KeyCode.H,
+            KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.SEMICOLON, KeyCode.QUOTE},
+        {KeyCode.SHIFT, KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V, KeyCode.B, KeyCode.N,
+            KeyCode.M, KeyCode.COMMA, KeyCode.PERIOD, KeyCode.SLASH},
+        {KeyCode.CONTROL, KeyCode.META, KeyCode.ALT, KeyCode.SPACE, KeyCode.LEFT,
+            KeyCode.UP, KeyCode.DOWN, KeyCode.RIGHT}
+    };
+
+    public VirtualKeyboard() {
+        keys = new Key[5][];
+        for (int row = 0; row < keyCodes.length; row++) {
+            keys[row] = new Key[keyCodes[row].length];
+            for (int col = 0; col < keyCodes[row].length; col++) {
+                keys[row][col] = new Key(keyTexts[row][col], keyCodes[row][col]);
+            }
+        }
     }
     
-    public static void main(final String[] args){
-        launch(args);
+    public Key getKey(KeyCode keyCode){
+        for (int i = 0; i < keys.length; i++){
+            for (int j = 0; j < keys[i].length; j++){
+                if (keys[i][j].getKeyCode() == keyCode){
+                    return keys[i][j];
+                }
+            }
+        }
+        return null;
     }
-    
-    public VirtualKeyboard(){
-        keyboard = new Keyboard();
+
+    public Node createNode() {
+        final VBox keyboardNode = new VBox(5);
+        keyboardNode.setPadding(new Insets(10));
+        keyboardNode.getStyleClass().add("virtual-keyboard");
+
+        final List<Node> keyboardNodeChildren = keyboardNode.getChildren();
+        for (int row = 0; row < keys.length; row++) {
+            HBox hbox = new HBox(5);
+            hbox.setAlignment(Pos.CENTER);
+            keyboardNodeChildren.add(hbox);
+
+            for (int col = 0; col < keys[row].length; col++) {
+                Key key = keys[row][col];
+                hbox.getChildren().add(key.createNode());
+            }
+        }
+
+        installEventHandler(keyboardNode);
+        return keyboardNode;
     }
-    
-    public Node getKeyboard(){
-        return keyboard.createNode();
-    }
-    
-    private class Keyboard {
-        private final Key[][] keys;
-        final String[][] keyTexts = new String[][]{
-            {"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="},
-            {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"},
-            {"a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'"},
-            {"shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"},
-            {"ctrl", "meta", "alt", " ", "arrow", "arrow", "arrow", "arrow"}
+
+    private void installEventHandler(final Parent keyboardNode) {
+        final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
+            public void handle(final KeyEvent keyEvent) {
+                final Key key = lookupKey(keyEvent.getCode());
+                if (key != null) {
+                    key.setPressed(!key.isPressed()
+                            && keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
+                    keyEvent.consume();
+                }
+            }
         };
-        final KeyCode[][] keyCodes = new KeyCode[][]{
-            {KeyCode.BACK_QUOTE, KeyCode.DIGIT1, KeyCode.DIGIT2, KeyCode.DIGIT3,
-                KeyCode.DIGIT4, KeyCode.DIGIT5, KeyCode.DIGIT6, KeyCode.DIGIT7,
-                KeyCode.DIGIT8, KeyCode.DIGIT9, KeyCode.DIGIT0, KeyCode.SUBTRACT,
-                KeyCode.EQUALS},
-            {KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.T, KeyCode.Y,
-                KeyCode.U, KeyCode.I, KeyCode.O, KeyCode.P, KeyCode.OPEN_BRACKET,
-                KeyCode.CLOSE_BRACKET, KeyCode.BACK_SLASH},
-            {KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.G, KeyCode.H,
-                KeyCode.J, KeyCode.K, KeyCode.L, KeyCode.SEMICOLON, KeyCode.QUOTE},
-            {KeyCode.SHIFT, KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V, KeyCode.B, KeyCode.N,
-                KeyCode.M, KeyCode.COMMA, KeyCode.PERIOD, KeyCode.SLASH},
-            {KeyCode.CONTROL, KeyCode.META, KeyCode.ALT, KeyCode.SPACE, KeyCode.LEFT,
-                KeyCode.UP, KeyCode.DOWN, KeyCode.RIGHT}
-        };
-        
-        public Keyboard(){
-            keys = new Key[5][];
-            for (int row = 0; row < keyCodes.length; row++){
-                keys[row] = new Key[keyCodes[row].length];
-                for (int col = 0; col < keyCodes[row].length; col++) {
-                    keys[row][col] = new Key(keyTexts[row][col], keyCodes[row][col]);
-                }
-            }
-        }
 
-        public Node createNode() {
-            final VBox keyboardNode = new VBox(5);
-            keyboardNode.setPadding(new Insets(10));
-            keyboardNode.getStyleClass().add("virtual-keyboard");
-            
-            final List<Node> keyboardNodeChildren = keyboardNode.getChildren();
-            for (int row = 0; row < keys.length; row++) {
-                HBox hbox = new HBox(5);
-                hbox.setAlignment(Pos.CENTER);
-                keyboardNodeChildren.add(hbox);
-
-                for (int col = 0; col < keys[row].length; col++) {
-                    Key key = keys[row][col];
-                    hbox.getChildren().add(key.createNode());
-                }
-            }
-
-            installEventHandler(keyboardNode);
-            return keyboardNode;
-        }
-
-        private void installEventHandler(final Parent keyboardNode) {
-            final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>(){
-                public void handle(final KeyEvent keyEvent){
-                    final Key key = lookupKey(keyEvent.getCode());
-                    if (key != null){
-                        key.setPressed(!key.isPressed() && 
-                                keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
-                        keyEvent.consume();
-                    }
-                }
-            };
-            
-            keyboardNode.setOnKeyPressed(keyEventHandler);
-        }
-
-        private Key lookupKey(final KeyCode keyCode) {
-            for (int row = 0; row < keys.length; row++) {
-                for (int col = 0; col < keys[row].length; col++) {
-                    Key key = keys[row][col];
-                    if (key.getKeyCode() == keyCode) {
-                        return key;
-                    }
-                }
-            }
-
-            return null;
-        }
+        keyboardNode.setOnKeyPressed(keyEventHandler);
     }
 
-    private class Key {
+    private Key lookupKey(final KeyCode keyCode) {
+        for (int row = 0; row < keys.length; row++) {
+            for (int col = 0; col < keys[row].length; col++) {
+                Key key = keys[row][col];
+                if (key.getKeyCode() == keyCode) {
+                    return key;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public class Key {
+
         private final String text;
         private final KeyCode keyCode;
         private final BooleanProperty pressedProperty;
@@ -142,19 +126,20 @@ public class VirtualKeyboard extends Application{
             this.keyCode = keyCode;
             this.pressedProperty = new SimpleBooleanProperty(this, "pressed");
         }
-        
-        public String getText(){
+
+        public String getText() {
             return this.text;
         }
-        
-        public KeyCode getKeyCode(){
+
+        public KeyCode getKeyCode() {
             return this.keyCode;
         }
-        
-        public boolean isPressed(){
+
+        public boolean isPressed() {
             return pressedProperty.get();
         }
-        public void setPressed(final boolean value){
+
+        public void setPressed(final boolean value) {
             pressedProperty.set(value);
         }
 
@@ -162,7 +147,7 @@ public class VirtualKeyboard extends Application{
             final StackPane keyNode = new StackPane();
             keyNode.setFocusTraversable(true);
             installEventHandler(keyNode);
-            
+
             final Rectangle keyBackground = new Rectangle(30, 30);
             keyBackground.fillProperty().bind(Bindings.when(pressedProperty).then(Color.RED).otherwise(Color.WHITE));
             keyBackground.setStroke(Color.BLACK);
@@ -201,16 +186,16 @@ public class VirtualKeyboard extends Application{
         }
 
         private void installEventHandler(final Node keyNode) {
-            final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>(){
-                public void handle(final KeyEvent keyEvent){
-                    if (keyEvent.getCode() == keyCode){
-                        setPressed(!isPressed() && 
-                                keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
+            final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
+                public void handle(final KeyEvent keyEvent) {
+                    if (keyEvent.getCode() == keyCode) {
+                        setPressed(!isPressed()
+                                && keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
                         keyEvent.consume();
                     }
                 }
             };
-            
+
             keyNode.setOnKeyPressed(keyEventHandler);
         }
     }

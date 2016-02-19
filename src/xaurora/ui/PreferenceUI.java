@@ -31,6 +31,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import static javafx.scene.layout.BorderPane.setMargin;
@@ -39,6 +40,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import xaurora.ui.VirtualKeyboard.Key;
 import xaurora.util.BlockedPage;
 import xaurora.util.UserPreference;
 import xaurora.util.BrowsedPage;
@@ -70,7 +72,7 @@ public class PreferenceUI extends Application{
     private static final int maxMatchingDisplayed = 20;
     private static final int majorTickUnit = 50;
     
-    UserPreference preferences = new UserPreference();
+    UserPreference preferences = UserPreference.getInstance();
     Stage stage;
     
     public static void main(String[] args) {
@@ -282,54 +284,60 @@ public class PreferenceUI extends Application{
     private BorderPane createHotkeysPane(){
         BorderPane border = new BorderPane();
         border.setPadding(new Insets(10));
-        VirtualKeyboard virtualKeyboard = new VirtualKeyboard();      
-        Node keyboardNode = virtualKeyboard.getKeyboard();
-        keyboardNode.setFocusTraversable(true);
-       
-        HBox keyboardBox = new HBox();
-        keyboardBox.getChildren().add(new Group(keyboardNode));
-        keyboardBox.setAlignment(Pos.CENTER);
-        keyboardBox.setFocusTraversable(true);
+        VirtualKeyboard[] virtualKeyboards = new VirtualKeyboard[numHotkeys];      
+        Node[] keyboardNodes = new Node[numHotkeys];
+        HBox[] keyboardBoxes = new HBox[numHotkeys];
+        
+        for (int i=0; i < numHotkeys; i++){
+            virtualKeyboards[i] = new VirtualKeyboard();
+            keyboardNodes[i] = virtualKeyboards[i].createNode();
+            setKeyboardHotkey(virtualKeyboards[i], i);
+            keyboardBoxes[i] = new HBox(6);
+            keyboardBoxes[i].getChildren().add(new Group(keyboardNodes[i]));
+            keyboardBoxes[i].setAlignment(Pos.CENTER);
+        }
         
         ChoiceBox cbHotkeys = new ChoiceBox();
         cbHotkeys.setItems(FXCollections.observableArrayList("extend word", "reduce word", "extend sentence",
                 "reduce sentence", "extend paragraph", "reduce paragraph"));
         cbHotkeys.setValue("extend word");
-        cbHotkeys.setOnAction(event -> {keyboardNode.requestFocus();});
-        border.setOnMouseClicked(event -> {keyboardNode.requestFocus();});
+        border.setCenter(keyboardBoxes[0]);
+        cbHotkeys.setOnAction(event -> {
+            int index = cbHotkeys.getSelectionModel().getSelectedIndex();
+            border.setCenter(keyboardBoxes[index]);
+            keyboardNodes[index].requestFocus();
+        });
+        border.setOnMouseClicked(event -> {
+            int index = cbHotkeys.getSelectionModel().getSelectedIndex();
+            border.setCenter(keyboardBoxes[index]);
+            keyboardNodes[index].requestFocus();
+        });
         
         HBox hbox = new HBox();
         hbox.getChildren().add(cbHotkeys);
         hbox.setAlignment(Pos.CENTER);
         border.setBottom(hbox);
-        border.setCenter(keyboardBox);
         
         return border;
     }
-    /*****
-    private String[] getHotkey(int index){
-        switch(index){
-            case 0: ; return preferences.getExtendWordHotkey();
-            case 1: ; return preferences.getReduceWordHotkey();
-            case 2: ; return preferences.getExtendSentenceHotkey();
-            case 3: ; return preferences.getReduceSentenceHotkey();
-            case 4: ; return preferences.getExtendParagraphHotkey();
-            case 5: ; return preferences.getReduceParagraphHotkey(); 
-        }
-        return null;
-    }
     
-    private void setHotkey(int index, String[] hotkey){
+    private void setKeyboardHotkey(VirtualKeyboard keyboard, int index){
+        KeyCode[] hotkey = new KeyCode[numHotkeys];
         switch(index){
-            case 0: ; preferences.setExtendWordHotkey(hotkey);
-            case 1: ; preferences.setReduceWordHotkey(hotkey);
-            case 2: ; preferences.setExtendSentenceHotkey(hotkey);
-            case 3: ; preferences.setReduceSentenceHotkey(hotkey);
-            case 4: ; preferences.setExtendParagraphHotkey(hotkey);
-            case 5: ; preferences.setReduceParagraphHotkey(hotkey); 
+            case 0: hotkey = preferences.getExtendWordHotkey(); break;
+            case 1: hotkey = preferences.getReduceWordHotkey(); break;
+            case 2: hotkey = preferences.getExtendSentenceHotkey(); break;
+            case 3: hotkey = preferences.getReduceSentenceHotkey(); break; 
+            case 4: hotkey = preferences.getExtendParagraphHotkey(); break;
+            case 5: hotkey = preferences.getReduceParagraphHotkey(); break;
+            default:    
+        }
+        
+        for (int i = 0; i < hotkey.length; i++){
+            Key key = keyboard.getKey(hotkey[i]);
+            key.setPressed(true);
         }
     }
-    ****/
     
     private GridPane createTextEditorPane(){
         GridPane grid = new GridPane();
