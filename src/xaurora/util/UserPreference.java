@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 
 public class UserPreference {
@@ -15,12 +16,12 @@ public class UserPreference {
     private boolean isRunOnStartUp;
     private boolean isHideInToolbar;
     //Hotkeys Pane
-    private String[] extendWordHotkey;
-    private String[] reduceWordHotkey;
-    private String[] extendSentenceHotkey;
-    private String[] reduceSentenceHotkey;
-    private String[] extendParagraphHotkey;
-    private String[] reduceParagraphHotkey;
+    private KeyCode[] extendWordHotkey;
+    private KeyCode[] reduceWordHotkey;
+    private KeyCode[] extendSentenceHotkey;
+    private KeyCode[] reduceSentenceHotkey;
+    private KeyCode[] extendParagraphHotkey;
+    private KeyCode[] reduceParagraphHotkey;
     //Text Editor Pane
     private int numMatchingTextDisplay;
     private boolean isShowTextSource;
@@ -38,18 +39,30 @@ public class UserPreference {
     private String previewTextLength;
     
     private static final int numPreferences = 19;
+    private static UserPreference instance = null;
+    
+    private UserPreference(){
+        
+    }
+    
+    public static UserPreference getInstance(){
+        if (instance == null){
+            instance = new UserPreference();
+        }
+        return instance;
+    }
 
     public void initPreferences(){
         //System Pane
         isRunOnStartUp = true;
         isHideInToolbar = true;
         //Hotkeys Pane
-        extendWordHotkey = new String[]{"Ctrl", "Alt", "Z"};
-        reduceWordHotkey = new String[]{"Ctrl", "Alt", "X"};
-        extendSentenceHotkey = new String[]{"Ctrl", "Alt", "C"};
-        reduceSentenceHotkey = new String[]{"Ctrl", "Alt", "V"};
-        extendParagraphHotkey = new String[]{"Ctrl", "Alt", "B"};
-        reduceParagraphHotkey = new String[]{"Ctrl", "Alt", "N"};
+        extendWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.Z};
+        reduceWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.X};
+        extendSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.C};
+        reduceSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.V};
+        extendParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.B};
+        reduceParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.N};
         //Text Editor Pane
         numMatchingTextDisplay = 5;
         isShowTextSource = true;
@@ -82,30 +95,64 @@ public class UserPreference {
             //System Pane
             isRunOnStartUp = Boolean.valueOf(settings[index++]);
             isHideInToolbar = Boolean.valueOf(settings[index++]);
+            
             //Hotkeys Pane
-            extendWordHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            reduceWordHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            extendSentenceHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            reduceSentenceHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            extendParagraphHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            reduceParagraphHotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            String[] hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendWordHotkey = new KeyCode[hotkey.length];
+            for (int i = 0; i < hotkey.length; i++){
+                extendWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            }
+            
+            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceWordHotkey = new KeyCode[hotkey.length];
+            for (int i = 0; i < hotkey.length; i++){
+                reduceWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            }
+            
+            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendSentenceHotkey = new KeyCode[hotkey.length];
+            for (int i = 0; i < hotkey.length; i++){
+                extendSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            }
+            
+            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceSentenceHotkey = new KeyCode[hotkey.length];
+            for (int i = 0; i < hotkey.length; i++){
+                reduceSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            }
+            
+            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            extendParagraphHotkey = new KeyCode[hotkey.length];
+            for (int i = 0; i < hotkey.length; i++){
+                extendParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            }
+            
+            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            reduceParagraphHotkey = new KeyCode[hotkey.length];
+            for (int i = 0; i < hotkey.length; i++){
+                reduceParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            }
+            
             //Text Editor Pane
             numMatchingTextDisplay = Integer.valueOf(settings[index++]);
             isShowTextSource = Boolean.valueOf(settings[index++]);
             boxColour = Color.valueOf(settings[index++]);
             textColour = Color.valueOf(settings[index++]);
             boxTransparency = Double.valueOf(settings[index++]);;
+            
             //Blocked List Pane
             String[] s = settings[index++].split("\\s+");
             blockedList = new ArrayList<BlockedPage>();
-            for (int i=0; i < s.length; i+=2){
-                BlockedPage page = new BlockedPage(s[i], Boolean.valueOf(s[i+1]));
+            for (int i=0; i < s.length/2; i++){
+                BlockedPage page = new BlockedPage(s[2*i], Boolean.valueOf(s[(2*i)+1]));
                 blockedList.add(page);
             }
+            
             //Path Pane
             dataPath = settings[index++];
             isShowPreviewText = Boolean.valueOf(settings[index++]);
             clearCachesTime = settings[index++];
+            
             //Storage Pane
             maxTextSizeStored = settings[index++];
             previewTextLength = settings[index++];
@@ -178,42 +225,42 @@ public class UserPreference {
         return isHideInToolbar;
     }
 
-    public String[] getExtendWordHotkey() {
+    public KeyCode[] getExtendWordHotkey() {
         return extendWordHotkey;
     }
 
-    public String[] getReduceWordHotkey() {
+    public KeyCode[] getReduceWordHotkey() {
         return reduceWordHotkey;
     }
 
-    public String[] getExtendSentenceHotkey() {
+    public KeyCode[] getExtendSentenceHotkey() {
         return extendSentenceHotkey;
     }
 
-    public String[] getReduceSentenceHotkey() {
+    public KeyCode[] getReduceSentenceHotkey() {
         return reduceSentenceHotkey;
     }
 
-    public String[] getExtendParagraphHotkey() {
+    public KeyCode[] getExtendParagraphHotkey() {
         return extendParagraphHotkey;
     }
 
-    public String[] getReduceParagraphHotkey() {
+    public KeyCode[] getReduceParagraphHotkey() {
         return reduceParagraphHotkey;
     }
     
-    public String[] getAllHotkeys(){
-        String[] hotkeys = null;
+    public KeyCode[][] getAllHotkeys(){
+        KeyCode[][] hotkeys = null;
         
-        String[] ewh = getExtendWordHotkey();
-        String[] rwh = getReduceWordHotkey();
-        String[] esh = getExtendSentenceHotkey();
-        String[] rsh = getReduceSentenceHotkey();
-        String[] eph = getExtendParagraphHotkey();
-        String[] rph = getReduceParagraphHotkey();
+        KeyCode[] ewh = getExtendWordHotkey();
+        KeyCode[] rwh = getReduceWordHotkey();
+        KeyCode[] esh = getExtendSentenceHotkey();
+        KeyCode[] rsh = getReduceSentenceHotkey();
+        KeyCode[] eph = getExtendParagraphHotkey();
+        KeyCode[] rph = getReduceParagraphHotkey();
         
         for (int i=0; i < 6; i++){
-            String[] hk = null;
+            KeyCode[] hk = null;
             switch(i){
                 case 0: hk = ewh; break;
                 case 1: hk = rwh; break;
@@ -222,7 +269,7 @@ public class UserPreference {
                 case 4: hk = eph; break;
                 case 5: hk = rph; break; 
             }
-            hotkeys[i] = hk[0] + " " + hk[1] + " " + hk[2];
+            hotkeys[i] = hk;
         }
         
         return hotkeys;
@@ -284,27 +331,27 @@ public class UserPreference {
         this.isHideInToolbar = isHideInToolbar;
     }
 
-    public void setExtendWordHotkey(String[] extendWordHotkey) {
+    public void setExtendWordHotkey(KeyCode[] extendWordHotkey) {
         this.extendWordHotkey = extendWordHotkey;
     }
 
-    public void setReduceWordHotkey(String[] reduceWordHotkey) {
+    public void setReduceWordHotkey(KeyCode[] reduceWordHotkey) {
         this.reduceWordHotkey = reduceWordHotkey;
     }
 
-    public void setExtendSentenceHotkey(String[] extendSentenceHotkey) {
+    public void setExtendSentenceHotkey(KeyCode[] extendSentenceHotkey) {
         this.extendSentenceHotkey = extendSentenceHotkey;
     }
 
-    public void setReduceSentenceHotkey(String[] reduceSentenceHotkey) {
+    public void setReduceSentenceHotkey(KeyCode[] reduceSentenceHotkey) {
         this.reduceSentenceHotkey = reduceSentenceHotkey;
     }
 
-    public void setExtendParagraphHotkey(String[] extendParagraphHotkey) {
+    public void setExtendParagraphHotkey(KeyCode[] extendParagraphHotkey) {
         this.extendParagraphHotkey = extendParagraphHotkey;
     }
 
-    public void setReduceParagraphHotkey(String[] reduceParagraphHotkey) {
+    public void setReduceParagraphHotkey(KeyCode[] reduceParagraphHotkey) {
         this.reduceParagraphHotkey = reduceParagraphHotkey;
     }
 
