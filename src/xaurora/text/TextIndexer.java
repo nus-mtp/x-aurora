@@ -47,7 +47,6 @@ public class TextIndexer {
 	private static final String FIELD_EMAIL = "email";
 	private static final String FIELD_FILENAME = "filename";
 	private static final String FIELD_TERMS = "term";
-	private static final String DEFAULT_SYNC_DIRECTORY = "";
 	//656 stop_word sets. Credits from http://www.ranks.nl/stopwords 
 	private static final List<String> stopWords = Arrays.asList("a","able","about","above","abst","accordance",
 											"according","accordingly","across","act","actually","added","adj","affected","affecting",
@@ -121,21 +120,14 @@ public class TextIndexer {
 	
 	private void init(){
 		try {
-			File syncDirectory =new File(this.DEFAULT_SYNC_DIRECTORY);
-			this.storeDirectory = FSDirectory.open(Paths.get(syncDirectory.getAbsolutePath()));
+			
+			this.storeDirectory = FSDirectory.open(Paths.get(DataFileIO.instanceOf().getIndexDirectory()));
 			this.paragraphParser = new XauroraParser(System.in);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		
 		
-	}
-	private void terminate(){
-		try {
-			this.writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	public static TextIndexer getInstance(){
 		if(instance == null){
@@ -144,7 +136,7 @@ public class TextIndexer {
 		return instance;
 	}
 	
-	public void createIndexDocumentFromWeb(String rawData,String url,String filename)
+	public synchronized void createIndexDocumentFromWeb(String rawData,String url,String filename)
 	{
 		//System.out.println("Creation Start!\n");
 		this.analyzer = new StandardAnalyzer();

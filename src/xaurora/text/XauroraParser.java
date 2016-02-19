@@ -60,18 +60,14 @@ public class XauroraParser implements XauroraParserConstants {
           if(!number.equals(""))
           {
                 TextIndexer.addNumber(doc,number);
-                System.out.println("1 "+number);
                 number = "";
           }
-          System.out.println(emailInput.image);
       break;
     case WORDS:
       words = jj_consume_token(WORDS);
   if(!number.equals(""))
           {
                 TextIndexer.addNumber(doc,number);
-                System.out.println("2 "+number);
-                System.out.println(words.image);
                 number = "";
           }
       break;
@@ -80,7 +76,6 @@ public class XauroraParser implements XauroraParserConstants {
   if(!number.equals(""))
           {
                 TextIndexer.addNumber(doc,number);
-                System.out.println("3 "+number);
                 number = "";
           }
       break;
@@ -89,7 +84,6 @@ public class XauroraParser implements XauroraParserConstants {
   if(!number.equals(""))
           {
                 TextIndexer.addNumber(doc,number);
-                System.out.println("4 "+number);
                 number = "";
           }
       break;
@@ -99,7 +93,6 @@ public class XauroraParser implements XauroraParserConstants {
   if(!number.equals(""))
           {
                 TextIndexer.addNumber(doc,number);
-                System.out.println("5 "+number);
                 number = "";
           }
       break;

@@ -23,18 +23,20 @@ import xaurora.text.TextIndexer;
 
 import java.util.*;
 public class DataFileIO {
-	private static final String DEFAULT_SYNC_DIRECTORY = "";
+	private static final String DEFAULT_SYNC_DIRECTORY = "/local_data/";
+	private static final String DEFAULT_INDEX_DIRECTORY = "/index_data";
 	private static final String DEFAULT_FILE_EXTENSION = ".txt";
 	private static final String TEXT_FILE_TYPE = "txt";
 	private static final String ERR_MSG_MD5_COLLISION = "ERROR MESSAGE: MD5 COLLISION";
 	private static final int INDEX_ZERO = 0;
 	private static final String NEW_EMPTY_STRING = "";
 	private static final char FILE_EXTENSION_DELIMITER = '.';
-	private static final String SOURCE_UNKNOWN = "";
+	private static final String SOURCE_UNKNOWN = "unknown";
 	private String syncDirectory = DEFAULT_SYNC_DIRECTORY;
+	private String indexDirectory = DEFAULT_INDEX_DIRECTORY;
 	private static DataFileIO instance = null;
 	private DataFileIO(){
-		
+		this.createLocalDirectories();
 	}
 	public static DataFileIO instanceOf(){
 		if(instance == null){
@@ -42,6 +44,17 @@ public class DataFileIO {
 		}
 		
 		return instance;
+	}
+	public void createLocalDirectories(){
+		File temp = new File("");
+		File storeDir = new File(temp.getAbsolutePath()+this.syncDirectory);
+		File indexDir = new File(temp.getAbsolutePath()+this.indexDirectory);
+		if(storeDir.mkdir()||storeDir.exists()){
+			this.syncDirectory = storeDir.getAbsolutePath();
+		}
+		if(indexDir.mkdir()||indexDir.exists()){
+			this.indexDirectory = indexDir.getAbsolutePath();
+		}
 	}
 	
 	//Description: this method is to update the sync directory
@@ -55,14 +68,19 @@ public class DataFileIO {
 		return true;
 	}
 	//Description: this method is to return the current sync directory
-	public String getDirectory(){
+	public String getSyncDirectory(){
 		return this.syncDirectory;
+	}
+	
+	public String getIndexDirectory(){
+		return this.indexDirectory;
 	}
 	//Description: Generate the file name from an ID and write the data into the text file
 	//pre-condition: a String type id and the data needs to be written into the file
 	//post-condition: nil
 	public void createDataFile(String url,String id,byte[] content){
-		String dstpath = this.syncDirectory+new String(id)+DEFAULT_FILE_EXTENSION;
+		String dstpath = this.syncDirectory+"\\"+new String(id)+DEFAULT_FILE_EXTENSION;
+		System.out.println(dstpath);
 		//Store the data in the lucene indexing system.
 		TextIndexer.getInstance().createIndexDocumentFromWeb(new String(content), url, dstpath);
 		File dstFile = new File(dstpath);
@@ -73,7 +91,6 @@ public class DataFileIO {
 			try{
 				dstFile.createNewFile();
 				FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
-				Security c = Security.getInstance();
 				String overallContent = url+"\n"+new String(content);
 				fos.write(Security.encrypt(overallContent.getBytes()));
 				fos.close();
@@ -96,9 +113,7 @@ public class DataFileIO {
 	private void extractFolder(ArrayList<String> content) {
 		File dir = new File(this.syncDirectory); 
 		Stack<File> s = new Stack<File>();
-		
 		s.push(dir);
-		
 		while (!s.isEmpty()){
 			File f = s.pop();
 			//System.out.println(f.exists());
@@ -128,7 +143,6 @@ public class DataFileIO {
 			Path path = Paths.get(f.getAbsolutePath());
 			byte[] data = Files.readAllBytes(path);
 			
-			Security c = Security.getInstance();
 			byte[] decrypted = Security.decrypt(data);
 			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				System.out.println((char) decrypted[i]);
