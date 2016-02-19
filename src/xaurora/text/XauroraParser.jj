@@ -8,34 +8,54 @@ options
 
 PARSER_BEGIN(XauroraParser)
 package xaurora.text;
+import org.apache.lucene.document.Document;
+import xaurora.text.TextIndexer;
 
 public class XauroraParser
 {
+  
+  private static XauroraParser instance = null;
+  private static String number = "";
+  private XauroraParser()  {	
+  }
+  public static XauroraParser getInstance()  {	if(instance == null) {
+         instance = new XauroraParser();
+      }
+      return instance;
+  }
+
+  
   public static void main(String args []) throws ParseException
   {
     XauroraParser parser = new XauroraParser(System.in);
+
+    
     while (true)
     {
-      System.out.println("Reading from standard input...");
-      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
+      
+	  
       try
       {
-        
+      	getNumber();
       }
       catch (Exception e)
       {
         System.out.println("NOK.");
         System.out.println(e.getMessage());
+		//XauroraParser.getNextToken();
         XauroraParser.ReInit(System.in);
       }
       catch (Error e)
       {
         System.out.println("Oops.");
         System.out.println(e.getMessage());
-        break;
+        XauroraParser.ReInit(System.in);
       }
     }
   }
+  
+  
+  
 }
 
 PARSER_END(XauroraParser)
@@ -70,41 +90,28 @@ SKIP :
 | ">"
 | ","
 | "/"
+| "\n"
+| "-"
 }
 
-
-TOKEN : /* OPERATORS */
-{
-< MINUS : "-" >
-
-}
 
 TOKEN :
 {
-  < INTEGER_LITERAL : <DECIMAL_LITERAL>|< FLOATING_POINT_LITERAL >>
-| < DECIMAL_LITERAL:["1"-"9"] (["0"-"9"])*>
+  < INTEGER_LITERAL :<DECIMAL_LITERAL>|< FLOATING_POINT_LITERAL >>
+| < DECIMAL_LITERAL:(["0"-"9"] (["0"-"9"])*)>
 | < FLOATING_POINT_LITERAL : (<DECIMAL_LITERAL >"."< DECIMAL_LITERAL >)>
 }
 
-TOKEN:
-{
-  < NUMBERS : (<MINUS >)?< INTEGER_LITERAL >>
-}
 
-TOKEN:
-{
-  < WORD_TERMINATOR: " " >
-}
+TOKEN :{
+  < TERM_SEPARATOR : " " >}
+
 
 TOKEN :
 {
- < SENTENCE_TERMINATOR : ((".")+|("!"|"?")(("!")*("?")*)*)(< WORD_TERMINATOR >)?>
+ < SENTENCE_TERMINATOR : ((".")+|("!"|"?")(("!")*("?")*)*)(< TERM_SEPARATOR >)?>
 }
 
-TOKEN :
-{
-  < PARAGRAPH_TERMINATOR :"\n" >
-}
 
 TOKEN :
 {
@@ -113,21 +120,63 @@ TOKEN :
 
 TOKEN :
 {
-  < EMAIL : (<CHARACTERS >)+"@"(<CHARACTERS >)+("."(<CHARACTERS >)+)+ >
+  < EMAIL : (<CHARACTERS >|<DECIMAL_LITERAL>)(<CHARACTERS >|<DECIMAL_LITERAL>|"_")*(<CHARACTERS >|<DECIMAL_LITERAL>)"@"(<CHARACTERS >|< DECIMAL_LITERAL >)+("."(<CHARACTERS >|< DECIMAL_LITERAL >)+)+ >
 }
 
 TOKEN :
 {
-  < WORDS : (~[" ",",","@","\n",".","?","!"])+ >
+  < WORDS : (~[" ",",","@","\n",".","?","!","0","1","2","3","4","5","6","7","8","9"])+ >
 }
 
-TOKEN :
+
+
+
+
+
+private void parseEmails(Document doc):
 {
-< SENTENCE : ((< WORDS >)(< WORD_TERMINATOR >< WORDS >)+)*< SENTENCE_TERMINATOR >>
+  Token emailInput;
+  Token numberInput;
+  Token words;}{
+  
+    emailInput = < EMAIL >
+	{
+	  TextIndexer.addEmail(doc,emailInput.image);
+	  if(!number.equals(""))	  {		TextIndexer.addNumber(doc,number);
+		number = "";
+	  }	}
+|  words = < WORDS >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		number = "";
+	  }}
+| 	< TERM_SEPARATOR >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		number = "";
+	  }}
+| < CHARACTERS >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		number = "";
+	  }}
+| "@"<WORDS >{
+  if(!number.equals(""))
+	  {
+		TextIndexer.addNumber(doc,number);
+		number = "";
+	  }}
+| numberInput = < INTEGER_LITERAL >{
+  number += numberInput.image;
+}
 }
 
-TOKEN :
+}
+public void parseEmailInSentence(Document doc):
+{}
 {
-  <PARAGRAPH : (< SENTENCE >)*< PARAGRAPH_TERMINATOR >>
-}
-
+  (parseEmails(doc))*(< SENTENCE_TERMINATOR >|<EOF>)  {
+      }}

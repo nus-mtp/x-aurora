@@ -3,12 +3,12 @@ package xaurora.dropbox;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import xaurora.util.UserProfile;
-
 import com.dropbox.core.DbxAccountInfo;
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
+
+import xaurora.util.UserProfile;
 
 public class DropboxAuth {
 	//unclear declaration
@@ -96,7 +96,7 @@ public class DropboxAuth {
 	
 	protected static String bytesToGB(long quota){		
 		//Magic String
-		double GB = (double) quota / (1024.0*1024.0*1024.0);
+		double GB = quota / (1024.0*1024.0*1024.0);
 		DecimalFormat df = new DecimalFormat("#.##");
 		//Magic String
 		return df.format(GB);		

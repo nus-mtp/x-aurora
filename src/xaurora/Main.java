@@ -1,10 +1,8 @@
 package xaurora;
 
 import xaurora.communication.*;
-import xaurora.io.DataFileIO;
-import xaurora.security.Security;
+import xaurora.system.DBManager;
 import xaurora.system.SystemManager;
-import xaurora.ui.LoginUI;
 
 public class Main {
 private static final int PORT_BROWSER = 6789;
@@ -13,7 +11,10 @@ private static final int PORT_PLUGIN = 23333;
 
 	public static void main(String[] args){
 		SystemManager sa = SystemManager.getInstance();
-
+		DBManager dbManager = new DBManager();
+		Thread autoUpdatingThread = new Thread(dbManager);
+		System.out.println("main");
+		autoUpdatingThread.start();
 		if(sa.isNetAccessible()){
 
 			

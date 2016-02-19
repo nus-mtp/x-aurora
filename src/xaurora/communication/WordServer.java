@@ -8,8 +8,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import xaurora.system.PrefixMatcher;
-
 public class WordServer implements Runnable{
 	ServerSocket server = null;
 	Socket client = null;

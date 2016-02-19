@@ -7,9 +7,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import xaurora.dropbox.*;
 import xaurora.io.DataFileIO;
 import xaurora.io.IDGenerator;
+import xaurora.text.TextIndexer;
 
 public class ChromeServer implements Runnable{
 	ServerSocket server = null;
@@ -33,8 +33,16 @@ public class ChromeServer implements Runnable{
 
 		while (true) {
 			isTextContent = false;
+			long lStartTime = System.currentTimeMillis();
 			String text = receiveMessage();
-			if (isTextContent) outputToFile(text);
+			long lEndTime = System.currentTimeMillis();
+			long difference = lEndTime - lStartTime;
+
+			System.out.println("Elapsed milliseconds for receiveMessage : " + difference);
+			if (isTextContent) {
+				outputToFile(text);
+				
+			}
 			
 
 		}
@@ -46,7 +54,7 @@ public class ChromeServer implements Runnable{
 	}
 	private void outputToFile(String text) {
 		String id = IDGenerator.instanceOf().GenerateID(getURL(text), TYPE_FULL_TEXT);
-		DataFileIO.instanceOf().createDataFile(id, String.valueOf(text).getBytes());
+		DataFileIO.instanceOf().createDataFile(getURL(text),id, String.valueOf(text).getBytes());
 	}
 
 	/*
@@ -69,6 +77,7 @@ public class ChromeServer implements Runnable{
 		// Skip Header
 		for (int i=0; i<4; i++){
 			line = in.readLine();
+			//System.out.println(line);
 			// Get length
 			if (i==3){
 				String[] data = line.split(":");
@@ -101,6 +110,7 @@ public class ChromeServer implements Runnable{
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+		//System.out.println(contentData);
 		return contentData;
 	}
 	
@@ -117,7 +127,7 @@ public class ChromeServer implements Runnable{
 		String res = new String();
 		
 		// Block list shall be merged to one string like:
-		String dummyBlocklist = "chrome://\ngoogle.com\nwikipedia.org\n";
+		String dummyBlocklist ="";// "chrome://\ngoogle.com\nwikipedia.org\n";
 		
 		// According to Communication code, generate response.
 		switch (commCode) {

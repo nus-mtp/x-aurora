@@ -1,14 +1,4 @@
 package xaurora.dropboxV2;
-import com.dropbox.core.DbxAppInfo;
-import com.dropbox.core.json.JsonReader;
-
-import static com.dropbox.core.util.StringUtil.jq;
-
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.session.SessionHandler;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -18,7 +8,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.session.SessionHandler;
+
+import com.dropbox.core.DbxAppInfo;
 
 public class Main extends AbstractHandler {
 
