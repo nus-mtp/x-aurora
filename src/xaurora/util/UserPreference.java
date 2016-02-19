@@ -39,6 +39,18 @@ public class UserPreference {
     private String previewTextLength;
     
     private static final int numPreferences = 19;
+    private static UserPreference instance = null;
+    
+    private UserPreference(){
+        
+    }
+    
+    public static UserPreference getInstance(){
+        if (instance == null){
+            instance = new UserPreference();
+        }
+        return instance;
+    }
 
     public void initPreferences(){
         //System Pane
