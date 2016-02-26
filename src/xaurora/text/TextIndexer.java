@@ -108,7 +108,6 @@ public class TextIndexer {
 											"x","y","yes","yet","you","youd","you'll","your","youre","yours","yourself","yourselves","you've","z","zero");
 	private static final CharArraySet stopSet = new CharArraySet(stopWords, true);
 	private static TextIndexer instance = null;
-	private XauroraParser paragraphParser;
 	private Directory storeDirectory;
 	private Analyzer analyzer;
 	private IndexWriterConfig config;
@@ -123,7 +122,6 @@ public class TextIndexer {
 		try {
 			
 			this.storeDirectory = FSDirectory.open(Paths.get(DataFileIO.instanceOf().getIndexDirectory()));
-			this.paragraphParser = new XauroraParser(System.in);
 			
 		} catch (IOException e1) {
 			e1.printStackTrace();

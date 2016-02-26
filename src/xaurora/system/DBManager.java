@@ -3,7 +3,7 @@ package xaurora.system;
 import xaurora.io.DataFileIO;
 
 public class DBManager implements Runnable{
-	private static long CHECK_INTERVAL = 600000;
+	private static final long DEFAULT_CHECK_INTERVAL = 600000;//10 minute
 	private boolean isToUpdate;
 	public void run() {
 		while(true){
@@ -13,7 +13,7 @@ public class DBManager implements Runnable{
 				this.isToUpdate = false;
 			}
 			if(isCorrectCheckTiming()&&!this.isToUpdate){
-				//DataFileIO.instanceOf().autoDbUpdate();
+				DataFileIO.instanceOf().autoCheckForExpiredFile();
 				System.out.println("auto update complete");
 			}
 		}
@@ -24,12 +24,12 @@ public class DBManager implements Runnable{
 	}
 	private static boolean isCorrectCheckTiming(){
 		long currentTime = System.currentTimeMillis();
-		//System.out.println(currentTime/1000%60);
-		return currentTime%60000== 0;
+		//Every 10 minutes
+		return currentTime%DEFAULT_CHECK_INTERVAL == 0;
 	}
 	private static boolean isCorrectUpdateTiming(){
 		long currentTime = System.currentTimeMillis();
-		//System.out.println(currentTime/1000%60);
-		return currentTime%60000== 30000;
+		//Every 5th minutes within a 10-minute-period
+		return currentTime%DEFAULT_CHECK_INTERVAL == 300000;
 	}
 }
