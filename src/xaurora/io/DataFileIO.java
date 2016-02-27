@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 import xaurora.security.*;
 import xaurora.system.TimeManager;
 import xaurora.text.TextIndexer;
-import xaurora.util.dataFileMetaData;
+import xaurora.util.DataFileMetaData;
 
 import java.util.*;
 public class DataFileIO {
@@ -78,13 +78,13 @@ public class DataFileIO {
 		return this.syncDirectory;
 	}
 	
-	//Description:¡¡return the current Indexing directory
+	//Description:ï¿½ï¿½return the current Indexing directory
 	public String getIndexDirectory(){
 		return this.indexDirectory;
 	}
 	
 	//Description: base on a MD5 hased String ID generated from the source url, generate the respective datafile path
-	//pre-condition:¡¡A correctly MD5-hashed String ID which identifies the source.
+	//pre-condition:ï¿½ï¿½A correctly MD5-hashed String ID which identifies the source.
 	//post-condition: An absolute path of this respective ID
 	private String generateDataFilePath(String id) {
 		String dstpath = this.syncDirectory+"\\"+new String(id)+DEFAULT_FILE_EXTENSION;
@@ -189,7 +189,7 @@ public class DataFileIO {
 	//Pre-condition: NIL
 	//Post-condition: NIL
 	public synchronized void autoCheckForExpiredFile(){
-		ArrayList<dataFileMetaData> allMetaData = this.getAllMetaData();
+		ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData();
 		for(int index = 0; index<allMetaData.size();index++){
 			if(TimeManager.getInstance().isExpired(allMetaData.get(index).getLastModified())){
 				//System.out.println(allMetaData.get(index).getFilename());
@@ -239,8 +239,8 @@ public class DataFileIO {
 	//				  URL
 	//				  Host name of the source
 	//				  Length of file
-	public ArrayList<dataFileMetaData> getAllMetaData(){
-		ArrayList<dataFileMetaData> result = new ArrayList<dataFileMetaData>();
+	public ArrayList<DataFileMetaData> getAllMetaData(){
+		ArrayList<DataFileMetaData> result = new ArrayList<DataFileMetaData>();
 		File dir = new File(this.syncDirectory); 
 		Stack<File> s = new Stack<File>();
 		s.push(dir);
@@ -255,7 +255,7 @@ public class DataFileIO {
 					}
 					
 				} else {
-					dataFileMetaData tempEntity = new dataFileMetaData(f.getName(),getUrlFromFile(f));
+					DataFileMetaData tempEntity = new DataFileMetaData(f.getName(),getUrlFromFile(f));
 					tempEntity.addFileMetaData(f.length(), f.lastModified());
 					result.add(tempEntity);					
 				}
@@ -267,7 +267,7 @@ public class DataFileIO {
 	//Pre-condition: NIL
 	//Post-condition: construct the indexing system with all data read successfully from the sync directory
 	public synchronized void updateIndexingFromFiles(){
-		ArrayList<dataFileMetaData> allMetaData = this.getAllMetaData();
+		ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData();
 		ArrayList<String> content = this.getContent();
 		for(int index = 0;index<allMetaData.size();index++){
 			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getURL(), allMetaData.get(index).getFilename());

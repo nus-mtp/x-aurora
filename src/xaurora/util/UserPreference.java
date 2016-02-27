@@ -95,7 +95,7 @@ public class UserPreference {
             //System Pane
             isRunOnStartUp = Boolean.valueOf(settings[index++]);
             isHideInToolbar = Boolean.valueOf(settings[index++]);
-            
+
             //Hotkeys Pane
             String[] hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             extendWordHotkey = new KeyCode[hotkey.length];

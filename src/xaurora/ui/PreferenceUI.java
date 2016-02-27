@@ -40,10 +40,12 @@ import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import xaurora.io.DataFileIO;
 import xaurora.ui.VirtualKeyboard.Key;
 import xaurora.util.BlockedPage;
 import xaurora.util.UserPreference;
 import xaurora.util.BrowsedPage;
+import xaurora.util.DataFileMetaData;
 
 /**
  *
@@ -57,7 +59,6 @@ public class PreferenceUI extends Application{
     private static final int imageWidth = 50;
     private static final int imageHeight = 50;
     private static final int buttonWidth = 70;
-    private static final int textFieldWidth = 50;
     private static final int spinnerWidth = 70;
     private static final int pieChartWidth = 200;
     private static final int pieChartHeight = 200;
@@ -73,6 +74,7 @@ public class PreferenceUI extends Application{
     private static final int majorTickUnit = 50;
     
     UserPreference preferences = UserPreference.getInstance();
+    DataFileIO dataFile = DataFileIO.instanceOf();
     Stage stage;
     
     public static void main(String[] args) {
@@ -208,24 +210,25 @@ public class PreferenceUI extends Application{
     private BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
         TableView table = new TableView();
+        TableColumn filenameCol = new TableColumn("Filename");
         TableColumn urlCol = new TableColumn("Url");
-        TableColumn titleCol = new TableColumn("Title");
+        TableColumn sourceCol = new TableColumn("Source");
         TableColumn lengthCol = new TableColumn("Length");
-        TableColumn deviceCol = new TableColumn("Device");
-        TableColumn timeCol = new TableColumn("Time");
+        TableColumn lastModifiedCol = new TableColumn("Last Modified");
         TableColumn deleteCol = new TableColumn("Delete");
-        table.getColumns().addAll(urlCol, titleCol, lengthCol, deviceCol, timeCol, deleteCol);
+        table.getColumns().addAll(filenameCol, urlCol, sourceCol, lengthCol, lastModifiedCol, deleteCol);
         table.setEditable(false);
         
-        ObservableList<BrowsedPage> browsedPages = FXCollections.observableArrayList();
-        //ArrayList<browsedPage> browsedList = getBrowsedList(); //from database
+        ObservableList<DataFileMetaData> browsedPages = FXCollections.observableArrayList();
+        ArrayList<DataFileMetaData> fileData = dataFile.getAllMetaData();
+        browsedPages.addAll(fileData);
         table.setItems(browsedPages);
         
-        Callback<TableColumn<BrowsedPage, Boolean>, TableCell<BrowsedPage, Boolean>> deleteCellFactory = 
-                new Callback<TableColumn<BrowsedPage, Boolean>, TableCell<BrowsedPage, Boolean>>(){
+        Callback<TableColumn<DataFileMetaData, Boolean>, TableCell<DataFileMetaData, Boolean>> deleteCellFactory = 
+                new Callback<TableColumn<DataFileMetaData, Boolean>, TableCell<DataFileMetaData, Boolean>>(){
             @Override
-            public TableCell call(TableColumn<BrowsedPage, Boolean> param) {
-                final TableCell<BrowsedPage, Boolean> cell =  new TableCell<BrowsedPage, Boolean>(){
+            public TableCell call(TableColumn<DataFileMetaData, Boolean> param) {
+                final TableCell<DataFileMetaData, Boolean> cell =  new TableCell<DataFileMetaData, Boolean>(){
                     Button deleteButton = new Button("X");
                     
                     @Override
@@ -238,9 +241,9 @@ public class PreferenceUI extends Application{
                             setGraphic(deleteButton);
                             setText(null);
                             deleteButton.setOnAction(event -> {
-                                BrowsedPage page = getTableView().getItems().get(getIndex());
-                                browsedPages.remove(page);
-                                //signal database to delete 
+                                DataFileMetaData data = getTableView().getItems().get(getIndex());
+                                browsedPages.remove(getIndex());
+                                dataFile.removeDataFile(data.getFilename());
                             });
                         }
                     }

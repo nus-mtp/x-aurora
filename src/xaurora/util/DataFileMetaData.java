@@ -5,15 +5,15 @@ import java.net.URL;
 
 import xaurora.system.TimeManager;
 
-public class dataFileMetaData {
-	private static final String SOURCE_UNKNOWN = "unknown";
+public class DataFileMetaData {
 	private String filename;
 	private String url;
 	private String source;
 	private long length;
 	private long lastModified;
+        private static final String SOURCE_UNKNOWN = "unknown";
 	
-	public dataFileMetaData(String filename,String url){
+	public DataFileMetaData(String filename,String url){
 		this.filename = filename;
 		this.url = url;
 		this.getHostFromURL();
