@@ -1,11 +1,21 @@
+/*
+ * This is the indexing component of the Xaurora software which is in charge of 
+ * indexing the unprocessed text data extracted from the web pages and handling 
+ * the CRUD queries to the indexing system 
+ *  
+ *   @author GAO RISHENG
+ */
+
+
+
+
 package xaurora.text;
 
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.ArrayList;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -32,6 +42,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -47,7 +58,9 @@ public class TextIndexer {
 	private static final String FIELD_EMAIL = "email";
 	public static final String FIELD_FILENAME = "filename";
 	private static final String FIELD_TERMS = "term";
+	private static final String FIELD_EXTENDED_DATA = "data";
 	private static final String DATAFILE_EXTENSION = ".txt";
+	private static final int DEFAULT_DISPLAY_NUMBER = 5;
 	//656 stop_word sets. Credits from http://www.ranks.nl/stopwords 
 	private static final List<String> stopWords = Arrays.asList("a","able","about","above","abst","accordance",
 											"according","accordingly","across","act","actually","added","adj","affected","affecting",
@@ -114,8 +127,10 @@ public class TextIndexer {
 	private IndexReader reader;
 	private IndexSearcher searcher;
 	private IndexWriter writer;
+	private int displayNumber;
+	//Singleton constructor
 	private TextIndexer(){
-		init();
+		this.init();
 	}
 	
 	private void init(){
@@ -126,7 +141,7 @@ public class TextIndexer {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
+		this.displayNumber = DEFAULT_DISPLAY_NUMBER;
 		
 	}
 	public static TextIndexer getInstance(){
@@ -135,7 +150,13 @@ public class TextIndexer {
 		}
 		return instance;
 	}
-	
+	//Description: After receiving text data from browser plugin, an entity
+	//of the indexing system will be created. For ease of deleting and retrieving
+	//We identify an entity from its source URL and delete it by knowing its actual 
+	//datafile filename
+	//Pre-condition: A string typed text data, the source url in String and its respective datafile
+	//filename.
+	//Post-condition: An entity of the indexing System will be created
 	public synchronized void createIndexDocumentFromWeb(String rawData,String url,String filename)
 	{
 		//System.out.println("Creation Start!\n");
@@ -148,30 +169,22 @@ public class TextIndexer {
 		String sourceHost = getHostFromURL(url);
 		try {
 			this.writer = new IndexWriter(this.storeDirectory,this.config);
-			//System.out.println("LENGTH "+paragraphs.length);
+
 			for(int i = 1;i<paragraphs.length;i++)
 			{
-				//System.out.println("PARAGRAPH "+paragraphs[i]);
 				if(paragraphs[i].replaceAll("[^\\x00-\\x7F]","").trim().equals(""))
 					continue;
 				String[] sentences = paragraphs[i].split("[.|!|?]+ ");
 				for(int j = 0; j<sentences.length;j++){
 					Document data = new Document();
 					addURL(data,url);
-					//System.out.println("add url done");
 					addSource(data,sourceHost);
-					//System.out.println("add source done");
 					addFilename(data,filename.replace(DATAFILE_EXTENSION, ""));
-					//System.out.println("add filename done");
-					extractEntityContent(sentences,j,data);
-					//System.out.println("extract Entity done");
-					//System.out.println(j+" "+sentences[j]);
+					insertSentencesIntoDocument(sentences,j,data);
 					extractNumbersAndEmails(sentences, j, data);
-					//System.out.println("add number done");
 					extractTerms(sentences[j],data);
-					//System.out.println("extracted");
+					insertParagraphIntoDocument(paragraphs[i],data);
 					this.writer.addDocument(data);
-					//System.out.println("ADD document successfully");
 				}
 			}
 			this.writer.commit();
@@ -185,6 +198,9 @@ public class TextIndexer {
 			e.printStackTrace();
 		}  
 	}
+	//Description: Extracting different terms and stores terms into a Lucene document
+	//Pre-condition: The String text and the lucene document that stores all the data
+	//Post-condition: the data stores inside the document object
 	private void extractTerms(String input,Document data){
 		TokenStream stream = this.analyzer.tokenStream(FIELD_TERMS, new StringReader(input.toLowerCase().trim()));
 		stream = new StopFilter(stream, stopSet);
@@ -201,15 +217,34 @@ public class TextIndexer {
 		}
 	    
 	}
-	private void extractEntityContent(String[] sentences,int i, Document data){
+	//Description: Inserting a sentence into the respective lucene document object
+	//Pre-condition: An array of String that storing all sentences within 1 paragraph
+	//				and the index of sentence that to be stored, and the respective lucene document
+	//Post-condition: The lucene document object will contain the sentence as one of its text fields
+	private void insertSentencesIntoDocument(String[] sentences,int i, Document data){
 		String input = "";
-		for(int index = i;index<sentences.length;index++){
-			input+=sentences[i]+". ";
-		}
+		input+=sentences[i]+". ";
 		addContent(data,input);
 	}
+	
+	//Description: Inserting a sentence into the respective lucene document object
+	//Pre-condition: An array of String that storing all sentences within 1 paragraph
+	//				and the index of sentence that to be stored, and the respective lucene document
+	//Post-condition: The lucene document object will contain the sentence as one of its text fields
+	private void insertParagraphIntoDocument(String input, Document data){
+
+		addData(data,input);
+	}
+	
+	//Description: Extracting Numbers and E-mails from a sentence, and store that into
+	//				the corresponding lucene document object
+	//Pre-condition: An array of String storing all sentence within a paragraph.
+	//				 The index of the sentence to be stored
+	//				 The respective lucene document object
+	//Post-condition: All number/e-mails (if exists) will be stored into the document object.
 	private void extractNumbersAndEmails(String[] paragraphs, int i, Document data) {
 		InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode((paragraphs[i]+". ").replaceAll("[^\\x00-\\x7F]", "")).array());
+		//convert the string into input stream and pass that into the JavaCC parser
 		XauroraParser.ReInit(is);
 		try {
 			XauroraParser.parseEmailInSentence(data);
@@ -218,6 +253,9 @@ public class TextIndexer {
 			e.printStackTrace();
 		}
 	}
+	//Description: Helper method that retrieve a hostname from the URL
+	//Pre-condition: A string typed extracted from the browser plug-in
+	//Post-condition: return a String storing the hostname if the URL is valid, throws an exception otherwise
 	private static String getHostFromURL(String url)
 	{
 		String host = SOURCE_UNKNOWN;
@@ -231,49 +269,85 @@ public class TextIndexer {
 		}
 		return host;
 	}
+	//Description: add an URL to a lucene document object.
+	//Pre-condition£º A string typed url and the lucene document
+	//Post-condition: the url will be added as a text field to the document
 	public static void addURL(Document doc,String url)
 	{
 		addTextField(doc,FIELD_URL,url);
 	}
+	//Description: add an source host name to a lucene document object.
+	//Pre-condition£º A string typed storing the hostname of the source and the lucene document
+	//Post-condition: the hostname will be added as a text field to the document
 	public static void addSource(Document doc,String source)
 	{
 		addTextField(doc,FIELD_SOURCE,source);
 	}
+	//Description: add the filename of the datafile to a lucene document object.
+	//Pre-condition£º A string storing the filename of the text datafile and the lucene document
+	//Post-condition: the filename will be added as a text field to the document
 	public static void addFilename(Document doc,String filename)
 	{
 		addTextField(doc,FIELD_FILENAME,filename);
 	}
+	//Description: add the text content of a sentence to a lucene document object.
+	//Pre-condition£º A string storing the text content and the lucene document
+	//Post-condition: the text will be added as a String field to the document
 	public static void addContent(Document doc,String content)
 	{
 		addStringField(doc,FIELD_CONTENT,content);
 	}
-
+	//Description: add the text content of a paragraph to a lucene document object.
+	//Pre-condition£º A string storing the text content and the lucene document
+	//Post-condition: the text will be added as a String field to the document
+	public static void addData(Document doc,String content)
+	{
+		addStringField(doc,FIELD_EXTENDED_DATA,content);
+	}
+	//Description: add a number to a lucene document object.
+	//Pre-condition£º A string storing the number and the lucene document
+	//Post-condition: the number will be added as a text field to the document
 	public static void addNumber(Document doc,String number)
 	{
 		addTextField(doc,FIELD_NUMBER,number);
 	}
+	//Description: add an E-mail address to a lucene document object.
+	//Pre-condition£º A string storing the e-mail address and the lucene document
+	//Post-condition: the e-mail address will be added as a text field to the document
 	public static void addEmail(Document doc,String email)
 	{
 		addTextField(doc,FIELD_EMAIL,email);
 	}
+	//Description: add a keyword extracted from the text to a lucene document object.
+	//Pre-condition£º A string keyword and the lucene document
+	//Post-condition: the keyword will be added as a String field to the document
 	public static void addTerms(Document doc,String term)
 	{
-		addTextField(doc,FIELD_NUMBER,term);
+		addTextField(doc,FIELD_TERMS,term);
 	}
+	//Description: add a text field to a lucene document object.
+	//Pre-condition£º A string storing the data and the lucene document
+	//Post-condition: the text field will be added as a String field to the document
 	private static void addTextField(Document doc,String field,String value)
 	{
 		doc.add(new TextField(field,value,Field.Store.YES));
 	}
-
+	//Description: add a String field to a lucene document object.
+	//Pre-condition£º A string storing the text content and the lucene document
+	//Post-condition: the text will be added as a String field to the document
 	private static void addStringField(Document doc,String field,String value)
 	{
 		doc.add(new StringField(field,value,Field.Store.YES));
 	}
-	
+	//Description: delete an entity in the lucene indexing system and removing its
+	//				actual datafile
+	//pre-condition: The field needs to search and the input query in String
+	//post-condition: The entity and its corresponding datafile will be deleted
+	//				  if found in the index system.
 	public synchronized void deleteByField(String field,String inputQuery){
-		System.out.println("HERE");
+		
 		this.analyzer = new StandardAnalyzer();
-		System.out.println("input is "+inputQuery);
+		
 		try {
 			this.reader  = DirectoryReader.open(this.storeDirectory);
 			this.searcher = new IndexSearcher(this.reader);
@@ -300,5 +374,30 @@ public class TextIndexer {
 			e.printStackTrace();
 		}
 	}
-	
+	//Description: Setting the number of result in the search (should be called by UI)
+	//Pre-condition: an int number 0<number< 10?
+	//Post-condition: the number of result to be return will be changed
+	public void setDisplayNumber(int number){
+		this.displayNumber = number;
+	}
+	//Description: Searching the indexing System to retrieve the text content
+	//Pre-condition: a valid Lucene Search Query
+	//Post-condition: returning an ArrayList of String which stores the content of all matching documents
+	public synchronized ArrayList<String> searchDocument(Query q){
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			this.reader  = DirectoryReader.open(this.storeDirectory);
+			this.searcher = new IndexSearcher(this.reader); 
+			TopDocs docs = this.searcher.search(q, this.displayNumber);
+			for(int i = 0;i<docs.totalHits;i++){
+				int id = docs.scoreDocs[i].doc;
+				String content = this.searcher.doc(id).get(FIELD_EXTENDED_DATA);
+				result.add(content);
+			}
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
 }
