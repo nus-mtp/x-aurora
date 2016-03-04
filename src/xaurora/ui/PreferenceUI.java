@@ -211,10 +211,16 @@ public class PreferenceUI extends Application{
         BorderPane border = new BorderPane();
         TableView table = new TableView();
         TableColumn filenameCol = new TableColumn("Filename");
+        filenameCol.setCellValueFactory(new PropertyValueFactory<>("filename"));
         TableColumn urlCol = new TableColumn("Url");
+        urlCol.setCellValueFactory(new PropertyValueFactory<>("url"));
         TableColumn sourceCol = new TableColumn("Source");
+        sourceCol.setCellValueFactory(new PropertyValueFactory<>("source"));
         TableColumn lengthCol = new TableColumn("Length");
+        lengthCol.setCellValueFactory(new PropertyValueFactory<>("length"));
         TableColumn lastModifiedCol = new TableColumn("Last Modified");
+        lastModifiedCol.setCellValueFactory(new PropertyValueFactory<>("lastModified"));
+        lastModifiedCol.setPrefWidth(100);
         TableColumn deleteCol = new TableColumn("Delete");
         table.getColumns().addAll(filenameCol, urlCol, sourceCol, lengthCol, lastModifiedCol, deleteCol);
         table.setEditable(false);
