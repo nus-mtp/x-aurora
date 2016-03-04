@@ -10,5 +10,8 @@
     "background": { 
         "scripts": ["variables.js","connector.js","main.js"]
     },
+    "browser_action": {
+        "default_icon": "Unconnected.png"
+    },
     "permissions": ["tabs"]
 }
