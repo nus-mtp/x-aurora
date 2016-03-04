@@ -94,7 +94,8 @@ public class WordServer implements Runnable{
 	*/
 	private String genOutput(String[] input, int commCode){
 		String res = new String();
-		String[] dummyHotKeys;
+		String dummyHotKeys = "0053%0056%0071\n0025%0033%0026";
+		String dummyPrefList = "this is selection 1\nthis is selection 2";
 		
 		switch(commCode){
 		case CommunicationCode.CONNECTION_REQUEST:
@@ -110,8 +111,13 @@ public class WordServer implements Runnable{
 		case CommunicationCode.CONNECTION_REQUEST_WITH_HOT_KEY:
 		{
 			res = Integer.toString(CommunicationCode.HOT_KEY);
-			res = res + "\n" ;
+			res = res + "\n" + dummyHotKeys + "\n";
 			break;
+		}
+		case CommunicationCode.REQUEST_FOR_PREFERENCE:
+		{
+			res = Integer.toString(CommunicationCode.PREFERENCE_LIST);
+			res = res + "\n" + dummyPrefList + "\n";
 		}
 		default:
 		{

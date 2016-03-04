@@ -6,6 +6,7 @@ chrome.tabs.onUpdated.addListener(function(tabId , changeInfo) {
 });
 
 // call connector to load.
+connector.getConnection();
 connector.onLoad();
 
 // Utility functions
@@ -39,3 +40,10 @@ function encode_utf8(s) {
 function decode_utf8(s) {
   return decodeURIComponent(escape(s));
 }
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        chrome.browserAction.setIcon({
+            path: request.newIconPath
+        });
+    });

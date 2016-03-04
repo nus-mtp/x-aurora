@@ -21,6 +21,7 @@ var connector = {
                 // According to response code, take actions.
                 if  (respCode == ALL_OK) {
                     serverStat = "connected";
+                    chrome.runtime.sendMessage({ "newIconPath" : "Connected.png" });
                     console.log("Connection is ALIVE!"); // Console message.
                 } else if (respCode == BLOCK_LIST) {
                     serverStat = "connected";
@@ -36,6 +37,7 @@ var connector = {
                 }
                 else {
                     serverStat = "unconnected";
+                    chrome.runtime.sendMessage({ "newIconPath" : "Unconnected.png" });
                     console.log("Connection lost!"); // Console message.
                 }
             }
@@ -82,7 +84,7 @@ var connector = {
                     console.log("Sending Texts!"); // Console message.
                     request.open('PUSH', 'http://127.0.0.1:'+dataPort, true);
                     
-                    //contentText = encode_utf8(contentText);
+                    contentText = encode_utf8(contentText);
                     request.send(SEND_TEXT+"\n"+tabUrl+"\n"+contentText);
 
                     // Upon received response, do actions according to response.
