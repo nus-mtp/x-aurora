@@ -8,7 +8,7 @@ using System.Text;
 
 namespace XAuroraWordPlugin
 {
-    public class Communicator
+    public static class Communicator
     {
         const int CONNECTION_REQUEST = 101;
         const int CONNECTION_REQUEST_WITH_HOT_KEY = 131;
@@ -23,14 +23,17 @@ namespace XAuroraWordPlugin
         const int REQUESTING_HOT_KEY = 1;
         const int CONNECTED = 2;
 
-        Boolean isHotkeyGet = false;
+        const int MAX_LENGTH = 200000;
+        const int MAX_RETRY_TIME = 3;
 
-        int serverStat = REQUESTING_HOT_KEY;
+        static Boolean isHotkeyGet = false;
+        static int serverStat = REQUESTING_HOT_KEY;
 
-        public void connect()
+        // Make Connection with background system.
+        public static void connect()
         {
             // Data buffer for incoming data.
-            byte[] bytes = new byte[1024];
+            byte[] bytes = new byte[MAX_LENGTH];
 
             // Connect to a remote device.
             try
@@ -47,7 +50,9 @@ namespace XAuroraWordPlugin
                     sender.Connect(backgroundSvr);
                     // Encode the data string into a byte array.
                     string data = "";
-                    switch (serverStat){
+                    // According to serverStat, generate message to send.
+                    switch (serverStat)
+                    {
                         case UNCONNECTED:
                             {
                                 if (isHotkeyGet)
@@ -71,6 +76,7 @@ namespace XAuroraWordPlugin
                             }
                     };
                     data = data.Length + "\n" + data;
+                    // Encode with UTF8.
                     byte[] msg = Encoding.UTF8.GetBytes(data);
 
                     // Send the data through the socket.
@@ -78,9 +84,9 @@ namespace XAuroraWordPlugin
 
                     // Receive the response from the remote device.
                     int bytesRec = sender.Receive(bytes);
-                    string res = Encoding.UTF8.GetString(bytes, 0, bytesRec);
+                    string res = Encoding.UTF8.GetString(bytes, 0, bytesRec).Trim();
                     string result = processResponse(res);
-                    if (result!="") Messenger.message(result);
+                    if (result != "") Messenger.message(result);
 
                     // Release the socket.
                     sender.Shutdown(SocketShutdown.Both);
@@ -107,12 +113,74 @@ namespace XAuroraWordPlugin
             }
         }
 
-        private string processResponse(string res)
+        // Send text for Preference List.
+        public static void pushText(String content, int retry)
         {
-            string[] seperator = new string[] {"\n"};
+            // Data buffer for incoming data.
+            byte[] bytes = new byte[MAX_LENGTH];
+
+            // Connect to a remote device.
+            try
+            {
+                IPEndPoint backgroundSvr = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23333);
+
+                // Create a TCP/IP  socket.
+                Socket sender = new Socket(AddressFamily.InterNetwork,
+                    SocketType.Stream, ProtocolType.Tcp);
+
+                // Connect the socket to the remote endpoint. Catch any errors.
+                try
+                {
+                    sender.Connect(backgroundSvr);
+                    // Encode the data string into a byte array.
+                    string data = "";
+                    data = REQUEST_FOR_PREFERENCE.ToString() + "\n" + content;
+                    data = data.Length + "\n" + data;
+                    byte[] msg = Encoding.UTF8.GetBytes(data);
+
+                    // Send the data through the socket.
+                    int bytesSent = sender.Send(msg);
+
+                    // Receive the response from the remote device.
+                    int bytesRec = sender.Receive(bytes);
+                    string res = Encoding.UTF8.GetString(bytes, 0, bytesRec).Trim();
+                    string result = processResponse(res);
+                    if (result != "") Messenger.message(result);
+
+                    // Release the socket.
+                    sender.Shutdown(SocketShutdown.Both);
+                    sender.Close();
+
+                }
+                catch (ArgumentNullException ane)
+                {
+                    Messenger.message("ArgumentNullException :" + ane.ToString());
+                }
+                catch (SocketException)
+                {
+                    if (retry < MAX_RETRY_TIME) pushText(content, retry + 1);
+                }
+                catch (Exception e)
+                {
+                    Messenger.message("Unexpected exception :" + e.ToString());
+                }
+
+            }
+            catch (Exception e)
+            {
+                Messenger.message(e.ToString());
+            }
+        }
+
+        // Process response by background system.
+        private static string processResponse(string res)
+        {
+            string[] seperator = new string[] { "\n" };
             string[] parts = res.Split(seperator, StringSplitOptions.None);
+            // Extract Communication code.
             int commCode = Int32.Parse(parts[0]);
             string result = "";
+            // According to Communication code, do actions.
             switch (commCode)
             {
                 case ALL_OK:
@@ -123,18 +191,24 @@ namespace XAuroraWordPlugin
                     {
                         break;
                     }
-                case HOT_KEY: 
+                case HOT_KEY:
                     {
                         serverStat = CONNECTED;
                         isHotkeyGet = true;
+                        for (int i = 0; i < parts.Length; i++)
+                        {
+                            Messenger.message(parts[i] + "\n");
+                        }
                         // update hotkey;
                         break;
                     }
                 case PREFERENCE_LIST:
                     {
-                        for (int i = 1;i<parts.Length;i++){
+                        for (int i = 1; i < parts.Length; i++)
+                        {
                             result = result + parts[i] + "\n";
                         }
+                        Messenger.message(result);
                         break;
                     }
                 default:
@@ -145,5 +219,11 @@ namespace XAuroraWordPlugin
             };
             return result;
         }
+
+        // Check for whether the plugin is connected to background system.
+        public static bool isConnected()
+        {
+            return serverStat.Equals(CONNECTED);
+        }  
     }
 }

@@ -1,5 +1,15 @@
 package xaurora.dropboxV2;
-import static com.dropbox.core.util.StringUtil.jq;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.TreeMap;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestUtil;
@@ -8,18 +18,6 @@ import com.dropbox.core.util.StringUtil;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.DbxFiles;
 import com.dropbox.core.v2.DbxPathV2;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.TreeMap;
-
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 public class DropboxBrowse {
 

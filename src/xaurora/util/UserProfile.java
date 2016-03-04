@@ -76,6 +76,7 @@ public class UserProfile {
 	}
 
 	
+	@Override
 	public String toString(){
 		String userInfo = "UserName: " + userName + "\nEmail: " + emailAddress + "\nUserID: " + userID + 
 				"\nStorage: " + storage + "\nLocal file is stored at: " + path;// + "\n" + getCurrent() + "\n";

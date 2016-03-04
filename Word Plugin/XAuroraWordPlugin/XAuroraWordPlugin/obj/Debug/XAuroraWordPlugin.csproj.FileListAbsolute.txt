@@ -9,20 +9,3 @@ c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWo
 c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.csproj.GenerateResource.Cache
 c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.dll
 c:\users\raven\documents\visual studio 2012\Projects\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.pdb
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.dll
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.pdb
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.dll.manifest
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\XAuroraWordPlugin.vsto
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.dll
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.v4.0.Framework.dll
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.Word.dll
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.VisualStudio.Tools.Applications.Runtime.dll
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.VisualStudio.Tools.Applications.Runtime.xml
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.v4.0.Framework.xml
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.Word.xml
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.xml
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.csprojResolveAssemblyReference.cache
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.Properties.Resources.resources
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.csproj.GenerateResource.Cache
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.dll
-E:\study\study2015sem1\CS3283\x-aurora\Word Plugin\XAuroraWordPlugin\XAuroraWordPlugin\obj\Debug\XAuroraWordPlugin.pdb

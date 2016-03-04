@@ -2,7 +2,6 @@ package xaurora.system;
 
 import java.io.IOException;
 
-import xaurora.dropbox.DropboxMain;
 import xaurora.io.DataFileIO;
 
 public class SystemManager {

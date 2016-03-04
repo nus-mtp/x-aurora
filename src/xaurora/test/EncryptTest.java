@@ -37,7 +37,7 @@ public class EncryptTest {
 			try {
 				int i = 0;
 				while(i<10000){
-					byte[] encrypted = c.encrypt(br1.readLine().getBytes("UTF-8"));
+					byte[] encrypted = Security.encrypt(br1.readLine().getBytes("UTF-8"));
 					result.add(encrypted);
 					i++;
 				}
