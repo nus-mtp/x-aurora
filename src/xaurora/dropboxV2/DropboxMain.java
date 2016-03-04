@@ -20,14 +20,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
-public class Main extends AbstractHandler {
+public class DropboxMain extends AbstractHandler {
 
 
 	private final Common common;
     private final DropboxAuth dropboxAuth;
     private final DropboxBrowse dropboxBrowse;
     
-    private Main(PrintWriter log, DbxAppInfo dbxAppInfo, File userDbFile)
+    private DropboxMain(PrintWriter log, DbxAppInfo dbxAppInfo, File userDbFile)
             throws IOException, Common.DatabaseException
     {
 		
@@ -44,12 +44,13 @@ public class Main extends AbstractHandler {
 	            response.sendError(404);
 	            return;
 	        }
-
+	        
 	        // Log the request path.
 	        String requestPath = target;
 	        if (request.getQueryString() != null) {
 	            requestPath += "?" + request.getQueryString();
 	        }
+
 	        common.log.println("-- Request: " + request.getMethod() + " " + requestPath);
 
 	        if (target.equals("/")) {
@@ -66,6 +67,7 @@ public class Main extends AbstractHandler {
 	        }
 	        // Dropbox authorization routes.
 	        else if (target.equals("/dropbox-auth-start")) {
+	        	common.log.println("https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home");
 	            dropboxAuth.doStart(request, response);
 	        }
 	        else if (target.equals("/dropbox-auth-finish")) {
@@ -74,13 +76,13 @@ public class Main extends AbstractHandler {
 	        else if (target.equals("/dropbox-unlink")) {
 	            dropboxAuth.doUnlink(request, response);
 	        }
-//	        // Dropbox file browsing routes.
-//	        else if (target.equals("/browse")) {
-//	            dropboxBrowse.doBrowse(request, response);
-//	        }
-//	        else if (target.equals("/upload")) {
-//	            dropboxBrowse.doUpload(request, response);
-//	        }
+	        // Dropbox file browsing routes.
+	        else if (target.equals("/browse")) {
+	        	dropboxBrowse.doBrowse(request, response);
+	        }
+	        else if (target.equals("/upload")) {
+	        	dropboxBrowse.doUpload(request, response);
+	        }
 	        else {
 	            response.sendError(404);
 	        }
@@ -105,17 +107,19 @@ public class Main extends AbstractHandler {
 	        PrintWriter out = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
 
 	        out.println("<html>");
-	        out.println("<head><title>Home - Web File Browser</title></head>");
+	        out.println("<head><title>xAurora</title></head>");
 	        out.println("<body>");
 	        fp.insertAntiRedressHtml(out);
 
 	        // Login form.
-	        out.println("<h2>Log in</h2>");
+	        out.println("<h2>Welcome to xAurora</h2>");
+	        //out.println("<h3>Connect to Dropbox!</h3>");
 	        out.println("<form action='/login' method='POST'>");
 	        fp.insertAntiCsrfFormField(out);
-	        out.println("<p>Username: <input name='username' type='text' /> (pick whatever you want)</p>");
-	        out.println("<p>No password needed for this tiny example.</p>");
-	        out.println("<input type='submit' value='Login' />");
+	        out.println("<p>Input your username: <input name='username' type='text' /> (pick whatever you want)</p>");
+	        out.println("<p>Dropbox email account: <input name='email' type='text' /> </p>");
+	        //out.println("<p>No password needed for this tiny example.</p>");
+	        out.println("<input type='submit' value='Connect to Dropbox!' />");
 	        out.println("</form>");
 
 	        out.println("</body>");
@@ -129,11 +133,14 @@ public class Main extends AbstractHandler {
 	        if (!common.checkPost(request, response)) return;
 
 	        String username = request.getParameter("username");
+	        common.log.println(username);
 	        if (username == null) {
 	            response.sendError(400, "Missing field \"username\".");
 	            return;
 	        }
-
+	        
+	        String email = request.getParameter("email");
+	        common.log.println(email);
 	        String usernameError = checkUsername(username);
 	        if (usernameError != null) {
 	            response.sendError(400, "Invalid username: " + usernameError);
@@ -147,6 +154,7 @@ public class Main extends AbstractHandler {
 	            if (user == null) {
 	                user = new User();
 	                user.username = username;
+	                user.email = email;
 	                user.dropboxAccessToken = null;
 
 	                common.userDb.put(user.username, user);
@@ -155,6 +163,7 @@ public class Main extends AbstractHandler {
 	        }
 
 	        request.getSession().setAttribute("logged-in-username", user.username);
+	        request.getSession().setAttribute("logged-in-email", user.email);
 	        response.sendRedirect("/");
 	    }
 	
@@ -195,12 +204,13 @@ public class Main extends AbstractHandler {
 	        PrintWriter out = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
 
 	        out.println("<html>");
-	        out.println("<head><title>Home - Web File Browser</title></head>");
-	        out.println("<body>");
+	        out.println("<head><title>xAurora</title></head>");
+	        out.println("<body>Welcome</body>");
 	        fp.insertAntiRedressHtml(out);
 
 	        // Show user info.
-	        out.println("<h2>User: " + escapeHtml4(user.username) + "</h2>");
+	        out.println("<h3>Username: " + escapeHtml4(user.username) + "</h3>");
+	        out.println("<h3>Dropbox email: " + escapeHtml4(user.email) + "</h3>");
 
 	        if (user.dropboxAccessToken != null) {
 	            // Show information about linked Dropbox account.  Display the "Unlink" form.
@@ -271,7 +281,7 @@ public class Main extends AbstractHandler {
 //	            System.exit(1); return;
 //	        }
 
-	        String argPort = "5051";
+	        String argPort = "5053";
 	        String argDatabase = "database.db";
 
 	        // Figure out what port to listen on.
@@ -294,7 +304,7 @@ public class Main extends AbstractHandler {
 
 	        // Run server
 	        try {
-	            Main main = new Main(new PrintWriter(System.out, true), dbxAppInfo, dbFile);
+	            DropboxMain main = new DropboxMain(new PrintWriter(System.out, true), dbxAppInfo, dbFile);
 
 	            Server server = new Server(port);
 	            SessionHandler sessionHandler = new SessionHandler();

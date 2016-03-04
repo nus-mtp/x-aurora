@@ -1,4 +1,5 @@
 package xaurora.dropboxV2;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -57,8 +58,9 @@ public class Common {
                 if (displaced != null) throw new DatabaseException("Couldn't load from database: Duplicate username: " + user.username);
             }
             log.println("Loaded " + userMap.size() + " records.");
+            System.out.println("UserDB loaded");
         }
-        System.out.println("UserDB loaded");
+        System.out.println("loadUserDb finished");
         return userMap;
     }
     
@@ -112,7 +114,8 @@ public class Common {
             throws IOException
     {
         String username = (String) request.getSession().getAttribute("logged-in-username");
-        if (username == null) {
+        String email = (String) request.getSession().getAttribute("logged-in-email");
+        if (username == null || email == null) {
             return null;
         }
         return userDb.get(username);
