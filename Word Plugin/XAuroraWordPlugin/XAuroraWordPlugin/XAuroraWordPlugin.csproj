@@ -154,6 +154,7 @@
   <ItemGroup>
     <Compile Include="Communicator.cs" />
     <Compile Include="InputDetector.cs" />
+    <Compile Include="Messenger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
