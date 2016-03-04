@@ -128,6 +128,7 @@ public class TextIndexer {
 	private IndexSearcher searcher;
 	private IndexWriter writer;
 	private int displayNumber;
+	private XauroraParser parser;
 	//Singleton constructor
 	private TextIndexer(){
 		this.init();
@@ -135,7 +136,7 @@ public class TextIndexer {
 	
 	private void init(){
 		try {
-			
+			this.analyzer = new StandardAnalyzer();
 			this.storeDirectory = FSDirectory.open(Paths.get(DataFileIO.instanceOf().getIndexDirectory()));
 			
 		} catch (IOException e1) {
@@ -174,6 +175,7 @@ public class TextIndexer {
 			{
 				if(paragraphs[i].replaceAll("[^\\x00-\\x7F]","").trim().equals(""))
 					continue;
+				paragraphs[i] = paragraphs[i].replaceAll("[^\\x00-\\x7F]","").trim();
 				String[] sentences = paragraphs[i].split("[.|!|?]+ ");
 				for(int j = 0; j<sentences.length;j++){
 					Document data = new Document();
@@ -193,6 +195,7 @@ public class TextIndexer {
 
 			System.out.println("Elapsed milliseconds: " + difference);
 			this.writer.close();
+			//printAll();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -216,6 +219,23 @@ public class TextIndexer {
 			e.printStackTrace();
 		}
 	    
+	}
+	public ArrayList<String> extractKeyWordsInUserInput(String input){
+		ArrayList<String> result = new ArrayList<String>();
+		TokenStream stream = this.analyzer.tokenStream(FIELD_TERMS, new StringReader(input.toLowerCase().trim()));
+		stream = new StopFilter(stream, stopSet);
+	    CharTermAttribute charTermAttribute = stream.addAttribute(CharTermAttribute.class);
+	    try {
+			stream.reset();
+			while(stream.incrementToken()) {
+				result.add(charTermAttribute.toString());
+			}
+			stream.close();
+		} catch (IOException e) {
+			// Log here
+			e.printStackTrace();
+		}
+	    return result;
 	}
 	//Description: Inserting a sentence into the respective lucene document object
 	//Pre-condition: An array of String that storing all sentences within 1 paragraph
@@ -243,9 +263,14 @@ public class TextIndexer {
 	//				 The respective lucene document object
 	//Post-condition: All number/e-mails (if exists) will be stored into the document object.
 	private void extractNumbersAndEmails(String[] paragraphs, int i, Document data) {
-		InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode((paragraphs[i]+". ").replaceAll("[^\\x00-\\x7F]", "")).array());
+		//InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode((paragraphs[i]+". ").replaceAll("[^\\x00-\\x7F]", "")).array());
+		InputStream is = new ByteArrayInputStream((paragraphs[i]+". ").replaceAll("[^\\x00-\\x7F]", "").getBytes());
 		//convert the string into input stream and pass that into the JavaCC parser
-		XauroraParser.ReInit(is);
+		if(this.parser == null){
+			this.parser = new XauroraParser(is);
+		} else {
+			XauroraParser.ReInit(is);
+		}
 		try {
 			XauroraParser.parseEmailInSentence(data);
 		} catch (xaurora.text.ParseException e) {
@@ -384,12 +409,15 @@ public class TextIndexer {
 	//Pre-condition: a valid Lucene Search Query
 	//Post-condition: returning an ArrayList of String which stores the content of all matching documents
 	public synchronized ArrayList<String> searchDocument(Query q){
+		System.out.println(q.toString());
 		ArrayList<String> result = new ArrayList<String>();
 		try {
 			this.reader  = DirectoryReader.open(this.storeDirectory);
 			this.searcher = new IndexSearcher(this.reader); 
-			TopDocs docs = this.searcher.search(q, this.displayNumber);
-			for(int i = 0;i<docs.totalHits;i++){
+			
+			TopDocs docs = this.searcher.search(q, DEFAULT_DISPLAY_NUMBER);
+			System.out.println(docs.totalHits);
+			for(int i = 0;i<DEFAULT_DISPLAY_NUMBER;i++){
 				int id = docs.scoreDocs[i].doc;
 				String content = this.searcher.doc(id).get(FIELD_EXTENDED_DATA);
 				result.add(content);
@@ -399,5 +427,22 @@ public class TextIndexer {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	public synchronized void printAll(){
+		try {
+			this.reader  = DirectoryReader.open(this.storeDirectory);
+			for (int i=0; i<reader.maxDoc(); i++) {
+			    
+
+			    Document doc = reader.document(i);
+			    String docId = doc.get("content");
+			    System.out.println(docId);
+			    // do something with docId here...
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

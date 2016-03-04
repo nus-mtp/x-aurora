@@ -21,7 +21,7 @@ public class TimeManager {
 		}
 		return classInstance;
 	}
-	public String formatDateInMilliseconds(long input){
+	public static String formatDateInMilliseconds(long input){
 		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT,Locale.getDefault());
 		GregorianCalendar calendar = new GregorianCalendar(TimeZone.getDefault());
 		calendar.setTimeInMillis(input);

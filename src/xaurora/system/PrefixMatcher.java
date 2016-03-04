@@ -19,16 +19,17 @@ public class PrefixMatcher {
 	private static final String WILDCARD = "*";
 	public static ArrayList<String> getResult(String userInput){
 		ArrayList<String> suggestion = new ArrayList<String>();
-		String[] words = extractKeyWords(userInput);
+		ArrayList<String> keywords = TextIndexer.getInstance().extractKeyWordsInUserInput(userInput);
 
-		String[] queries = new String[2];
-		String[] fields = new String[2];
-		queries[0] = constructFuzzyQuery(words);
-		queries[1] = userInput+calcFuzzy(userInput);
+		String[] queries = new String[1];
+		String[] fields = new String[1];
+		queries[0] = constructFuzzyQuery(keywords);
+		queries[0] = userInput+calcFuzzy(userInput);
 		fields[0] = FIELD_TO_SEARCH_KEYWORD;
-		fields[1] = FIELD_TO_SEARCH_STRING;
+		fields[0] = FIELD_TO_SEARCH_STRING;
 		try {
-			Query searchQuery = MultiFieldQueryParser.parse(queries, fields, new StandardAnalyzer());
+			//Query searchQuery = MultiFieldQueryParser.getPrefixQuery(FIELD_TO_SEARCH_STRING ,userInput);
+			Query searchQuery = new QueryParser("content",new StandardAnalyzer()).parse(userInput);
 			suggestion = TextIndexer.getInstance().searchDocument(searchQuery);
 		} catch (ParseException e) {
 			
@@ -36,27 +37,26 @@ public class PrefixMatcher {
 		}
 		return suggestion;
 	}
-	private static String constructFuzzyQuery(String[] keywords){
+	private static String constructFuzzyQuery(ArrayList<String> keywords){
 		StringBuilder builder = new StringBuilder();
-		
-		for(int index = 0;index<keywords.length;index++){
-			String word = keywords[index].trim();
+		builder.append("\"");
+		for(int index = 0;index<keywords.size();index++){
+			String word = keywords.get(index).trim();
 			word = removeQuotationCharacter(word);
 			String fuzziness = calcFuzzy(word);
-			word = QueryParser.escape(word);
+			//word = QueryParser.escape(word);
 			if(word.equals("")){
 				continue;
 			}
 			builder.append(word);
-			builder.append(fuzziness);
+			//builder.append(fuzziness);
 			builder.append(" ");
 		}
 		builder.append(WILDCARD);
+		builder.append("\"");
 		return builder.toString();
 	}
-	private static String[] extractKeyWords(String input){
-		return input.toLowerCase().trim().split(" ");
-	}
+
 	private static String removeQuotationCharacter(String input){
 		input = input.replaceAll(unicodeToUTF8(UNICODE_LEFT_DOUBLE_QUOTE), "\"");
 		input = input.replaceAll(unicodeToUTF8(UNICODE_RIGHT_DOUBLE_QUOTE), "\"");
@@ -81,5 +81,9 @@ public class PrefixMatcher {
 			return "~0.0";
 		else
 			return "~"+(wordLength-FUZZY_ALLOWANCE)/wordLength;
+	}
+	//THIS IS FOR TESTING WITHOUT THE WORD PLUGIN COMPONENT ONLY!
+	public static void main(String[] args){
+		
 	}
 }
