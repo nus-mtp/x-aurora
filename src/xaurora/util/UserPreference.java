@@ -100,45 +100,91 @@ public class UserPreference {
             String[] hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             extendWordHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
-                extendWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                try{
+                    extendWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                }catch(IllegalArgumentException | NullPointerException ex){
+                    extendWordHotkey = getDefaultExtendWordHotkey();
+                    break;
+                }
             }
             
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             reduceWordHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
-                reduceWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                try{
+                    reduceWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                }catch(IllegalArgumentException | NullPointerException ex){
+                    reduceWordHotkey = getDefaultReduceWordHotkey();
+                    break;
+                }
             }
             
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             extendSentenceHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
-                extendSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                try{
+                    extendSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                }catch(IllegalArgumentException | NullPointerException ex){
+                    extendSentenceHotkey = getDefaultExtendSentenceHotkey();
+                    break;
+                }
             }
             
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             reduceSentenceHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
-                reduceSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                try{
+                    reduceSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                }catch(IllegalArgumentException | NullPointerException ex){
+                    reduceSentenceHotkey = getDafaultReduceSentenceHotkey();
+                    break;
+                }
             }
             
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             extendParagraphHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
-                extendParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                try{
+                    extendParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                }catch(IllegalArgumentException | NullPointerException ex){
+                    extendParagraphHotkey = getDefaultExtendParagraphHotkey();
+                    break;
+                }
             }
             
             hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
             reduceParagraphHotkey = new KeyCode[hotkey.length];
             for (int i = 0; i < hotkey.length; i++){
-                reduceParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                try{
+                    reduceParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+                }catch(IllegalArgumentException | NullPointerException ex){
+                    reduceParagraphHotkey = getDefaultReduceParagraphHotkey();
+                    break;
+                }
             }
             
             //Text Editor Pane
-            numMatchingTextDisplay = Integer.valueOf(settings[index++]);
+            try{
+                numMatchingTextDisplay = Integer.valueOf(settings[index++]);
+            }catch(NumberFormatException ex){
+                numMatchingTextDisplay = getDefaultNumMatchingTextDisplay();
+            }
             isShowTextSource = Boolean.valueOf(settings[index++]);
-            boxColour = Color.valueOf(settings[index++]);
-            textColour = Color.valueOf(settings[index++]);
-            boxTransparency = Double.valueOf(settings[index++]);;
+            try{
+                boxColour = Color.valueOf(settings[index++]);
+            }catch(NullPointerException | IllegalArgumentException ex){
+                boxColour = getDefaultBoxColour();
+            }
+            try{
+                textColour = Color.valueOf(settings[index++]);
+            }catch(NullPointerException | IllegalArgumentException ex){
+                textColour = getDefaultTextColour();
+            } 
+            try{
+                boxTransparency = Double.valueOf(settings[index++]);;
+            }catch(NumberFormatException ex){
+                boxTransparency = getDefaultBoxTransparency();
+            }
             
             //Blocked List Pane
             String[] s = settings[index++].split("\\s+");
@@ -321,6 +367,62 @@ public class UserPreference {
 
     public static int getNumPreferences() {
         return numPreferences;
+    }
+    
+    public KeyCode[] getDefaultExtendWordHotkey(){
+        return extendWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.Z};
+    }
+
+    public KeyCode[] getDefaultReduceWordHotkey() {
+        return reduceWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.X};
+    }
+
+    public KeyCode[] getDefaultExtendSentenceHotkey() {
+        return extendSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.C};
+    }
+
+    public KeyCode[] getDafaultReduceSentenceHotkey() {
+        return reduceSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.V};
+    }
+
+    public KeyCode[] getDefaultExtendParagraphHotkey() {
+        return extendParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.B};
+    }
+
+    public KeyCode[] getDefaultReduceParagraphHotkey() {
+        return reduceParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.N};
+    }
+    
+    public int getDefaultNumMatchingTextDisplay() {
+        return numMatchingTextDisplay = 5;
+    }
+
+    public Color getDefaultBoxColour() {
+        return boxColour = Color.WHITE;
+    }
+
+    public Color getDefaultTextColour() {
+        return textColour = Color.BLACK;
+    }
+
+    public double getDefaultBoxTransparency() {
+        return boxTransparency = 0;
+    }
+
+    public String getDefaultDataPath() {
+        return dataPath = "C:/User/Desktop";
+    }
+
+    public String getDefaultClearCachesTime() {
+        return clearCachesTime = "device is off";
+    }
+
+    public String getDefaultMaxTextSizeStored() {
+        return maxTextSizeStored = "100MB";
+    }
+
+    public String getDefaultPreviewTextLength() {
+        return previewTextLength = "one sentence";
     }
 
     public void setIsRunOnStartUp(boolean isRunOnStartUp) {
