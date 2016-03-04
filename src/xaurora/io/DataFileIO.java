@@ -255,7 +255,7 @@ public class DataFileIO {
 					}
 					
 				} else {
-					DataFileMetaData tempEntity = new DataFileMetaData(f.getName(),getUrlFromFile(f));
+					DataFileMetaData tempEntity = new DataFileMetaData(f.getName().substring(0, f.getName().lastIndexOf(".")),getUrlFromFile(f));
 					tempEntity.addFileMetaData(f.length(), f.lastModified());
 					result.add(tempEntity);					
 				}
