@@ -11,7 +11,7 @@ public class DataFileMetaData {
 	private String source;
 	private long length;
 	private long lastModified;
-        private static final String SOURCE_UNKNOWN = "unknown";
+    private static final String SOURCE_UNKNOWN = "unknown";
 	
 	public DataFileMetaData(String filename,String url){
 		this.filename = filename;

@@ -34,14 +34,14 @@ private static final int PORT_PLUGIN = 23333;
 		//Establish connection between browser/editor and logic
 		
 		wordSvrThread.start();
-		ArrayList<String> actualResult = new ArrayList<String>();
+		/*ArrayList<String> actualResult = new ArrayList<String>();
 		Scanner sc = new Scanner(System.in);
 		String userInput = sc.nextLine();
 		actualResult = PrefixMatcher.getResult(userInput+"*");
 		System.out.println(actualResult.isEmpty());
 		for(int i = 0;i<actualResult.size();i++){
 			System.out.println(actualResult.get(i));
-		}
+		}*/
 		
         sa.login(false);
         

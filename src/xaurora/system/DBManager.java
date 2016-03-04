@@ -3,7 +3,7 @@ package xaurora.system;
 import xaurora.io.DataFileIO;
 
 public class DBManager implements Runnable{
-	private static final long DEFAULT_CHECK_INTERVAL = 60000;//10 minute
+	private static final long DEFAULT_CHECK_INTERVAL = 6000000;//10 minute
 	private boolean isToUpdate;
 	public void run() {
 		while(true){
@@ -30,6 +30,6 @@ public class DBManager implements Runnable{
 	private static boolean isCorrectUpdateTiming(){
 		long currentTime = System.currentTimeMillis();
 		//Every 5th minutes within a 10-minute-period
-		return currentTime%DEFAULT_CHECK_INTERVAL == 30000;
+		return currentTime%DEFAULT_CHECK_INTERVAL == 3000000;
 	}
 }
