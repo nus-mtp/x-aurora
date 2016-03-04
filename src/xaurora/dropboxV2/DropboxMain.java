@@ -1,4 +1,14 @@
 package xaurora.dropboxV2;
+import com.dropbox.core.DbxAppInfo;
+import com.dropbox.core.json.JsonReader;
+
+import static com.dropbox.core.util.StringUtil.jq;
+
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.session.SessionHandler;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -8,12 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.session.SessionHandler;
-
-import com.dropbox.core.DbxAppInfo;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 public class DropboxMain extends AbstractHandler {
 
@@ -62,7 +67,6 @@ public class DropboxMain extends AbstractHandler {
 	        }
 	        // Dropbox authorization routes.
 	        else if (target.equals("/dropbox-auth-start")) {
-	        	common.log.println("https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home");
 	            dropboxAuth.doStart(request, response);
 	        }
 	        else if (target.equals("/dropbox-auth-finish")) {
@@ -150,9 +154,12 @@ public class DropboxMain extends AbstractHandler {
 	                user = new User();
 	                user.username = username;
 	                user.email = email;
+	                String userInfo = username+email;
+	                int code = userInfo.hashCode();
+	                user.code = code;
 	                user.dropboxAccessToken = null;
 
-	                common.userDb.put(user.username, user);
+	                common.userDb.put(user.code, user);
 	                common.saveUserDb();
 	            }
 	        }
@@ -209,7 +216,7 @@ public class DropboxMain extends AbstractHandler {
 
 	        if (user.dropboxAccessToken != null) {
 	            // Show information about linked Dropbox account.  Display the "Unlink" form.
-	            out.println("<p>Linked to your Dropbox account (" + escapeHtml4(user.dropboxAccessToken) + "), ");
+	            out.println("<p>Linked to your Dropbox account! Access Token :" + escapeHtml4(user.dropboxAccessToken) + ", ");
 	            out.println("<form action='/dropbox-unlink' method='POST'>");
 	            fp.insertAntiCsrfFormField(out);
 	            out.println("<input type='submit' value='Unlink Dropbox account' />");
@@ -276,7 +283,7 @@ public class DropboxMain extends AbstractHandler {
 //	            System.exit(1); return;
 //	        }
 
-	        String argPort = "5053";
+	        String argPort = "5054";
 	        String argDatabase = "database.db";
 
 	        // Figure out what port to listen on.
