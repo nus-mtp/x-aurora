@@ -83,8 +83,7 @@ var connector = {
                     var request = new XMLHttpRequest();
                     console.log("Sending Texts!"); // Console message.
                     request.open('PUSH', 'http://127.0.0.1:'+dataPort, true);
-                    
-                    contentText = encode_utf8(contentText);
+                      
                     request.send(SEND_TEXT+"\n"+tabUrl+"\n"+contentText);
 
                     // Upon received response, do actions according to response.
