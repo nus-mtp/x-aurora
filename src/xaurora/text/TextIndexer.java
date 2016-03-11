@@ -295,70 +295,70 @@ public class TextIndexer {
 		return host;
 	}
 	//Description: add an URL to a lucene document object.
-	//Pre-condition£º A string typed url and the lucene document
+	//Pre-conditionï¿½ï¿½ A string typed url and the lucene document
 	//Post-condition: the url will be added as a text field to the document
 	public static void addURL(Document doc,String url)
 	{
 		addTextField(doc,FIELD_URL,url);
 	}
 	//Description: add an source host name to a lucene document object.
-	//Pre-condition£º A string typed storing the hostname of the source and the lucene document
+	//Pre-conditionï¿½ï¿½ A string typed storing the hostname of the source and the lucene document
 	//Post-condition: the hostname will be added as a text field to the document
 	public static void addSource(Document doc,String source)
 	{
 		addTextField(doc,FIELD_SOURCE,source);
 	}
 	//Description: add the filename of the datafile to a lucene document object.
-	//Pre-condition£º A string storing the filename of the text datafile and the lucene document
+	//Pre-conditionï¿½ï¿½ A string storing the filename of the text datafile and the lucene document
 	//Post-condition: the filename will be added as a text field to the document
 	public static void addFilename(Document doc,String filename)
 	{
 		addTextField(doc,FIELD_FILENAME,filename);
 	}
 	//Description: add the text content of a sentence to a lucene document object.
-	//Pre-condition£º A string storing the text content and the lucene document
+	//Pre-conditionï¿½ï¿½ A string storing the text content and the lucene document
 	//Post-condition: the text will be added as a String field to the document
 	public static void addContent(Document doc,String content)
 	{
 		addStringField(doc,FIELD_CONTENT,content);
 	}
 	//Description: add the text content of a paragraph to a lucene document object.
-	//Pre-condition£º A string storing the text content and the lucene document
+	//Pre-conditionï¿½ï¿½ A string storing the text content and the lucene document
 	//Post-condition: the text will be added as a String field to the document
 	public static void addData(Document doc,String content)
 	{
 		addStringField(doc,FIELD_EXTENDED_DATA,content);
 	}
 	//Description: add a number to a lucene document object.
-	//Pre-condition£º A string storing the number and the lucene document
+	//Pre-conditionï¿½ï¿½ A string storing the number and the lucene document
 	//Post-condition: the number will be added as a text field to the document
 	public static void addNumber(Document doc,String number)
 	{
 		addTextField(doc,FIELD_NUMBER,number);
 	}
 	//Description: add an E-mail address to a lucene document object.
-	//Pre-condition£º A string storing the e-mail address and the lucene document
+	//Pre-conditionï¿½ï¿½ A string storing the e-mail address and the lucene document
 	//Post-condition: the e-mail address will be added as a text field to the document
 	public static void addEmail(Document doc,String email)
 	{
 		addTextField(doc,FIELD_EMAIL,email);
 	}
 	//Description: add a keyword extracted from the text to a lucene document object.
-	//Pre-condition£º A string keyword and the lucene document
+	//Pre-conditionï¿½ï¿½ A string keyword and the lucene document
 	//Post-condition: the keyword will be added as a String field to the document
 	public static void addTerms(Document doc,String term)
 	{
 		addTextField(doc,FIELD_TERMS,term);
 	}
 	//Description: add a text field to a lucene document object.
-	//Pre-condition£º A string storing the data and the lucene document
+	//Pre-conditionï¿½ï¿½ A string storing the data and the lucene document
 	//Post-condition: the text field will be added as a String field to the document
 	private static void addTextField(Document doc,String field,String value)
 	{
 		doc.add(new TextField(field,value,Field.Store.YES));
 	}
 	//Description: add a String field to a lucene document object.
-	//Pre-condition£º A string storing the text content and the lucene document
+	//Pre-conditionï¿½ï¿½ A string storing the text content and the lucene document
 	//Post-condition: the text will be added as a String field to the document
 	private static void addStringField(Document doc,String field,String value)
 	{
