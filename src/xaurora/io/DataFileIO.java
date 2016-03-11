@@ -78,13 +78,13 @@ public class DataFileIO {
 		return this.syncDirectory;
 	}
 	
-	//Description:��return the current Indexing directory
+	//Description: return the current Indexing directory
 	public String getIndexDirectory(){
 		return this.indexDirectory;
 	}
 	
 	//Description: base on a MD5 hased String ID generated from the source url, generate the respective datafile path
-	//pre-condition:��A correctly MD5-hashed String ID which identifies the source.
+	//pre-condition:A correctly MD5-hashed String ID which identifies the source.
 	//post-condition: An absolute path of this respective ID
 	private String generateDataFilePath(String id) {
 		String dstpath = this.syncDirectory+"\\"+new String(id)+DEFAULT_FILE_EXTENSION;
@@ -104,7 +104,8 @@ public class DataFileIO {
 		dstFile.createNewFile();
 		FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
 		String overallContent = url+"\n"+new String(content);
-		fos.write(Security.encrypt(overallContent.getBytes()));
+		//fos.write(Security.encrypt(overallContent.getBytes()));
+		fos.write(overallContent.getBytes());
 		fos.close();
 	}
 	
@@ -126,6 +127,7 @@ public class DataFileIO {
 		} else {
 			try{
 				writeDataFileWithEncryption(url, content, dstFile);
+				
 			} catch(IOException e){
 				
 			} 
@@ -159,7 +161,7 @@ public class DataFileIO {
 					}		
 				} else {	
 					if(getExtension(f).equals(TEXT_FILE_TYPE)) {
-						readFileContent(content, f);
+						content.add(readFileContent(f));
 					}
 				}
 			}
@@ -169,20 +171,24 @@ public class DataFileIO {
 	//pre-condition: an ArrayList that stores the content read from a data file and a valid data file
 	//Post-condition: the data stored in the encrypted file will be decrypted and
 	//				  store into the input arraylist.
-	private void readFileContent(ArrayList<String> content, File f) {
+	private String readFileContent( File f) {
+		
+		String output = NEW_EMPTY_STRING;
 		try{
 			Path path = Paths.get(f.getAbsolutePath());
 			byte[] data = Files.readAllBytes(path);
 			
-			byte[] decrypted = Security.decrypt(data);
-			String output = NEW_EMPTY_STRING;
+			//byte[] decrypted = Security.decrypt(data);
+			byte[] decrypted = data;
+			
 			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				output+=String.valueOf((char)decrypted[i]);
 			}
-			content.add(output);
+			
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+		return output;
 	}
 	
 	//Description: Check for expired file and delete its local datafile and indexing entity
@@ -210,11 +216,11 @@ public class DataFileIO {
 		
 	}
 	private String getUrlFromFile(File f){
-		ArrayList<String> temp = new ArrayList<String>();
-		readFileContent(temp,f);
+		String textContent = readFileContent(f);
+		String[] paragraphs = textContent.split("\n");
 		String result = "";
-		if(temp.size()>0){
-			result = temp.get(0);
+		if(paragraphs.length>0){
+			result = paragraphs[0];
 		}
 		return result;
 	}
