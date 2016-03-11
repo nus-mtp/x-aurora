@@ -119,7 +119,8 @@ public class DataFileIO {
 	public void createDataFile(String url,String id,byte[] content){
 		String dstpath = generateDataFilePath(id);
 		//Store the data in the lucene indexing system.
-		TextIndexer.getInstance().createIndexDocumentFromWeb(new String(content), url, dstpath);
+		long currentTime = System.currentTimeMillis();
+		TextIndexer.getInstance().createIndexDocumentFromWeb(new String(content), url, dstpath,currentTime);
 		File dstFile = new File(dstpath);
 		if(dstFile.exists()){
 			System.err.println(ERR_MSG_MD5_COLLISION);
@@ -173,22 +174,21 @@ public class DataFileIO {
 	//				  store into the input arraylist.
 	private String readFileContent( File f) {
 		
-		String output = NEW_EMPTY_STRING;
+		StringBuilder output = new StringBuilder(NEW_EMPTY_STRING);
 		try{
 			Path path = Paths.get(f.getAbsolutePath());
 			byte[] data = Files.readAllBytes(path);
 			
-			//byte[] decrypted = Security.decrypt(data);
-			byte[] decrypted = data;
+			byte[] decrypted = data;//Security.decrypt(data);
 			
-			for(int i = INDEX_ZERO;i<decrypted.length;i++){
-				output+=String.valueOf((char)decrypted[i]);
+			for(int i = INDEX_ZERO;i<decrypted.length;i++){	
+				output.append(String.valueOf((char)decrypted[i]));
 			}
 			
 		} catch (IOException e){
 			e.printStackTrace();
 		}
-		return output;
+		return output.toString();
 	}
 	
 	//Description: Check for expired file and delete its local datafile and indexing entity
@@ -276,7 +276,7 @@ public class DataFileIO {
 		ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData();
 		ArrayList<String> content = this.getContent();
 		for(int index = 0;index<allMetaData.size();index++){
-			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getURL(), allMetaData.get(index).getFilename());
+			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getURL(), allMetaData.get(index).getFilename(),allMetaData.get(index).getLastModified());
 		}
 	}
 }
