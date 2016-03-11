@@ -256,7 +256,7 @@ public class DataFileIO {
 					
 				} else {
 					DataFileMetaData tempEntity = new DataFileMetaData(f.getName().substring(0, f.getName().lastIndexOf(".")),getUrlFromFile(f));
-					tempEntity.addFileMetaData(f.length(), f.lastModified());
+                                        tempEntity.addFileMetaData(f.length(), f.lastModified());
 					result.add(tempEntity);					
 				}
 			}
@@ -270,7 +270,7 @@ public class DataFileIO {
 		ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData();
 		ArrayList<String> content = this.getContent();
 		for(int index = 0;index<allMetaData.size();index++){
-			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getURL(), allMetaData.get(index).getFilename());
+			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getUrl(), allMetaData.get(index).getFilename());
 		}
 	}
 }
