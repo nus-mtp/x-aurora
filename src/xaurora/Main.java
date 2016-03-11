@@ -42,7 +42,7 @@ private static final int PORT_PLUGIN = 23333;
 		for(int i = 0;i<actualResult.size();i++){
 			System.out.println(actualResult.get(i));
 		}
-		
+                
         sa.login(false);
         
 	}
