@@ -33,15 +33,9 @@ public class ChromeServer implements Runnable{
 
 		while (true) {
 			isTextContent = false;
-			long lStartTime = System.currentTimeMillis();
 			String text = receiveMessage();
-			long lEndTime = System.currentTimeMillis();
-			long difference = lEndTime - lStartTime;
-
-			//System.out.println("Elapsed milliseconds for receiveMessage : " + difference);
 			if (isTextContent) {
-				outputToFile(text);
-				
+				outputToFile(text);			
 			}
 			
 
