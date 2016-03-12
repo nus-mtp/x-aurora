@@ -221,10 +221,10 @@ public class DataFileIO {
 		try{
 			Path path = Paths.get(f.getAbsolutePath());
 			byte[] data = Files.readAllBytes(path);
-			
+
 			byte[] decrypted = Security.decrypt(data);
-			
-			for(int i = INDEX_ZERO;i<decrypted.length;i++){	
+
+			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				output.append(String.valueOf((char)decrypted[i]));
 			}
 			
@@ -335,8 +335,8 @@ public class DataFileIO {
 					}
 					
 				} else {
-					DataFileMetaData tempEntity = new DataFileMetaData(f.getName(),getUrlFromFile(f));
-					tempEntity.addFileMetaData(f.length(), f.lastModified());
+					DataFileMetaData tempEntity = new DataFileMetaData(f.getName().substring(0, f.getName().lastIndexOf(".")),getUrlFromFile(f));
+                                        tempEntity.addFileMetaData(f.length(), f.lastModified());
 					result.add(tempEntity);					
 				}
 			}
@@ -353,8 +353,10 @@ public class DataFileIO {
 	public synchronized void updateIndexingFromFiles(){
 		ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData();
 		ArrayList<String> content = this.getContent();
+
 		for(int index = INDEX_ZERO;index<allMetaData.size();index++){
-			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getURL(), allMetaData.get(index).getFilename(),allMetaData.get(index).getLastModified());
+			TextIndexer.getInstance().createIndexDocumentFromWeb(content.get(index), allMetaData.get(index).getUrl(), allMetaData.get(index).getFilename(),allMetaData.get(index).getLastModified());
+
 		}
 	}
 }

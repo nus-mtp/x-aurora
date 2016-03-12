@@ -391,6 +391,7 @@ public class TextIndexer {
 		}
 		return host;
 	}
+
 	/**
 	 * Description: add an URL to a lucene document object.
 	 * @param doc,A lucene Document object
@@ -398,10 +399,12 @@ public class TextIndexer {
 	 * 
 	 * @author GAO RISHENG A0101891L
 	 */
+
 	public static void addURL(Document doc,String url)
 	{
 		addTextField(doc,FIELD_URL,url);
 	}
+
 
 	/**
 	 * Description: add an source host name to a lucene document object.
@@ -410,10 +413,12 @@ public class TextIndexer {
 	 * 
 	 * @author GAO RISHENG A0101891L
 	 */
+
 	public static void addSource(Document doc,String source)
 	{
 		addStringField(doc,FIELD_SOURCE,source);
 	}
+
 	
 	/**
 	 * Description: add the filename of the datafile to a lucene document object.
@@ -422,10 +427,12 @@ public class TextIndexer {
 	 * 
 	 * @author GAO RISHENG A0101891L
 	 */
+
 	public static void addFilename(Document doc,String filename)
 	{
 		addStringField(doc,FIELD_FILENAME,filename);
 	}
+
 	
 	/**
 	 * Description: add the text content of a sentence to a lucene document object.
@@ -434,10 +441,12 @@ public class TextIndexer {
 	 * 
 	 * @author GAO RISHENG A0101891L
 	 */
+
 	public static void addContent(Document doc,String content)
 	{
 		addTextField(doc,FIELD_CONTENT,content);
 	}
+
 	
 	/**
 	 * Description: add the text content of a paragraph to a lucene document object.
@@ -446,10 +455,12 @@ public class TextIndexer {
 	 * 
 	 * @author GAO RISHENG A0101891L
 	 */
+
 	public static void addData(Document doc,String content)
 	{
 		addStringField(doc,FIELD_EXTENDED_DATA,content);
 	}
+
 
 	/**
 	 * Description: add a number to a lucene document object.
@@ -462,6 +473,7 @@ public class TextIndexer {
 	{
 		addStringField(doc,FIELD_NUMBER,number);
 	}
+
 
 	/**
 	 * Description: add an E-mail address to a lucene document object.
@@ -497,6 +509,7 @@ public class TextIndexer {
 	public static void addLastModified(Document doc,long value){
 		addLongField(doc,FIELD_LAST_MODIFIED,value);
 	}
+
 	
 	/**
 	 * Description: add a text field to a lucene document object.
@@ -511,6 +524,7 @@ public class TextIndexer {
 		doc.add(new TextField(field,value,Field.Store.YES));
 	}
 
+
 	
 	/**
 	 * Description: add a String field to a lucene document object.
@@ -520,6 +534,7 @@ public class TextIndexer {
 	 * 
 	 * @author GAO RISHENG A0101891L
 	 */
+
 	private static void addStringField(Document doc,String field,String value)
 	{
 		doc.add(new StringField(field,value,Field.Store.YES));
