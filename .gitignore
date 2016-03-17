@@ -1,1 +1,13 @@
 /bin/
+/local_data/
+/index_data/
+/lib/
+.classpath
+Aurora.png
+build.xml
+dropbox.png
+.project
+/.settings/
+/build/
+/nbproject/
+/unit_testing/
