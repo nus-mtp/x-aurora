@@ -22,7 +22,7 @@ import xaurora.text.TextIndexer;
 import xaurora.util.DataFileMetaData;
 
 import java.util.*;
-public class DataFileIO {
+public final class DataFileIO {
 	private static final String PATH_SEPARATOR = "\\";
 	private static final String NEWLINE = "\n";
 	private static final String DEFAULT_SYNC_DIRECTORY = "/local_data/";
@@ -133,7 +133,8 @@ public class DataFileIO {
 		dstFile.createNewFile();
 		FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
 		String overallContent = url+NEWLINE+new String(content);
-		fos.write(Security.encrypt(overallContent.getBytes()));
+		//Use the filename of the data file as the IV of the encryption
+		fos.write(Security.encrypt(overallContent.getBytes(),dstFile.getName().replace(DEFAULT_FILE_EXTENSION,NEW_EMPTY_STRING)));
 		//fos.write(overallContent.getBytes());
 		fos.close();
 	}
@@ -222,7 +223,7 @@ public class DataFileIO {
 			Path path = Paths.get(f.getAbsolutePath());
 			byte[] data = Files.readAllBytes(path);
 
-			byte[] decrypted = Security.decrypt(data);
+			byte[] decrypted = Security.decrypt(data,f.getName().replace(DEFAULT_FILE_EXTENSION,NEW_EMPTY_STRING));
 
 			for(int i = INDEX_ZERO;i<decrypted.length;i++){
 				output.append(String.valueOf((char)decrypted[i]));
@@ -359,4 +360,23 @@ public class DataFileIO {
 
 		}
 	}
+	
+	/**
+	 * Secure Programming. Making this Object not-clonable. Object.clone() allows cloning the data of an object without initialize it
+	 * which may leak the chances for attacker to access the data internally
+	 * @Author GAO RISHENG A0101891L
+	 */
+	public final Object clone() throws java.lang.CloneNotSupportedException {
+        throw new java.lang.CloneNotSupportedException();
+	}
+	
+	/**
+	 * Secure Programming. Disable the serialize option of the object which avoid attacker to print the object in serialize manner
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void writeObject(ObjectOutputStream out)
+			throws java.io.IOException {
+			        throw new java.io.IOException("Object cannot be serialized");
+			}
 }
