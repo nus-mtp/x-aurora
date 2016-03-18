@@ -1,5 +1,6 @@
 package xaurora.system;
 
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -13,6 +14,11 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 
 public class PrefixMatcher {
+	private static final int EMAIL_LEGAL_CHARACTERS = 62;
+	private static final String PRESET_NUMBER_SEARCH_INPUT = "number:";
+	private static final String PRESET_EMAIL_SEARCH_INPUT = "email:";
+	private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+	private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
 	private static final String FIELD_TO_SEARCH_KEYWORD = "content";
 	private static final String FIELD_EMAIL = "email";
 	private static final String FIELD_NUMBER = "number";
@@ -22,9 +28,9 @@ public class PrefixMatcher {
 	private static final double FUZZY_ALLOWANCE = 1.5;
 	public static ArrayList<String> getResult(String userInput){
 		ArrayList<String> suggestion = new ArrayList<String>();
-		if(userInput.equals("number:")){
+		if(userInput.equals(PRESET_NUMBER_SEARCH_INPUT)){
 			suggestion = generateNumberQuery(suggestion);
-		} else if(userInput.equals("email:")){
+		} else if(userInput.equals(PRESET_EMAIL_SEARCH_INPUT)){
 			suggestion = generateEmailQuery(suggestion);
 		} else {
 			suggestion = generatreNormalQuery(userInput, suggestion);
@@ -33,7 +39,7 @@ public class PrefixMatcher {
 	}
 	
 	private static ArrayList<String> generateEmailQuery(ArrayList<String> suggestion){
-		String[] queries = new String[62];
+		String[] queries = new String[EMAIL_LEGAL_CHARACTERS];
 		String[] fields = new String[62];
 		for(int i = 0;i<62;i++){
 			fields[i] = FIELD_EMAIL;
@@ -161,6 +167,15 @@ public class PrefixMatcher {
 	 */
 	private final void writeObject(ObjectOutputStream out)
 			throws java.io.IOException {
-			        throw new java.io.IOException("Object cannot be serialized");
+			        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+			}
+	/**
+	 * Secure Programming. Disable the de-serialize option of the object which avoid attacker to de-serialize the object stores in the file system
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void readObject(ObjectInputStream in)
+			throws java.io.IOException {
+			        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
 			}
 }

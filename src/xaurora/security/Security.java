@@ -1,5 +1,6 @@
 package xaurora.security;
 
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import javax.crypto.Cipher;
@@ -19,6 +20,8 @@ public final class Security {
 	private static final String DEFAULT_CHARSET = "UTF-8";
 	private static final String ENCRYPT_METHOD = "AES/CBC/PKCS5PADDING";
 	private static final String ENCRYPT_SEED = "x4Ur0raXaurORAe3";
+	private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+	private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
 	private static final int INDEX_ZERO = 0;
 	private static final int IV_LENGTH = 16;
 
@@ -109,6 +112,16 @@ public final class Security {
 	 */
 	private final void writeObject(ObjectOutputStream out)
 			throws java.io.IOException {
-			        throw new java.io.IOException("Object cannot be serialized");
+			        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+			}
+	
+	/**
+	 * Secure Programming. Disable the de-serialize option of the object which avoid attacker to de-serialize the object stores in the file system
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void readObject(ObjectInputStream in)
+			throws java.io.IOException {
+			        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
 			}
 }

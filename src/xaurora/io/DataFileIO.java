@@ -23,6 +23,8 @@ import xaurora.util.DataFileMetaData;
 
 import java.util.*;
 public final class DataFileIO {
+	private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+	private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
 	private static final String PATH_SEPARATOR = "\\";
 	private static final String NEWLINE = "\n";
 	private static final String DEFAULT_SYNC_DIRECTORY = "/local_data/";
@@ -336,7 +338,7 @@ public final class DataFileIO {
 					}
 					
 				} else {
-					DataFileMetaData tempEntity = new DataFileMetaData(f.getName().substring(0, f.getName().lastIndexOf(".")),getUrlFromFile(f));
+					DataFileMetaData tempEntity = new DataFileMetaData(f.getName().substring(INDEX_ZERO, f.getName().lastIndexOf(FILE_EXTENSION_DELIMITER)),getUrlFromFile(f));
                                         tempEntity.addFileMetaData(f.length(), f.lastModified());
 					result.add(tempEntity);					
 				}
@@ -377,6 +379,16 @@ public final class DataFileIO {
 	 */
 	private final void writeObject(ObjectOutputStream out)
 			throws java.io.IOException {
-			        throw new java.io.IOException("Object cannot be serialized");
+			        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+			}
+	
+	/**
+	 * Secure Programming. Disable the de-serialize option of the object which avoid attacker to de-serialize the object stores in the file system
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void readObject(ObjectInputStream in)
+			throws java.io.IOException {
+			        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
 			}
 }
