@@ -71,7 +71,7 @@ public class PreferenceUI extends Application{
     private static final int minMatchingDisplayed = 1;
     private static final int maxMatchingDisplayed = 20;
     private static final int majorTickUnit = 50;
-    
+    private static final String styleSheets = "style.css";
     UserPreference preferences = UserPreference.getInstance();
     DataFileIO dataFile = DataFileIO.instanceOf();
     Stage stage;
@@ -86,6 +86,8 @@ public class PreferenceUI extends Application{
         stage.setTitle("x-aurora");      
         Scene preferenceScene = createPreferenceScene();
         stage.setScene(preferenceScene);
+        String styleSheetsPath = new File(styleSheets).getAbsolutePath().replace("\\", "/");
+        preferenceScene.getStylesheets().add("File:///" + styleSheetsPath);
         stage.show();
     }
     

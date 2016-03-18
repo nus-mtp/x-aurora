@@ -1,5 +1,7 @@
 package xaurora.ui;
 
+import java.io.File;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -41,7 +43,8 @@ public class LoginUI extends Application{
         stage.setTitle(stageTitle);      
         Scene loginScene = createLoginScene();
         stage.setScene(loginScene);
-        //loginScene.getStylesheets().add(styleSheets);
+        String styleSheetsPath = new File(styleSheets).getAbsolutePath().replace("\\", "/");
+        loginScene.getStylesheets().add("File:///" + styleSheetsPath);
         stage.show();
     }
     
