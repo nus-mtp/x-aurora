@@ -1,4 +1,4 @@
-package xaurora.dropboxV2;
+package src.xaurora.dropboxV2;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class Common {
 	public final PrintWriter log;
     public final DbxAppInfo dbxAppInfo;
     public final File userDbFile;
-    public final Map<Integer,User> userDb;
+    public final Map<String,User> userDb;
     
     public Common(PrintWriter log, DbxAppInfo dbxAppInfo, File userDbFile)
             throws IOException, DatabaseException
@@ -45,18 +45,18 @@ public class Common {
         
     private static final ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     
-    private Map<Integer,User> loadUserDb(File dbFile)
+    private Map<String,User> loadUserDb(File dbFile)
             throws IOException, DatabaseException
     {
-        HashMap<Integer,User> userMap = new HashMap<Integer,User>();
+        HashMap<String,User> userMap = new HashMap<String,User>();
 
         if (dbFile.isFile()) {
             log.println("Loading User DB from " + jq(dbFile.getPath()) + ".");
             ArrayList<User> userList = jsonMapper.readValue(dbFile, CollectionType.construct(ArrayList.class, SimpleType.construct(User.class)));
             for (User user : userList) {
             	log.println(user.toString());
-                Object displaced = userMap.put(user.code, user);
-                if (displaced != null) throw new DatabaseException("Couldn't load from database: Duplicate username: " + user.username);
+                Object displaced = userMap.put(user.getUserName(), user);
+                if (displaced != null) throw new DatabaseException("Couldn't load from database: Duplicate username: " + user.getUserName());
             }
             log.println("Loaded " + userMap.size() + " records.");
             System.out.println("UserDB loaded");
@@ -115,13 +115,10 @@ public class Common {
             throws IOException
     {
         String username = (String) request.getSession().getAttribute("logged-in-username");
-        String email = (String) request.getSession().getAttribute("logged-in-email");
-        if (username == null || email == null) {
+        if (username == null) {
             return null;
         }
-        String userInfo = username+email;
-        int hashcode = userInfo.hashCode();
-        return userDb.get(hashcode);
+        return userDb.get(username);
     }
 
     public User requireLoggedInUser(HttpServletRequest request, HttpServletResponse response)
@@ -148,7 +145,7 @@ public class Common {
         // database (since it's invalid anyway).
         if (ex instanceof DbxException.InvalidAccessToken) {
             page(response, 400, "Cannot access Dropbox account", "It looks like your web-file-browser account is no longer linked to your Dropbox account.");
-            user.dropboxAccessToken = null;
+            user.setAccessToken(null);
             saveUserDb();
             return;
         }

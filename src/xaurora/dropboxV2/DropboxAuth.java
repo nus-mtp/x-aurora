@@ -1,10 +1,4 @@
-package xaurora.dropboxV2;
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+package src.xaurora.dropboxV2;
 
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
@@ -12,10 +6,19 @@ import com.dropbox.core.DbxSessionStore;
 import com.dropbox.core.DbxStandardSessionStore;
 import com.dropbox.core.DbxWebAuth;
 
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import java.io.IOException;
+
 public class DropboxAuth {
 
 	private final Common common;
-
+	public static boolean readyToSync = false;
+	
     public DropboxAuth(Common common)
     {
         this.common = common;
@@ -35,7 +38,7 @@ public class DropboxAuth {
 
         // Start the authorization process with Dropbox.
         String authorizeUrl = getWebAuth(request).start();
-
+        common.log.println(authorizeUrl);
         // Redirect the user to the Dropbox website so they can approve our application.
         // The Dropbox website will send them back to /dropbox-auth-finish when they're done.
         response.sendRedirect(authorizeUrl);
@@ -52,8 +55,7 @@ public class DropboxAuth {
     // an HTTP POST.
     
     public void doFinish(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException
-    {
+            throws IOException, ServletException{
         if (!common.checkGet(request, response)) return;
 
         User user = common.requireLoggedInUser(request, response);
@@ -98,11 +100,17 @@ public class DropboxAuth {
 
         // We have an Dropbox API access token now.  This is what will let us make Dropbox API
         // calls.  Save it in the database entry for the current user.
-        user.dropboxAccessToken = authFinish.accessToken;
+        String accessToken = authFinish.accessToken;
+        user.setAccessToken(accessToken);
+        readyToSync = true;
         common.saveUserDb();
+//        DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
+//        		Locale.getDefault().toString());
+        //DbxClientV2 client = new DbxClientV2(common.getRequestConfig(request), accessToken);
 
         response.sendRedirect("/");
     }
+    
     
     // -------------------------------------------------------------------------------------------
     // POST /dropbox-unlink
@@ -116,9 +124,9 @@ public class DropboxAuth {
         if (user == null) return;
 
         // Remove the access token from the database.
-        user.dropboxAccessToken = null;
+        user.setAccessToken(null);
         common.saveUserDb();
-
+        readyToSync = false;
         response.sendRedirect("/");
     }
     
