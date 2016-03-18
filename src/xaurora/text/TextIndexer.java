@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,7 +60,7 @@ import org.apache.lucene.store.FSDirectory;
 import xaurora.io.DataFileIO;
 
 
-public class TextIndexer {
+public final class TextIndexer {
 	/**
 	 * Constant used
 	 */
@@ -691,4 +692,22 @@ public class TextIndexer {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Secure Programming. Making this Object not-clonable. Object.clone() allows cloning the data of an object without initialize it
+	 * which may leak the chances for attacker to access the data internally
+	 * @Author GAO RISHENG A0101891L
+	 */
+	public final Object clone() throws java.lang.CloneNotSupportedException {
+        throw new java.lang.CloneNotSupportedException();
+	}
+	
+	/**
+	 * Secure Programming. Disable the serialize option of the object which avoid attacker to print the object in serialize manner
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void writeObject(ObjectOutputStream out)
+			throws java.io.IOException {
+			        throw new java.io.IOException("Object cannot be serialized");
+			}
 }

@@ -1,6 +1,6 @@
 package xaurora.system;
 
-import java.nio.charset.Charset;
+import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,12 +8,8 @@ import java.util.regex.Pattern;
 import xaurora.text.TextIndexer;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.MultiPhraseQuery;
-import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 
 public class PrefixMatcher {
@@ -148,4 +144,23 @@ public class PrefixMatcher {
 		}
 		return queries;
 	}
+	
+	/**
+	 * Secure Programming. Making this Object not-clonable. Object.clone() allows cloning the data of an object without initialize it
+	 * which may leak the chances for attacker to access the data internally
+	 * @Author GAO RISHENG A0101891L
+	 */
+	public final Object clone() throws java.lang.CloneNotSupportedException {
+        throw new java.lang.CloneNotSupportedException();
+	}
+	
+	/**
+	 * Secure Programming. Disable the serialize option of the object which avoid attacker to print the object in serialize manner
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void writeObject(ObjectOutputStream out)
+			throws java.io.IOException {
+			        throw new java.io.IOException("Object cannot be serialized");
+			}
 }
