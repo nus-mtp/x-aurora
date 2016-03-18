@@ -21,6 +21,7 @@ public class LoginUI extends Application{
     private static final String stageTitle = "x-aurora";
     private static final String name = "x-aurora: simplify copy and paste";
     private static final String styleSheets = "style.css";
+    private static final String imagePath = "File:dropbox.png";
     private static final int sceneWidth = 500;
     private static final int sceneHeight = 300;
     private static final int topOffset = 15;
@@ -78,7 +79,7 @@ public class LoginUI extends Application{
         grid.setPadding(new Insets(topOffset, rightOffset, bottomOffset, leftOffset));
         grid.setAlignment(Pos.CENTER);
 
-        Image dropboxIcon = new Image("File:dropbox.png");
+        Image dropboxIcon = new Image(imagePath);
         ImageView dropboxView = new ImageView(dropboxIcon);
         dropboxView.setFitHeight(140);
         dropboxView.setFitWidth(140);
