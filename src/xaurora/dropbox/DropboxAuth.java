@@ -19,7 +19,7 @@ public class DropboxAuth {
 	static String userID;
 	static int index;
 	
-	public static void setAccessToken (String url){
+	public static void setAccessToken  (String url) {
 		boolean userAvailable = false;
 		for (int i = 0; i< DropboxMain.user.size(); i++){
 			UserProfile demo = DropboxMain.user.get(i);
