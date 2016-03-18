@@ -2,69 +2,107 @@ package xaurora.system;
 
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import xaurora.text.TextIndexer;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.MultiPhraseQuery;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 
 public class PrefixMatcher {
 	private static final String FIELD_TO_SEARCH_KEYWORD = "content";
-	private static final String FIELD_TO_SEARCH_STRING = "data";
+	private static final String FIELD_EMAIL = "email";
+	private static final String FIELD_NUMBER = "number";
+	private static final int TYPE_DEFAULT = 0;
+	private static final int TYPE_EMAIL = 1;
+	private static final int TYPE_NUMBER = 2;
 	private static final double FUZZY_ALLOWANCE = 1.5;
-	private static final String UNICODE_LEFT_DOUBLE_QUOTE = "\u201C";
-	private static final String UNICODE_RIGHT_DOUBLE_QUOTE = "\u201D";
-	private static final String WILDCARD = "*";
 	public static ArrayList<String> getResult(String userInput){
 		ArrayList<String> suggestion = new ArrayList<String>();
-		ArrayList<String> keywords = TextIndexer.getInstance().extractKeyWordsInUserInput(userInput);
-
-		String[] queries = new String[1];
-		String[] fields = new String[1];
-		queries[0] = constructFuzzyQuery(keywords);
-		queries[0] = userInput+calcFuzzy(userInput);
-		fields[0] = FIELD_TO_SEARCH_KEYWORD;
-		fields[0] = FIELD_TO_SEARCH_STRING;
+		if(userInput.equals("number:")){
+			suggestion = generateNumberQuery(suggestion);
+		} else if(userInput.equals("email:")){
+			suggestion = generateEmailQuery(suggestion);
+		} else {
+			suggestion = generatreNormalQuery(userInput, suggestion);
+		}
+		return suggestion;
+	}
+	
+	private static ArrayList<String> generateEmailQuery(ArrayList<String> suggestion){
+		String[] queries = new String[62];
+		String[] fields = new String[62];
+		for(int i = 0;i<62;i++){
+			fields[i] = FIELD_EMAIL;
+			if(i<10){
+				queries[i] = String.valueOf(i)+"*";
+			} else if(i<36){
+				queries[i] = String.valueOf((char)(i+55))+"*";
+			} else {
+				queries[i] = String.valueOf((char)(i+61))+"*";
+			}
+			
+		}
 		try {
-			//Query searchQuery = MultiFieldQueryParser.getPrefixQuery(FIELD_TO_SEARCH_STRING ,userInput);
-			Query searchQuery = new QueryParser("content",new StandardAnalyzer()).parse(userInput);
-			suggestion = TextIndexer.getInstance().searchDocument(searchQuery);
+			
+			Query searchQuery = MultiFieldQueryParser.parse(queries, fields, new StandardAnalyzer());
+			
+			suggestion = TextIndexer.getInstance().searchDocument(searchQuery,TYPE_EMAIL);
 		} catch (ParseException e) {
 			
 			e.printStackTrace();
 		}
 		return suggestion;
 	}
-	private static String constructFuzzyQuery(ArrayList<String> keywords){
-		StringBuilder builder = new StringBuilder();
-		builder.append("\"");
-		for(int index = 0;index<keywords.size();index++){
-			String word = keywords.get(index).trim();
-			word = removeQuotationCharacter(word);
-			String fuzziness = calcFuzzy(word);
-			//word = QueryParser.escape(word);
-			if(word.equals("")){
-				continue;
-			}
-			builder.append(word);
-			//builder.append(fuzziness);
-			builder.append(" ");
+	private static ArrayList<String> generateNumberQuery(ArrayList<String> suggestion){
+		String[] queries = new String[10];
+		String[] fields = new String[10];
+		for(int i = 0;i<10;i++){
+			fields[i] = FIELD_NUMBER;
+			queries[i] = String.valueOf(i)+"*";	
 		}
-		builder.append(WILDCARD);
-		builder.append("\"");
-		return builder.toString();
+		try {
+			
+			Query searchQuery = MultiFieldQueryParser.parse(queries, fields, new StandardAnalyzer());
+			
+			suggestion = TextIndexer.getInstance().searchDocument(searchQuery,TYPE_NUMBER);
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+		}
+		return suggestion;
 	}
 
-	private static String removeQuotationCharacter(String input){
-		input = input.replaceAll(unicodeToUTF8(UNICODE_LEFT_DOUBLE_QUOTE), "\"");
-		input = input.replaceAll(unicodeToUTF8(UNICODE_RIGHT_DOUBLE_QUOTE), "\"");
-		return input;
+
+	private static ArrayList<String> generatreNormalQuery(String userInput, ArrayList<String> suggestion) {
+		ArrayList<String> keywords = TextIndexer.getInstance().extractKeyWordsInUserInput(userInput);
+
+		String[] queries = constructQuery(userInput,keywords);
+		String[] fields = new String[queries.length];
+		for(int i = 0; i<fields.length;i++){
+			fields[i] = FIELD_TO_SEARCH_KEYWORD;
+		}
+		try {
+			
+			Query searchQuery = MultiFieldQueryParser.parse(queries, fields, new StandardAnalyzer());
+			
+			suggestion = TextIndexer.getInstance().searchDocument(searchQuery,TYPE_DEFAULT);
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+		}
+		return suggestion;
 	}
-	private static String unicodeToUTF8(String str){
-		return new String(str.getBytes(Charset.defaultCharset()), Charset.defaultCharset());
-	}
+
+
+
 
 	/**
 	 * Calculate fuzziness value of a string using the length of the string.   
@@ -82,8 +120,32 @@ public class PrefixMatcher {
 		else
 			return "~"+(wordLength-FUZZY_ALLOWANCE)/wordLength;
 	}
-	//THIS IS FOR TESTING WITHOUT THE WORD PLUGIN COMPONENT ONLY!
-	public static void main(String[] args){
+	private static boolean isContainNumberKeyWords(String userInput){
+		return userInput.contains("number");
+	}
+	private static boolean isContainEmailKeyWords(String userInput){
+		Pattern p = Pattern.compile("(e(-)?mail( address)?)|contact");
+		Matcher m = p.matcher(userInput);
+		return m.find();
 		
+	}
+	private static String[] constructQuery(String userInput,ArrayList<String> keywords){
+		
+		int length = keywords.size();
+		if(isContainEmailKeyWords(userInput)){
+			length++;
+		}
+		if(isContainNumberKeyWords(userInput)){
+			length++;
+		}
+		length++;
+		String[] queries = new String[length];
+		int currentIndex = 1;
+		queries[0] = "\""+userInput+"\"";
+
+		for(int i = 0;i<keywords.size();i++){
+			queries[i+currentIndex] = keywords.get(i).replace("~[0-9,a-z]","")+calcFuzzy(keywords.get(i).replace("~[0-9,a-z]","")); 
+		}
+		return queries;
 	}
 }

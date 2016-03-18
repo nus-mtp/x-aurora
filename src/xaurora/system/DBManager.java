@@ -25,7 +25,7 @@ public class DBManager implements Runnable{
 	private static boolean isCorrectCheckTiming(){
 		long currentTime = System.currentTimeMillis();
 		//Every 10 minutes
-		return currentTime%DEFAULT_CHECK_INTERVAL == 0;
+		return currentTime%DEFAULT_CHECK_INTERVAL == 10000;
 	}
 	private static boolean isCorrectUpdateTiming(){
 		long currentTime = System.currentTimeMillis();

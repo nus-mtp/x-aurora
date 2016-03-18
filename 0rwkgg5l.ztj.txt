@@ -1,0 +1,144 @@
+﻿Merge branch 'master' of https://github.com/nus-mtp/x-aurora
+
+# Conflicts:
+#	.classpath
+#	build/classes/xaurora/dropboxV2/Common$DatabaseException.class
+#	build/classes/xaurora/dropboxV2/Common.class
+#	build/classes/xaurora/dropboxV2/User.class
+#	build/classes/xaurora/system/PrefixMatcher.class
+#	build/classes/xaurora/ui/LoginUI.class
+#	build/classes/xaurora/ui/PreferenceUI.class
+#	build/classes/xaurora/ui/UISystem.class
+#	build/classes/xaurora/ui/VirtualKeyboard.class
+#	build/classes/xaurora/util/UserPreference.class
+#
+# It looks like you may be committing a merge.
+# If this is not correct, please remove the file
+#	.git/MERGE_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch and 'origin/master' have diverged,
+# and have 5 and 17 different commits each, respectively.
+#   (use "git pull" to merge the remote branch into yours)
+#
+# All conflicts fixed but you are still merging.
+#
+# Changes to be committed:
+#	deleted:    .classpath
+#	deleted:    .settings/org.eclipse.jdt.core.prefs
+#	deleted:    .settings/org.eclipse.ltk.core.refactoring.prefs
+#	deleted:    .settings/sf.eclipse.javacc.prefs
+#	deleted:    Aurora.png
+#	modified:   Chrome Plugin/connector.js
+#	deleted:    build.xml
+#	deleted:    build/built-jar.properties
+#	deleted:    build/classes/xaurora/Main.class
+#	deleted:    build/classes/xaurora/communication/ChromeServer.class
+#	deleted:    build/classes/xaurora/communication/CommunicationCode.class
+#	deleted:    build/classes/xaurora/communication/WordServer.class
+#	deleted:    build/classes/xaurora/dropbox/DeleteOperation.class
+#	deleted:    build/classes/xaurora/dropbox/DownloadOperation.class
+#	deleted:    build/classes/xaurora/dropbox/DropboxAuth.class
+#	deleted:    build/classes/xaurora/dropbox/DropboxMain.class
+#	deleted:    build/classes/xaurora/dropbox/TestDropbox.class
+#	deleted:    build/classes/xaurora/dropbox/UploadOperation.class
+#	deleted:    build/classes/xaurora/dropboxV2/Common$DatabaseException.class
+#	deleted:    build/classes/xaurora/dropboxV2/Common.class
+#	deleted:    build/classes/xaurora/dropboxV2/DropboxAuth.class
+#	deleted:    build/classes/xaurora/dropboxV2/DropboxBrowse.class
+#	deleted:    build/classes/xaurora/dropboxV2/FormProtection.class
+#	deleted:    build/classes/xaurora/dropboxV2/User.class
+#	deleted:    build/classes/xaurora/io/DataFileIO.class
+#	deleted:    build/classes/xaurora/io/IDGenerator.class
+#	deleted:    build/classes/xaurora/io/PreferenceIO.class
+#	deleted:    build/classes/xaurora/security/Security.class
+#	deleted:    build/classes/xaurora/system/PrefixMatcher.class
+#	deleted:    build/classes/xaurora/system/SystemManager.class
+#	deleted:    build/classes/xaurora/test/DecryptTest.class
+#	deleted:    build/classes/xaurora/test/EncryptTest.class
+#	deleted:    build/classes/xaurora/test/SecurityInputProcessor.class
+#	deleted:    build/classes/xaurora/test/SecurityTestInputGenerator.class
+#	deleted:    build/classes/xaurora/ui/LoginUI.class
+#	deleted:    build/classes/xaurora/ui/PreferenceUI.class
+#	deleted:    build/classes/xaurora/ui/UISystem.class
+#	deleted:    build/classes/xaurora/ui/VirtualKeyboard.class
+#	deleted:    build/classes/xaurora/ui/style.css
+#	deleted:    build/classes/xaurora/util/BlockedPage.class
+#	deleted:    build/classes/xaurora/util/BrowsedPage.class
+#	deleted:    build/classes/xaurora/util/UserPreference.class
+#	deleted:    build/classes/xaurora/util/UserProfile.class
+#	deleted:    build/test/classes/preferenceUITest.class
+#	deleted:    build/test/results/TEST-preferenceUITest.xml
+#	deleted:    dropbox.png
+#	deleted:    lib/com.fasterxml.jackson.databind.jar
+#	deleted:    lib/commons-lang3-3.0.jar
+#	deleted:    lib/dropbox-core-sdk-2.0-beta-5.jar
+#	deleted:    lib/guava-13.0.1.jar
+#	deleted:    lib/jackson-annotations-2.1.2.jar
+#	deleted:    lib/jackson-core-2.6.1.jar
+#	deleted:    lib/javax.servlet-3.0.jar
+#	deleted:    lib/org.eclipse.jetty.http.jar
+#	deleted:    lib/org.eclipse.jetty.io.jar
+#	deleted:    lib/org.eclipse.jetty.server.jar
+#	deleted:    lib/org.eclipse.jetty.util.jar
+#	deleted:    lib/testFx-3.1.2-javadoc.jar
+#	deleted:    lib/testFx-3.1.2-sources.jar
+#	deleted:    lib/testFx-3.1.2.jar
+#	deleted:    nbproject/build-impl.xml
+#	deleted:    nbproject/configs/Run_as_WebStart.properties
+#	deleted:    nbproject/configs/Run_in_Browser.properties
+#	deleted:    nbproject/genfiles.properties
+#	deleted:    nbproject/jfx-impl.xml
+#	deleted:    nbproject/private/configs/Run_as_WebStart.properties
+#	deleted:    nbproject/private/configs/Run_in_Browser.properties
+#	deleted:    nbproject/private/private.properties
+#	deleted:    nbproject/private/private.xml
+#	deleted:    nbproject/project.properties
+#	deleted:    nbproject/project.xml
+#	modified:   src/xaurora/Main.java
+#	modified:   src/xaurora/communication/ChromeServer.java
+#	modified:   src/xaurora/io/DataFileIO.java
+#	modified:   src/xaurora/system/DBManager.java
+#	modified:   src/xaurora/system/PrefixMatcher.java
+#	modified:   src/xaurora/text/TextIndexer.java
+#	modified:   src/xaurora/ui/PreferenceUI.java
+#	deleted:    src/xaurora/util/BrowsedPage.java
+#	modified:   src/xaurora/util/DataFileMetaData.java
+#
+# Changes not staged for commit:
+#	deleted:    build/classes/xaurora/dropboxV2/DropboxMain.class
+#	deleted:    build/classes/xaurora/system/DBManager.class
+#	deleted:    build/classes/xaurora/system/TimeManager.class
+#	deleted:    build/classes/xaurora/text/.gitignore
+#	deleted:    build/classes/xaurora/text/ParseException.class
+#	deleted:    build/classes/xaurora/text/SimpleCharStream.class
+#	deleted:    build/classes/xaurora/text/TextIndexer.class
+#	deleted:    build/classes/xaurora/text/Token.class
+#	deleted:    build/classes/xaurora/text/TokenMgrError.class
+#	deleted:    build/classes/xaurora/text/XauroraParser.class
+#	deleted:    build/classes/xaurora/text/XauroraParser.jj
+#	deleted:    build/classes/xaurora/text/XauroraParserConstants.class
+#	deleted:    build/classes/xaurora/text/XauroraParserTokenManager.class
+#	deleted:    build/classes/xaurora/ui/VirtualKeyboard$Key.class
+#	deleted:    build/classes/xaurora/util/DataFileMetaData.class
+#	modified:   src/xaurora/communication/ChromeServer.java
+#	modified:   src/xaurora/dropboxV2/DropboxMain.java
+#
+# Untracked files:
+#	api.app
+#	lib/com.fasterxml.jackson.databind.jar
+#	lib/commons-lang3-3.0.jar
+#	lib/dropbox-core-sdk-1.8.2.jar
+#	lib/jackson-annotations-2.1.2.jar
+#	lib/jackson-core-2.6.1.jar
+#	lib/javax.servlet-3.0.jar
+#	lib/org.eclipse.jetty.http.jar
+#	lib/org.eclipse.jetty.io.jar
+#	lib/org.eclipse.jetty.server.jar
+#	lib/org.eclipse.jetty.util.jar
+#
+

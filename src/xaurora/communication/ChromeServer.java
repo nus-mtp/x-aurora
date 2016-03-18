@@ -41,7 +41,7 @@ public class ChromeServer implements Runnable{
 			//System.out.println("Elapsed milliseconds for receiveMessage : " + difference);
 			if (isTextContent) {
 				outputToFile(text);
-				
+						
 			}
 			
 

@@ -1,4 +1,4 @@
-/*
+/**
  * This is the indexing component of the Xaurora software which is in charge of 
  * indexing the unprocessed text data extracted from the web pages and handling 
  * the CRUD queries to the indexing system 
@@ -6,24 +6,26 @@
  *   @author GAO RISHENG
  */
 
-
-
-
 package xaurora.text;
-
+/*
+ * Basic Data Structure
+ */
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-
+/*
+ * Required I/O
+ */
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
-
+/*
+ * Indexing Library 
+ */
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -31,10 +33,14 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocValuesType;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -42,26 +48,76 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-
+/*
+ * Software Internal Import
+ */
 import xaurora.io.DataFileIO;
 
+
 public class TextIndexer {
+	/**
+	 * Constant used
+	 */
+
+	/**
+	 * Field Constant
+	 */
+	public static final String FIELD_FILENAME = "filename";
 	private static final String SOURCE_UNKNOWN = "unknown";
 	private static final String FIELD_SOURCE = "source";
 	private static final String FIELD_URL = "url";
 	private static final String FIELD_CONTENT = "content";
 	private static final String FIELD_NUMBER = "number";
 	private static final String FIELD_EMAIL = "email";
-	public static final String FIELD_FILENAME = "filename";
 	private static final String FIELD_TERMS = "term";
 	private static final String FIELD_EXTENDED_DATA = "data";
+	private static final String FIELD_LAST_MODIFIED = "last_modified";
+	
+	/**
+	 * DATA file extension
+	 */
 	private static final String DATAFILE_EXTENSION = ".txt";
+	
+
+	/**
+	 * Integer Constants
+	 */
 	private static final int DEFAULT_DISPLAY_NUMBER = 5;
-	//656 stop_word sets. Credits from http://www.ranks.nl/stopwords 
+	private static final int INDEX_ZERO = 0;
+	private static final int INDEX_SCORE = 0;
+	private static final int INDEX_LAST_MODIFIED = 1;
+	private static final int TYPE_EMAIL_SEARCH = 1;
+	private static final int TYPE_NUMBER_SEARCH = 2;
+	private static final int NUM_OF_SORT_RULES = 2;
+	
+	/**
+	 * String Constants
+	 */
+	private static final String NEWLINE = "\n";
+	private static final String EMPTY_STRING = "";
+	private static final String PATTERN_NON_ASCII_CHARACTERS = "[^\\x00-\\x7F]";
+	private static final String PATTERN_SENTENCE_TERMINATOR = "[.|!|?]+ ";
+	
+	//Overwriting the FieldType for lucene indexing system
+	//This will be significant to the sorting rule
+	private static final FieldType LONG_FIELD_TYPE_STORED_SORTED = new FieldType();
+	static {
+	    LONG_FIELD_TYPE_STORED_SORTED.setTokenized(true);
+	    LONG_FIELD_TYPE_STORED_SORTED.setOmitNorms(true);
+	    LONG_FIELD_TYPE_STORED_SORTED.setIndexOptions(IndexOptions.DOCS);
+	    LONG_FIELD_TYPE_STORED_SORTED.setNumericType(FieldType.NumericType.LONG);
+	    LONG_FIELD_TYPE_STORED_SORTED.setStored(true);
+	    LONG_FIELD_TYPE_STORED_SORTED.setDocValuesType(DocValuesType.NUMERIC);
+	    LONG_FIELD_TYPE_STORED_SORTED.freeze();
+	}
+	/**
+	 * 656 stop_word sets. Credits from http://www.ranks.nl/stopwords 
+	 */
 	private static final List<String> stopWords = Arrays.asList("a","able","about","above","abst","accordance",
 											"according","accordingly","across","act","actually","added","adj","affected","affecting",
 											"affects","after","afterwards","again","against","ah","all","almost","alone","along","already","also",
@@ -121,15 +177,38 @@ public class TextIndexer {
 											"x","y","yes","yet","you","youd","you'll","your","youre","yours","yourself","yourselves","you've","z","zero");
 	private static final CharArraySet stopSet = new CharArraySet(stopWords, true);
 	private static TextIndexer instance = null;
+	/**
+	 * Directory that stores the indexing files
+	 */
 	private Directory storeDirectory;
+	/**
+	 * This is to analyze the text and mainly for indexing and searching (over-writable)
+	 */
 	private Analyzer analyzer;
 	private IndexWriterConfig config;
-	private IndexReader reader;
-	private IndexSearcher searcher;
+	/**
+	 * Input to indexing system
+	 */
 	private IndexWriter writer;
+	/**
+	 * Read from the indexing system
+	 */
+	private IndexReader reader;
+	/**
+	 * Apply searching to the indexing system
+	 */
+	private IndexSearcher searcher;
+	/**
+	 * number of searching records to be displayed
+	 */
 	private int displayNumber;
+	/**
+	 * Parsing text input from raw text extracted from web-browser
+	 */
 	private XauroraParser parser;
-	//Singleton constructor
+	/**
+	 * Singleton constructor
+	 */
 	private TextIndexer(){
 		this.init();
 	}
@@ -158,42 +237,54 @@ public class TextIndexer {
 	//Pre-condition: A string typed text data, the source url in String and its respective datafile
 	//filename.
 	//Post-condition: An entity of the indexing System will be created
-	public synchronized void createIndexDocumentFromWeb(String rawData,String url,String filename)
+	/**
+	 * Description: After receiving text data from browser plugin, an entity
+	 * 				of the indexing system will be created. For ease of deleting and retrieving
+	 * 				We identify an entity from its source URL and delete it by knowing its actual 
+	 * 				datafile filename
+	 * @param rawData, A string that stores all text data extracted from a webpage
+	 * @param url, the URL of the respective webpage
+	 * @param filename, the file name of the data file
+	 * @param lastModified, the time when the file is created.
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+	public synchronized void createIndexDocumentFromWeb(String rawData,String url,String filename,long lastModified)
 	{
-		//System.out.println("Creation Start!\n");
+		//Create analyzer for indexing system
 		this.analyzer = new StandardAnalyzer();
 		this.config = new IndexWriterConfig(this.analyzer);
-		
-		long lStartTime = System.currentTimeMillis();
-		String[] paragraphs = rawData.split("\n");
-		
+		//split paragraphs
+		String[] paragraphs = rawData.split(NEWLINE);
+		//retrieving host name from URL
 		String sourceHost = getHostFromURL(url);
 		try {
 			this.writer = new IndexWriter(this.storeDirectory,this.config);
 
 			for(int i = 1;i<paragraphs.length;i++)
 			{
-				if(paragraphs[i].replaceAll("[^\\x00-\\x7F]","").trim().equals(""))
+				//Not storing pure special characters lines
+				if(paragraphs[i].replaceAll(PATTERN_NON_ASCII_CHARACTERS,EMPTY_STRING).trim().equals(EMPTY_STRING))
 					continue;
-				paragraphs[i] = paragraphs[i].replaceAll("[^\\x00-\\x7F]","").trim();
-				String[] sentences = paragraphs[i].split("[.|!|?]+ ");
-				for(int j = 0; j<sentences.length;j++){
+				paragraphs[i] = paragraphs[i].replaceAll(PATTERN_NON_ASCII_CHARACTERS,EMPTY_STRING).trim();
+				//split sentence
+				String[] sentences = paragraphs[i].split(PATTERN_SENTENCE_TERMINATOR);
+				for(int j = INDEX_ZERO; j<sentences.length;j++){
+					//write data in a document object
 					Document data = new Document();
 					addURL(data,url);
 					addSource(data,sourceHost);
-					addFilename(data,filename.replace(DATAFILE_EXTENSION, ""));
+					addFilename(data,filename.replace(DATAFILE_EXTENSION, EMPTY_STRING));
 					insertSentencesIntoDocument(sentences,j,data);
 					extractNumbersAndEmails(sentences, j, data);
-					extractTerms(sentences[j],data);
+					addLastModified(data,lastModified);
 					insertParagraphIntoDocument(paragraphs[i],data);
 					this.writer.addDocument(data);
 				}
 			}
+			//write the document into the indexing system
+			//without this, searching will not be available
 			this.writer.commit();
-			long lEndTime = System.currentTimeMillis();
-			long difference = lEndTime - lStartTime;
-
-			System.out.println("Elapsed milliseconds: " + difference);
 			this.writer.close();
 			//printAll();
 
@@ -201,27 +292,18 @@ public class TextIndexer {
 			e.printStackTrace();
 		}  
 	}
-	//Description: Extracting different terms and stores terms into a Lucene document
-	//Pre-condition: The String text and the lucene document that stores all the data
-	//Post-condition: the data stores inside the document object
-	private void extractTerms(String input,Document data){
-		TokenStream stream = this.analyzer.tokenStream(FIELD_TERMS, new StringReader(input.toLowerCase().trim()));
-		stream = new StopFilter(stream, stopSet);
-	    CharTermAttribute charTermAttribute = stream.addAttribute(CharTermAttribute.class);
-	    try {
-			stream.reset();
-			while(stream.incrementToken()) {
-				addTerms(data,charTermAttribute.toString());
-			}
-			stream.close();
-		} catch (IOException e) {
-			// Log here
-			e.printStackTrace();
-		}
-	    
-	}
+
+	/**
+	 * Description: Filtering out all the unnecessary Stop Words from the current raw Text input
+	 * 				Mainly for filtering the stop words in the userInput to provider a efficient term searching
+	 * @param input, the raw user input String
+	 * @return An ArrayList<String> that stores all keywords inside the user input
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	public ArrayList<String> extractKeyWordsInUserInput(String input){
 		ArrayList<String> result = new ArrayList<String>();
+		//Load the stop words sets
 		TokenStream stream = this.analyzer.tokenStream(FIELD_TERMS, new StringReader(input.toLowerCase().trim()));
 		stream = new StopFilter(stream, stopSet);
 	    CharTermAttribute charTermAttribute = stream.addAttribute(CharTermAttribute.class);
@@ -237,34 +319,43 @@ public class TextIndexer {
 		}
 	    return result;
 	}
-	//Description: Inserting a sentence into the respective lucene document object
-	//Pre-condition: An array of String that storing all sentences within 1 paragraph
-	//				and the index of sentence that to be stored, and the respective lucene document
-	//Post-condition: The lucene document object will contain the sentence as one of its text fields
-	private void insertSentencesIntoDocument(String[] sentences,int i, Document data){
-		String input = "";
-		input+=sentences[i]+". ";
-		addContent(data,input);
+
+	/**
+	 * Description: Inserting a sentence into the respective lucene document object
+	 * @param sentences: An array storing the all sentences within a paragraph
+	 * @param i, the index of the sentence to be stored
+	 * @param data, a lucene document object
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+	private void insertSentencesIntoDocument(String[] sentences,int i, Document data){	
+		addContent(data,sentences[i]);
 	}
 	
-	//Description: Inserting a sentence into the respective lucene document object
-	//Pre-condition: An array of String that storing all sentences within 1 paragraph
-	//				and the index of sentence that to be stored, and the respective lucene document
-	//Post-condition: The lucene document object will contain the sentence as one of its text fields
+	/**
+	 * Description: Inserting a sentence into the respective lucene document object
+	 * @param input, the String storing the text in a paragraph
+	 * @param data, A lucene Document object
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	private void insertParagraphIntoDocument(String input, Document data){
 
 		addData(data,input);
 	}
 	
-	//Description: Extracting Numbers and E-mails from a sentence, and store that into
-	//				the corresponding lucene document object
-	//Pre-condition: An array of String storing all sentence within a paragraph.
-	//				 The index of the sentence to be stored
-	//				 The respective lucene document object
-	//Post-condition: All number/e-mails (if exists) will be stored into the document object.
+	/**
+	 * Description: Extracting Numbers and E-mails from a sentence, and store that into
+	 * 				the corresponding lucene document object.
+	 * @param paragraphs,An array of String storing all sentence within a paragraph.
+	 * @param i, The index of the sentence to be stored
+	 * @param data,A lucene Document object
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	private void extractNumbersAndEmails(String[] paragraphs, int i, Document data) {
-		//InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode((paragraphs[i]+". ").replaceAll("[^\\x00-\\x7F]", "")).array());
-		InputStream is = new ByteArrayInputStream((paragraphs[i]+". ").replaceAll("[^\\x00-\\x7F]", "").getBytes());
+		//InputStream is = new ByteArrayInputStream(Charset.forName("UTF-8").encode((paragraphs[i]+". ").replaceAll(PATTERN_NON_ASCII_CHARACTERS, EMPTY_STRING)).array());
+		InputStream is = new ByteArrayInputStream((paragraphs[i]).replaceAll(PATTERN_NON_ASCII_CHARACTERS, EMPTY_STRING).getBytes());
 		//convert the string into input stream and pass that into the JavaCC parser
 		if(this.parser == null){
 			this.parser = new XauroraParser(is);
@@ -274,13 +365,19 @@ public class TextIndexer {
 		try {
 			XauroraParser.parseEmailInSentence(data);
 		} catch (xaurora.text.ParseException e) {
-
+			System.out.println(data.getField(FIELD_FILENAME));
+			System.out.println(paragraphs[i]);
 			e.printStackTrace();
 		}
 	}
-	//Description: Helper method that retrieve a hostname from the URL
-	//Pre-condition: A string typed extracted from the browser plug-in
-	//Post-condition: return a String storing the hostname if the URL is valid, throws an exception otherwise
+	
+	/**
+	 * Description: Helper method that retrieve a host name from the URL
+	 * @param url:A string typed extracted from the browser plug-in
+	 * @return: A String storing the host name if the URL is valid, throws an exception otherwise
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	private static String getHostFromURL(String url)
 	{
 		String host = SOURCE_UNKNOWN;
@@ -294,103 +391,209 @@ public class TextIndexer {
 		}
 		return host;
 	}
-	//Description: add an URL to a lucene document object.
-	//Pre-condition£º A string typed url and the lucene document
-	//Post-condition: the url will be added as a text field to the document
+
+	/**
+	 * Description: add an URL to a lucene document object.
+	 * @param doc,A lucene Document object
+	 * @param url, A string typed url
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+
 	public static void addURL(Document doc,String url)
 	{
 		addTextField(doc,FIELD_URL,url);
 	}
-	//Description: add an source host name to a lucene document object.
-	//Pre-condition£º A string typed storing the hostname of the source and the lucene document
-	//Post-condition: the hostname will be added as a text field to the document
+
+
+	/**
+	 * Description: add an source host name to a lucene document object.
+	 * @param doc,A lucene Document object
+	 * @param source, A string storing the hostname of the source
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+
 	public static void addSource(Document doc,String source)
 	{
-		addTextField(doc,FIELD_SOURCE,source);
+		addStringField(doc,FIELD_SOURCE,source);
 	}
-	//Description: add the filename of the datafile to a lucene document object.
-	//Pre-condition£º A string storing the filename of the text datafile and the lucene document
-	//Post-condition: the filename will be added as a text field to the document
+
+	
+	/**
+	 * Description: add the filename of the datafile to a lucene document object.
+	 * @param doc,A lucene Document object
+	 * @param filename, A string storing the filename of the text datafile
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+
 	public static void addFilename(Document doc,String filename)
 	{
-		addTextField(doc,FIELD_FILENAME,filename);
+		addStringField(doc,FIELD_FILENAME,filename);
 	}
-	//Description: add the text content of a sentence to a lucene document object.
-	//Pre-condition£º A string storing the text content and the lucene document
-	//Post-condition: the text will be added as a String field to the document
+
+	
+	/**
+	 * Description: add the text content of a sentence to a lucene document object.
+	 * @param doc,A lucene Document object
+	 * @param content, A string storing the text content
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+
 	public static void addContent(Document doc,String content)
 	{
-		addStringField(doc,FIELD_CONTENT,content);
+		addTextField(doc,FIELD_CONTENT,content);
 	}
-	//Description: add the text content of a paragraph to a lucene document object.
-	//Pre-condition£º A string storing the text content and the lucene document
-	//Post-condition: the text will be added as a String field to the document
+
+	
+	/**
+	 * Description: add the text content of a paragraph to a lucene document object.
+	 * @param doc,A lucene Document object
+	 * @param content, A string storing the text content
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+
 	public static void addData(Document doc,String content)
 	{
 		addStringField(doc,FIELD_EXTENDED_DATA,content);
 	}
-	//Description: add a number to a lucene document object.
-	//Pre-condition£º A string storing the number and the lucene document
-	//Post-condition: the number will be added as a text field to the document
+
+
+	/**
+	 * Description: add a number to a lucene document object.
+	 * @param doc,A lucene Document object
+	 * @param number,A string storing the number
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	public static void addNumber(Document doc,String number)
 	{
-		addTextField(doc,FIELD_NUMBER,number);
+		addStringField(doc,FIELD_NUMBER,number);
 	}
-	//Description: add an E-mail address to a lucene document object.
-	//Pre-condition£º A string storing the e-mail address and the lucene document
-	//Post-condition: the e-mail address will be added as a text field to the document
+
+
+	/**
+	 * Description: add an E-mail address to a lucene document object.
+	 * @param doc, A lucene Document object
+	 * @param email,A string storing the e-mail address
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	public static void addEmail(Document doc,String email)
 	{
-		addTextField(doc,FIELD_EMAIL,email);
+		addStringField(doc,FIELD_EMAIL,email);
 	}
-	//Description: add a keyword extracted from the text to a lucene document object.
-	//Pre-condition£º A string keyword and the lucene document
-	//Post-condition: the keyword will be added as a String field to the document
+	
+	/**
+	 * Description: add a keyword extracted from the text to a lucene document object.
+	 * @param doc, A lucene Document object
+	 * @param term, A String keyword
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	public static void addTerms(Document doc,String term)
 	{
 		addTextField(doc,FIELD_TERMS,term);
 	}
-	//Description: add a text field to a lucene document object.
-	//Pre-condition£º A string storing the data and the lucene document
-	//Post-condition: the text field will be added as a String field to the document
+	
+	/**
+	 * Description: Adding the last-modified information to the document
+	 * @param doc, A lucene Document object
+	 * @param value, A long variable storing the value of last-modified field of the data file(must >0)
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+	public static void addLastModified(Document doc,long value){
+		addLongField(doc,FIELD_LAST_MODIFIED,value);
+	}
+
+	
+	/**
+	 * Description: add a text field to a lucene document object.
+	 * @param doc£¬A lucene Document object
+	 * @param field, A String storing the name of the field
+	 * @param value£¬A string storing the text content
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	private static void addTextField(Document doc,String field,String value)
 	{
 		doc.add(new TextField(field,value,Field.Store.YES));
 	}
-	//Description: add a String field to a lucene document object.
-	//Pre-condition£º A string storing the text content and the lucene document
-	//Post-condition: the text will be added as a String field to the document
+
+
+	
+	/**
+	 * Description: add a String field to a lucene document object.
+	 * @param doc£¬A lucene Document object
+	 * @param field, A String storing the name of the field
+	 * @param value£¬A string storing the text content
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
+
 	private static void addStringField(Document doc,String field,String value)
 	{
 		doc.add(new StringField(field,value,Field.Store.YES));
 	}
-	//Description: delete an entity in the lucene indexing system and removing its
-	//				actual datafile
-	//pre-condition: The field needs to search and the input query in String
-	//post-condition: The entity and its corresponding datafile will be deleted
-	//				  if found in the index system.
+
+	
+	/**
+	 * Description: Add a long field to a lucene document object with overwritten field setting
+	 ¡Á 				This is mainly for storing the time when the data was retrieved and use that for
+	 ¡Á				sorting (more received result will rank higher)
+	 * @param doc, A lucene Document object
+	 * @param field, A String storing the name of the field
+	 * @param value, A long typed variable that stores the millisecond number between the current time and
+	 *				 1970.X.X.XX.XX.XX and the lucene document
+	 *
+	 * @author GAO RISHENG A0101891L
+	 */
+	private static void addLongField(Document doc,String field,long value){
+		doc.add(new LongField(field,value,LONG_FIELD_TYPE_STORED_SORTED));
+	}
+	
+	/**
+	 * Description: delete an entity in the lucene indexing system and removing its
+	 ¡Á				actual datafile
+	 * @param The field needs to search 
+	 * @param Tthe input query in String
+	 * Post-condition: The entity and its corresponding datafile will be deleted
+	 ¡Á				  if found in the index system.
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 */
 	public synchronized void deleteByField(String field,String inputQuery){
 		
 		this.analyzer = new StandardAnalyzer();
 		
 		try {
+			//open the current indexing directory
 			this.reader  = DirectoryReader.open(this.storeDirectory);
 			this.searcher = new IndexSearcher(this.reader);
 			
-			Query deleteQuery = new QueryParser(field,this.analyzer).parse(inputQuery.replace(DATAFILE_EXTENSION,""));
+			//Generate the delete query from removing the file extension from the input data file name
+			Query deleteQuery = new QueryParser(field,this.analyzer).parse(inputQuery.replace(DATAFILE_EXTENSION,EMPTY_STRING));
 			
+			//Estimate the count of entries to be deleted
 			TopDocs docs = this.searcher.search(deleteQuery, this.searcher.count(deleteQuery));
-			for(int i = 0;i<docs.totalHits;i++){
+			//Remove the text file
+			for(int i = INDEX_ZERO;i<docs.totalHits;i++){
 				int id = docs.scoreDocs[i].doc;
 				String filename = this.searcher.doc(id).get(FIELD_FILENAME);
 				DataFileIO.instanceOf().removeDataFile(filename);
 			}
+			//Remove the respective entities from the indexing system
 			this.reader.close();
 			this.analyzer = new StandardAnalyzer();
 			this.config = new IndexWriterConfig(this.analyzer);
 			this.writer = new IndexWriter(this.storeDirectory,this.config);
 			this.writer.deleteDocuments(deleteQuery);
 			this.writer.close();
+			//change to log
 			System.out.println("DELETE COMPLETE");
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -399,27 +602,52 @@ public class TextIndexer {
 			e.printStackTrace();
 		}
 	}
-	//Description: Setting the number of result in the search (should be called by UI)
-	//Pre-condition: an int number 0<number< 10?
-	//Post-condition: the number of result to be return will be changed
+
+	
+	/**
+	 * Description: Setting the number of result in the search (should be called by UI)
+	 * @param the number to be set to the display number, an integer number 0<number< 10?
+	 * Post-condition: the number of result to be return will be changed
+	 * @author GAO RISHENG A0101891L
+	 */
 	public void setDisplayNumber(int number){
 		this.displayNumber = number;
 	}
-	//Description: Searching the indexing System to retrieve the text content
-	//Pre-condition: a valid Lucene Search Query
-	//Post-condition: returning an ArrayList of String which stores the content of all matching documents
-	public synchronized ArrayList<String> searchDocument(Query q){
-		System.out.println(q.toString());
+	
+	/**
+	 * Description: Searching the indexing System to retrieve the text content
+	 * @param An valid lucene search query, an integer identifies the type of searching
+	 * @return an ArrayList of String which stores the content of all matching documents
+	 * @author GAO RISHENG A0101891L
+	 */
+	public synchronized ArrayList<String> searchDocument(Query q,int type){
 		ArrayList<String> result = new ArrayList<String>();
 		try {
 			this.reader  = DirectoryReader.open(this.storeDirectory);
 			this.searcher = new IndexSearcher(this.reader); 
-			
-			TopDocs docs = this.searcher.search(q, DEFAULT_DISPLAY_NUMBER);
-			System.out.println(docs.totalHits);
-			for(int i = 0;i<DEFAULT_DISPLAY_NUMBER;i++){
+			//configure the sorting rules of the search
+			SortField[] filters = setSortingRules();
+			Sort sort = new Sort(filters);		
+			TopDocs docs = this.searcher.search(q, this.displayNumber,sort);
+			int searchNumber = Math.min(docs.totalHits, DEFAULT_DISPLAY_NUMBER);
+			for(int i = INDEX_ZERO;i<searchNumber;i++){
 				int id = docs.scoreDocs[i].doc;
-				String content = this.searcher.doc(id).get(FIELD_EXTENDED_DATA);
+				String content;
+				switch(type){
+					case TYPE_EMAIL_SEARCH:
+					{
+						content = this.searcher.doc(id).get(FIELD_EMAIL);
+						break;
+					}
+					case TYPE_NUMBER_SEARCH:{
+						content = this.searcher.doc(id).get(FIELD_NUMBER);
+						break;
+					}
+					default:{
+						content = this.searcher.doc(id).get(FIELD_EXTENDED_DATA);
+						break;
+					}
+				}	
 				result.add(content);
 			}
 		
@@ -429,14 +657,32 @@ public class TextIndexer {
 		return result;
 	}
 	
+
+	/**
+	 * Description: Setting the sorting rules for search results, 
+	 * pre-condition: All search field defined must be indexable and not tokenized
+	 * @return an array of SortFields which define the sorting rule of the search
+	 * 	 
+	 * * @author GAO RISHENG A0101891L
+	 */
+	private SortField[] setSortingRules() {
+		SortField[] filters = new SortField[NUM_OF_SORT_RULES];
+		filters[INDEX_SCORE] = SortField.FIELD_SCORE;
+		filters[INDEX_LAST_MODIFIED] = new SortField(FIELD_LAST_MODIFIED,SortField.Type.LONG,false);
+		return filters;
+	}
+	/**
+	 * Description: Testing Helper Methods that prints all content of all entries in the indexing system 
+	 * 
+	 * @author GAO RISHENG A0101891L
+	 * 
+	 */
 	public synchronized void printAll(){
 		try {
 			this.reader  = DirectoryReader.open(this.storeDirectory);
-			for (int i=0; i<reader.maxDoc(); i++) {
-			    
-
-			    Document doc = reader.document(i);
-			    String docId = doc.get("content");
+			for (int i=INDEX_ZERO; i<reader.maxDoc(); i++) {
+				Document doc = reader.document(i);
+			    String docId = doc.get(FIELD_CONTENT);
 			    System.out.println(docId);
 			    // do something with docId here...
 			}

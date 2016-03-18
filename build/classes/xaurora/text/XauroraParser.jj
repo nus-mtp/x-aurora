@@ -1,181 +1,0 @@
-/**
- * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
- */
-options
-{
-  static = true;
-}
-
-PARSER_BEGIN(XauroraParser)
-package xaurora.text;
-import org.apache.lucene.document.Document;
-import xaurora.text.TextIndexer;
-
-public class XauroraParser
-{
-  
-  private static XauroraParser instance = null;
-  private static String number = "";
-  private XauroraParser()  {	
-  }
-  public static XauroraParser getInstance()  {	if(instance == null) {
-         instance = new XauroraParser();
-      }
-      return instance;
-  }
-
-  
-  public static void main(String args []) throws ParseException
-  {
-    XauroraParser parser = new XauroraParser(System.in);
-
-    
-    while (true)
-    {
-      
-	  
-      try
-      {
-      }
-      catch (Exception e)
-      {
-        System.out.println("NOK.");
-        System.out.println(e.getMessage());
-		//XauroraParser.getNextToken();
-        XauroraParser.ReInit(System.in);
-      }
-      catch (Error e)
-      {
-        System.out.println("Oops.");
-        System.out.println(e.getMessage());
-        XauroraParser.ReInit(System.in);
-      }
-    }
-  }
-  
-  
-  
-}
-
-PARSER_END(XauroraParser)
-
-SKIP :
-{
-  "\r"
-| "\t"
-| "`"
-| "~"
-| "#"
-| "$"
-| "%"
-| "^"
-| "&"
-| "*"
-| "("
-| ")"
-| "+"
-| "="
-| "{"
-| "}"
-| "["
-| "]"
-| "|"
-| "\\"
-| ":"
-| ";"
-| "\""
-| "\'"
-| "<"
-| ">"
-| ","
-| "/"
-| "\n"
-| "-"
-}
-
-
-TOKEN :
-{
-  < INTEGER_LITERAL :<DECIMAL_LITERAL>|< FLOATING_POINT_LITERAL >>
-| < DECIMAL_LITERAL:(["0"-"9"] (["0"-"9"])*)>
-| < FLOATING_POINT_LITERAL : (<DECIMAL_LITERAL >"."< DECIMAL_LITERAL >)>
-}
-
-
-TOKEN :{
-  < TERM_SEPARATOR : " " >}
-
-
-TOKEN :
-{
- < SENTENCE_TERMINATOR : ((".")+|("!"|"?")(("!")*("?")*)*)(< TERM_SEPARATOR >)?>
-}
-
-
-TOKEN :
-{
-  < CHARACTERS : ["A"-"Z"]|["a"-"z"] >
-}
-
-TOKEN :
-{
-  < EMAIL : (<CHARACTERS >|<DECIMAL_LITERAL>)(<CHARACTERS >|<DECIMAL_LITERAL>|"_")*(<CHARACTERS >|<DECIMAL_LITERAL>)"@"(<CHARACTERS >|< DECIMAL_LITERAL >)+("."(<CHARACTERS >|< DECIMAL_LITERAL >)+)+ >
-}
-
-TOKEN :
-{
-  < WORDS : (~[" ",",","@","\n",".","?","!","0","1","2","3","4","5","6","7","8","9"])+ >
-}
-
-
-
-
-
-
-private void parseEmails(Document doc):
-{
-  Token emailInput;
-  Token numberInput;
-  Token words;}{
-  
-    emailInput = < EMAIL >
-	{
-	  TextIndexer.addEmail(doc,emailInput.image);
-	  if(!number.equals(""))	  {		TextIndexer.addNumber(doc,number);
-		number = "";
-	  }	}
-|  words = < WORDS >{
-  if(!number.equals(""))
-	  {
-		TextIndexer.addNumber(doc,number);
-		number = "";
-	  }}
-| 	< TERM_SEPARATOR >{
-  if(!number.equals(""))
-	  {
-		TextIndexer.addNumber(doc,number);
-		number = "";
-	  }}
-| < CHARACTERS >{
-  if(!number.equals(""))
-	  {
-		TextIndexer.addNumber(doc,number);
-		number = "";
-	  }}
-| "@"<WORDS >{
-  if(!number.equals(""))
-	  {
-		TextIndexer.addNumber(doc,number);
-		number = "";
-	  }}
-| numberInput = < INTEGER_LITERAL >{
-  number += numberInput.image;
-}
-}
-
-
-public void parseEmailInSentence(Document doc):
-{}
-{
-  (parseEmails(doc))*(< SENTENCE_TERMINATOR >|<EOF>)  {
-      }}
