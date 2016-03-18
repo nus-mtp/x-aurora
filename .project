@@ -20,4 +20,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>sf.eclipse.javacc.javaccnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>lucene-5.4.1</name>
+			<type>2</type>
+			<location>E:/study/study2015sem1/CS3283/lucene-5.4.1</location>
+		</link>
+	</linkedResources>
 </projectDescription>
