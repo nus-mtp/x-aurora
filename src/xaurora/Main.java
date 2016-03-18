@@ -6,6 +6,8 @@ import java.util.Scanner;
 import xaurora.communication.*;
 import xaurora.system.DBManager;
 import xaurora.system.SystemManager;
+
+import xaurora.ui.LoginUI;
 import xaurora.text.PrefixMatcher;
 
 public class Main {

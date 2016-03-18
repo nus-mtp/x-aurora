@@ -1,4 +1,5 @@
 package xaurora.dropboxV2;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -9,25 +10,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import static com.dropbox.core.util.StringUtil.jq;
 
-import com.dropbox.core.DbxAppInfo;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.util.LangUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.SimpleType;
+import com.dropbox.core.DbxAppInfo;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.util.LangUtil;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 public class Common {
 
 	public final PrintWriter log;
     public final DbxAppInfo dbxAppInfo;
     public final File userDbFile;
-    public final Map<String,User> userDb;
+    public final Map<Integer,User> userDb;
     
     public Common(PrintWriter log, DbxAppInfo dbxAppInfo, File userDbFile)
             throws IOException, DatabaseException
@@ -40,21 +45,23 @@ public class Common {
         
     private static final ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     
-    private Map<String,User> loadUserDb(File dbFile)
+    private Map<Integer,User> loadUserDb(File dbFile)
             throws IOException, DatabaseException
     {
-        HashMap<String,User> userMap = new HashMap<String,User>();
+        HashMap<Integer,User> userMap = new HashMap<Integer,User>();
 
         if (dbFile.isFile()) {
             log.println("Loading User DB from " + jq(dbFile.getPath()) + ".");
             ArrayList<User> userList = jsonMapper.readValue(dbFile, CollectionType.construct(ArrayList.class, SimpleType.construct(User.class)));
             for (User user : userList) {
-                Object displaced = userMap.put(user.username, user);
+            	log.println(user.toString());
+                Object displaced = userMap.put(user.code, user);
                 if (displaced != null) throw new DatabaseException("Couldn't load from database: Duplicate username: " + user.username);
             }
             log.println("Loaded " + userMap.size() + " records.");
+            System.out.println("UserDB loaded");
         }
-        System.out.println("UserDB loaded");
+        System.out.println("loadUserDb finished");
         return userMap;
     }
     
@@ -108,10 +115,13 @@ public class Common {
             throws IOException
     {
         String username = (String) request.getSession().getAttribute("logged-in-username");
-        if (username == null) {
+        String email = (String) request.getSession().getAttribute("logged-in-email");
+        if (username == null || email == null) {
             return null;
         }
-        return userDb.get(username);
+        String userInfo = username+email;
+        int hashcode = userInfo.hashCode();
+        return userDb.get(hashcode);
     }
 
     public User requireLoggedInUser(HttpServletRequest request, HttpServletResponse response)
