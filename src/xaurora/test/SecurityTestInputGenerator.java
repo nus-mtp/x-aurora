@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,6 +18,8 @@ import java.util.Scanner;
  *
  */
 public final class SecurityTestInputGenerator {
+	private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+	private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
 	static final String RANDOM_INPUT_DIRECTORY = "/unit_testing/Security_Test/Input/Random_Input/";
 	static final String EXPECTED_OUTPUT_DIRECTORY = "/unit_testing/Security_Test/Output/Expected_Output/";
 	static final String ACTUAL_OUTPUT_DIRECTORY = "/unit_testing/Security_Test/Output/Actual_Output/";
@@ -155,6 +158,16 @@ public final class SecurityTestInputGenerator {
 	 */
 	private final void writeObject(ObjectOutputStream out)
 			throws java.io.IOException {
-			        throw new java.io.IOException("Object cannot be serialized");
+			        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+			}
+	
+	/**
+	 * Secure Programming. Disable the de-serialize option of the object which avoid attacker to de-serialize the object stores in the file system
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void readObject(ObjectInputStream in)
+			throws java.io.IOException {
+			        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
 			}
 }

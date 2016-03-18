@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -65,6 +66,8 @@ public final class TextIndexer {
 	 * Constant used
 	 */
 
+	private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+	private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
 	/**
 	 * Field Constant
 	 */
@@ -595,7 +598,6 @@ public final class TextIndexer {
 			this.writer.deleteDocuments(deleteQuery);
 			this.writer.close();
 			//change to log
-			System.out.println("DELETE COMPLETE");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -708,6 +710,16 @@ public final class TextIndexer {
 	 */
 	private final void writeObject(ObjectOutputStream out)
 			throws java.io.IOException {
-			        throw new java.io.IOException("Object cannot be serialized");
+			        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+			}
+	
+	/**
+	 * Secure Programming. Disable the de-serialize option of the object which avoid attacker to de-serialize the object stores in the file system
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void readObject(ObjectInputStream in)
+			throws java.io.IOException {
+			        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
 			}
 }

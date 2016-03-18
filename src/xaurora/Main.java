@@ -17,7 +17,6 @@ private static final int PORT_PLUGIN = 23333;
 		SystemManager sa = SystemManager.getInstance();
 		DBManager dbManager = new DBManager();
 		Thread autoUpdatingThread = new Thread(dbManager);
-		System.out.println("main");
 		autoUpdatingThread.start();
 		if(sa.isNetAccessible()){
 

@@ -1,5 +1,6 @@
 package xaurora.test;
 
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
@@ -7,6 +8,8 @@ import java.io.ObjectOutputStream;
  * Description: simple Helper data structure for testing that stores the content and a filename
  */
 public final class SecurityTestTextUnit {
+	private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+	private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
 	private byte[] text; //it can be either cipher or plaintext;
 	private String filename; //represents its filename;
 	public SecurityTestTextUnit(byte[] text,String filename) {
@@ -37,6 +40,16 @@ public final class SecurityTestTextUnit {
 	 */
 	private final void writeObject(ObjectOutputStream out)
 			throws java.io.IOException {
-			        throw new java.io.IOException("Object cannot be serialized");
+			        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+			}
+	
+	/**
+	 * Secure Programming. Disable the de-serialize option of the object which avoid attacker to de-serialize the object stores in the file system
+	 * and inspect the internal status of the object
+	 * @author GAO RISHENG A0101891L
+	 */
+	private final void readObject(ObjectInputStream in)
+			throws java.io.IOException {
+			        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
 			}
 }
