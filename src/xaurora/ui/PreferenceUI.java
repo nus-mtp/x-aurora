@@ -256,6 +256,7 @@ public class PreferenceUI extends Application{
                         }
                     }
                 };
+                cell.setAlignment(Pos.CENTER);
                 return cell;        
             }
         };
@@ -518,17 +519,17 @@ public class PreferenceUI extends Application{
         grid.setPadding(new Insets(topOffset, rightOffset, bottomOffset, leftOffset));
         grid.setAlignment(Pos.CENTER);
         
-        Label labelPath =  new Label("Store data at: ");
-        TextField pathField = new TextField();
-        pathField.setEditable(false);
-        pathField.setMinWidth(300);
-        pathField.setText(preferences.getDataPath());
-        Button browseButton = new Button("Browse");
-        browseButton.setOnAction(event -> {
+        Label labelContentPath =  new Label("Store content at: ");
+        TextField contentPathField = new TextField();
+        contentPathField.setEditable(false);
+        contentPathField.setMinWidth(300);
+        contentPathField.setText(preferences.getContentPath());
+        Button browseContentButton = new Button("Browse");
+        browseContentButton.setOnAction(event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             File selectedDirectory = directoryChooser.showDialog(stage);
-            pathField.setText(selectedDirectory.getAbsolutePath());
-            preferences.setDataPath(selectedDirectory.getAbsolutePath());
+            contentPathField.setText(selectedDirectory.getAbsolutePath());
+            preferences.setContentPath(selectedDirectory.getAbsolutePath());
         });
                 
         Label labelShowPreviewText = new Label("Store preview text as caches to improve matching speed");
@@ -542,9 +543,9 @@ public class PreferenceUI extends Application{
         cbClearCachesTime.setValue(preferences.getClearCachesTime());
         cbClearCachesTime.setOnAction(event -> {preferences.setClearCachesTime((String) cbClearCachesTime.getSelectionModel().getSelectedItem());});     
         
-        grid.add(labelPath, 0, 0);
-        grid.add(pathField, 0, 1);
-        grid.add(browseButton, 1, 1);
+        grid.add(labelContentPath, 0, 0);
+        grid.add(contentPathField, 0, 1);
+        grid.add(browseContentButton, 1, 1);
         grid.add(labelShowPreviewText, 0, 2);
         grid.add(checkboxShowPreviewText, 1, 2);
         grid.add(labelClearCachesTime, 0, 3);

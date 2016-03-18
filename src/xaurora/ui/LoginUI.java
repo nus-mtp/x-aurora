@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -92,6 +93,12 @@ public class LoginUI extends Application{
         loginButton.setOnAction(event -> {
             getHostServices().showDocument(loginPage);
             SystemManager.getInstance().login(true);
+            grid.getChildren().clear();
+            
+            ProgressIndicator loadingIndicator = new ProgressIndicator();
+        	Label labelLoading = new Label("Waiting for login");
+        	grid.add(loadingIndicator, 0, 0);
+        	grid.add(labelLoading, 0, 1);
         });
         grid.add(loginButton, 1, 0);
         

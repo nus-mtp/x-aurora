@@ -31,7 +31,7 @@ public class UserPreference {
     //Blocked List Pane
     private ArrayList<BlockedPage> blockedList;
     //Path Pane
-    private String dataPath;
+    private String contentPath;
     private boolean isShowPreviewText;
     private String clearCachesTime;
     //Storage Pane
@@ -72,7 +72,7 @@ public class UserPreference {
         //Blocked List Pane
         blockedList = new ArrayList<BlockedPage>();
         //Path Pane
-        dataPath = "C:/User/Desktop";
+        contentPath = "C:/User/Desktop";
         isShowPreviewText = true;
         clearCachesTime = "device is off";
         //Storage Pane
@@ -195,7 +195,7 @@ public class UserPreference {
             }
             
             //Path Pane
-            dataPath = settings[index++];
+            contentPath = settings[index++];
             isShowPreviewText = Boolean.valueOf(settings[index++]);
             clearCachesTime = settings[index++];
             
@@ -248,7 +248,7 @@ public class UserPreference {
                 bufferedWriter.write(page.getUrl() + " " + String.valueOf(page.getIsEnabled()) + " ");
             }
             bufferedWriter.newLine();         
-            bufferedWriter.write(String.valueOf(dataPath));
+            bufferedWriter.write(String.valueOf(contentPath));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isShowPreviewText));
             bufferedWriter.newLine();
@@ -345,8 +345,8 @@ public class UserPreference {
         return blockedList;
     }
 
-    public String getDataPath() {
-        return dataPath;
+    public String getContentPath() {
+        return contentPath;
     }
 
     public boolean isShowPreviewText() {
@@ -409,8 +409,8 @@ public class UserPreference {
         return boxTransparency = 0;
     }
 
-    public String getDefaultDataPath() {
-        return dataPath = "C:/User/Desktop";
+    public String getDefaultContentPath() {
+        return contentPath = "C:/User/Desktop";
     }
 
     public String getDefaultClearCachesTime() {
@@ -481,8 +481,8 @@ public class UserPreference {
         this.blockedList = blockedList;
     }
 
-    public void setDataPath(String dataPath) {
-        this.dataPath = dataPath;
+    public void setContentPath(String contentPath) {
+        this.contentPath = contentPath;
     }
 
     public void setIsShowPreviewText(boolean isShowPreviewText) {
