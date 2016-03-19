@@ -9,6 +9,7 @@ import java.net.Socket;
 
 import xaurora.io.DataFileIO;
 import xaurora.io.IDGenerator;
+import xaurora.system.SystemManager;
 import xaurora.text.TextIndexer;
 
 public class ChromeServer implements Runnable {
@@ -17,7 +18,7 @@ public class ChromeServer implements Runnable {
     int port = 0;
     boolean isTextContent = false;
     private static final int TYPE_FULL_TEXT = 0;
-
+    private SystemManager systemManager;
     public ChromeServer(int inputedPort) {
         port = inputedPort;
     }
@@ -30,12 +31,13 @@ public class ChromeServer implements Runnable {
             // TODO: Think of ways to popup error box
             e.printStackTrace();
         }
-
+        this.systemManager = SystemManager.getInstance();
+        while(!this.systemManager.isManagerInitialize()){}
         while (true) {
             isTextContent = false;
             String text = receiveMessage();
             if (isTextContent) {
-                outputToFile(text);
+                outputToFile(text,this.systemManager);
             }
 
         }
@@ -46,11 +48,11 @@ public class ChromeServer implements Runnable {
         return data[0];
     }
 
-    private void outputToFile(String text) {
+    private void outputToFile(String text,SystemManager manager) {
         String id = IDGenerator.instanceOf().GenerateID(getURL(text),
                 TYPE_FULL_TEXT);
-        DataFileIO.instanceOf().createDataFile(getURL(text), id,
-                String.valueOf(text).getBytes());
+        manager.getDataFileIOInstance().createDataFile(getURL(text), id,
+                String.valueOf(text).getBytes(),manager);
     }
 
     /*

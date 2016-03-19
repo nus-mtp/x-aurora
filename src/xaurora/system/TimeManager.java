@@ -15,6 +15,7 @@ import java.util.TimeZone;
 public final class TimeManager {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
     private static final int MILLISECONDS_PER_SECOND = 1000;
+    private static final int SECONDS_PER_HOURS = 3600;
     private static final long DEFAULT_EXPIRE_INTERVAL = 259200000;// 3 days
     private long expireInterval;
     private static TimeManager classInstance;
@@ -84,5 +85,9 @@ public final class TimeManager {
      */
     public final void setExpiredInterval(long seconds) {
         this.expireInterval = seconds * MILLISECONDS_PER_SECOND;
+    }
+    
+    public final void setExpiredInterval(int hours){
+        this.expireInterval = hours*SECONDS_PER_HOURS*MILLISECONDS_PER_SECOND;
     }
 }

@@ -16,7 +16,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import xaurora.security.*;
+import xaurora.system.SystemManager;
 import xaurora.system.TimeManager;
+import xaurora.system.SecurityManager;
 import xaurora.text.TextIndexer;
 import xaurora.util.DataFileMetaData;
 
@@ -36,6 +38,7 @@ public final class DataFileIO {
     private static final int INDEX_ZERO = 0;
     private static final String NEW_EMPTY_STRING = "";
     private static final char FILE_EXTENSION_DELIMITER = '.';
+
     private String syncDirectory = DEFAULT_SYNC_DIRECTORY;
     private String indexDirectory = DEFAULT_INDEX_DIRECTORY;
     private static DataFileIO instance = null;
@@ -43,7 +46,7 @@ public final class DataFileIO {
     // Singleton Class constructor
     // This is to limits that only 1 instance of DataFileIO will be created
     private DataFileIO() {
-        this.createLocalDirectories();
+        //this.createLocalDirectories();
     }
 
     public static final DataFileIO instanceOf() {
@@ -60,9 +63,8 @@ public final class DataFileIO {
      * Directory: /project_directory/index_data/
      */
     public final void createLocalDirectories() {
-        File temp = new File(NEW_EMPTY_STRING);
-        File storeDir = new File(temp.getAbsolutePath() + this.syncDirectory);
-        File indexDir = new File(temp.getAbsolutePath() + this.indexDirectory);
+        File storeDir = new File(this.syncDirectory);
+        File indexDir = new File(this.indexDirectory);
         if (storeDir.mkdir() || storeDir.exists()) {
             this.syncDirectory = storeDir.getAbsolutePath();
         }
@@ -81,12 +83,20 @@ public final class DataFileIO {
      * @author GAO RISHENG A0101891L
      * 
      */
-    public final boolean setDirectory(String path) {
+    public final void setDirectory(String path) {
         if (!new File(path).exists() || !new File(path).isDirectory()) {
-            return false;
+            //log error
+        } else {
+            this.syncDirectory = path;
         }
-        this.syncDirectory = path;
-        return true;
+    }
+
+    public final void setIndexDirectory(String path) {
+        if (!new File(path).exists() || !new File(path).isDirectory()) {
+
+        } else {
+            this.indexDirectory = path;
+        }
     }
 
     /**
@@ -142,13 +152,13 @@ public final class DataFileIO {
      * @author GAO RISHENG A0101891L
      */
     private void writeDataFileWithEncryption(String url, byte[] content,
-            File dstFile) throws IOException {
+            File dstFile,SecurityManager secure) throws IOException {
         dstFile.createNewFile();
         FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
         String overallContent = url + NEWLINE + new String(content);
         // Use the filename of the data file as the IV of the encryption
         fos.write(Security.encrypt(overallContent.getBytes(), dstFile.getName()
-                .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING)));
+                .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING),secure));
         // fos.write(overallContent.getBytes());
         fos.close();
     }
@@ -165,11 +175,11 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public void createDataFile(String url, String id, byte[] content) {
+    public void createDataFile(String url, String id, byte[] content,SystemManager manager) {
         String dstpath = generateDataFilePath(id);
         // Store the data in the lucene indexing system.
         long currentTime = System.currentTimeMillis();
-        TextIndexer.getInstance().createIndexDocumentFromWeb(
+        manager.getIndexerInstance().createIndexDocumentFromWeb(
                 new String(content), url, dstpath, currentTime);
         File dstFile = new File(dstpath);
         if (dstFile.exists()) {
@@ -177,7 +187,7 @@ public final class DataFileIO {
 
         } else {
             try {
-                writeDataFileWithEncryption(url, content, dstFile);
+                writeDataFileWithEncryption(url, content, dstFile,manager.getSecurityManagerInstance());
 
             } catch (IOException e) {
 
@@ -194,10 +204,10 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public ArrayList<String> getContent() {
+    public ArrayList<String> getContent(SystemManager manager) {
         ArrayList<String> content = new ArrayList<String>();
 
-        extractFolder(content);
+        extractFolder(content,manager);
 
         return content;
     }
@@ -212,7 +222,7 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private void extractFolder(ArrayList<String> content) {
+    private void extractFolder(ArrayList<String> content,SystemManager manager) {
         File dir = new File(this.syncDirectory);
         Stack<File> s = new Stack<File>();
         s.push(dir);
@@ -226,7 +236,7 @@ public final class DataFileIO {
                     }
                 } else {
                     if (getExtension(f).equals(TEXT_FILE_TYPE)) {
-                        content.add(readFileContent(f));
+                        content.add(readFileContent(f,manager));
                     }
                 }
             }
@@ -244,7 +254,7 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private String readFileContent(File f) {
+    private String readFileContent(File f,SystemManager system) {
         assert (f.isFile() && f.exists() && !f.isDirectory() && !getExtension(f)
                 .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
         StringBuilder output = new StringBuilder(NEW_EMPTY_STRING);
@@ -253,7 +263,7 @@ public final class DataFileIO {
             byte[] data = Files.readAllBytes(path);
 
             byte[] decrypted = Security.decrypt(data, f.getName()
-                    .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING));
+                    .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING),system.getSecurityManagerInstance());
 
             for (int i = INDEX_ZERO; i < decrypted.length; i++) {
                 output.append(String.valueOf((char) decrypted[i]));
@@ -272,13 +282,13 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public synchronized void autoCheckForExpiredFile() {
-        ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData();
+    public synchronized void autoCheckForExpiredFile(SystemManager manager) {
+        ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData(manager);
         for (int index = INDEX_ZERO; index < allMetaData.size(); index++) {
-            if (TimeManager.getInstance()
+            if (manager.getTimeManagerInstance()
                     .isExpired(allMetaData.get(index).getLastModified())) {
                 // System.out.println(allMetaData.get(index).getFilename());
-                TextIndexer.getInstance().deleteByField(
+                manager.getIndexerInstance().deleteByField(
                         TextIndexer.FIELD_FILENAME,
                         allMetaData.get(index).getFilename());
             }
@@ -315,10 +325,10 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L.
      */
-    private String getUrlFromFile(File f) {
+    private String getUrlFromFile(File f,SystemManager manager) {
         assert (f.isFile() && f.exists()
                 && !f.isDirectory()) : ERR_INVALID_FILE_TYPE;
-        String textContent = readFileContent(f);
+        String textContent = readFileContent(f,manager);
         String[] paragraphs = textContent.split(NEWLINE);
         String result = NEW_EMPTY_STRING;
         if (paragraphs.length > INDEX_ZERO) {
@@ -360,7 +370,7 @@ public final class DataFileIO {
      *         data: Filename URL Host name of the source Length of file
      * @author GAO RISHENG A0101891L
      */
-    public ArrayList<DataFileMetaData> getAllMetaData() {
+    public ArrayList<DataFileMetaData> getAllMetaData(SystemManager manager) {
         ArrayList<DataFileMetaData> result = new ArrayList<DataFileMetaData>();
         File dir = new File(this.syncDirectory);
         Stack<File> s = new Stack<File>();
@@ -380,7 +390,7 @@ public final class DataFileIO {
                             f.getName().substring(INDEX_ZERO,
                                     f.getName().lastIndexOf(
                                             FILE_EXTENSION_DELIMITER)),
-                            getUrlFromFile(f));
+                            getUrlFromFile(f,manager));
                     tempEntity.addFileMetaData(f.length(), f.lastModified());
                     result.add(tempEntity);
                 }
@@ -396,12 +406,15 @@ public final class DataFileIO {
      * 
      * @author GAORISHENG A0101891L
      */
-    public synchronized void updateIndexingFromFiles() {
-        ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData();
-        ArrayList<String> content = this.getContent();
+    public synchronized void updateIndexingFromFiles(SystemManager manager) {
+        System.out.println("reading meta data");
+        ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData(manager);
+        System.out.println("reading content");
+        ArrayList<String> content = this.getContent(manager);
 
         for (int index = INDEX_ZERO; index < allMetaData.size(); index++) {
-            TextIndexer.getInstance().createIndexDocumentFromWeb(
+            System.out.println("creating lucene document");
+            manager.getIndexerInstance().createIndexDocumentFromWeb(
                     content.get(index), allMetaData.get(index).getUrl(),
                     allMetaData.get(index).getFilename(),
                     allMetaData.get(index).getLastModified());

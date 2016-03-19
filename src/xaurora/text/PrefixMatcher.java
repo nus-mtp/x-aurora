@@ -54,14 +54,14 @@ public class PrefixMatcher {
      * @return all the relevance search result in the indexing system in Strings
      * @author GAO RISHENG A0101891L
      */
-    public static ArrayList<String> getResult(String userInput) {
+    public static ArrayList<String> getResult(String userInput,TextIndexer indexer) {
         ArrayList<String> suggestion = new ArrayList<String>();
         if (userInput.equals(PRESET_NUMBER_SEARCH_INPUT)) {
-            suggestion = generateNumberQuery(suggestion);
+            suggestion = generateNumberQuery(suggestion,indexer);
         } else if (userInput.equals(PRESET_EMAIL_SEARCH_INPUT)) {
-            suggestion = generateEmailQuery(suggestion);
+            suggestion = generateEmailQuery(suggestion,indexer);
         } else {
-            suggestion = generatreNormalQuery(userInput, suggestion);
+            suggestion = generatreNormalQuery(userInput, suggestion,indexer);
         }
         return suggestion;
     }
@@ -76,7 +76,7 @@ public class PrefixMatcher {
      * @author GAO RISHENG A0101891L
      */
     private static ArrayList<String> generateEmailQuery(
-            ArrayList<String> suggestion) {
+            ArrayList<String> suggestion,TextIndexer indexer) {
         String[] queries = new String[EMAIL_LEGAL_CHARACTERS];
         String[] fields = new String[EMAIL_LEGAL_CHARACTERS];
         for (int i = INDEX_ZERO; i < EMAIL_LEGAL_CHARACTERS; i++) {
@@ -97,7 +97,7 @@ public class PrefixMatcher {
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
 
-            suggestion = TextIndexer.getInstance().searchDocument(searchQuery,
+            suggestion = indexer.searchDocument(searchQuery,
                     TYPE_EMAIL);
         } catch (ParseException e) {
 
@@ -117,7 +117,7 @@ public class PrefixMatcher {
      * @author GAO RISHENG A0101891L
      */
     private static ArrayList<String> generateNumberQuery(
-            ArrayList<String> suggestion) {
+            ArrayList<String> suggestion,TextIndexer indexer) {
         String[] queries = new String[DITIT_BOUNDARY];
         String[] fields = new String[DITIT_BOUNDARY];
         for (int i = INDEX_ZERO; i < DITIT_BOUNDARY; i++) {
@@ -129,7 +129,7 @@ public class PrefixMatcher {
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
 
-            suggestion = TextIndexer.getInstance().searchDocument(searchQuery,
+            suggestion = indexer.searchDocument(searchQuery,
                     TYPE_NUMBER);
         } catch (ParseException e) {
 
@@ -149,8 +149,8 @@ public class PrefixMatcher {
      * @author GAO RISHENG A0101891L
      */
     private static ArrayList<String> generatreNormalQuery(String userInput,
-            ArrayList<String> suggestion) {
-        ArrayList<String> keywords = TextIndexer.getInstance()
+            ArrayList<String> suggestion,TextIndexer indexer) {
+        ArrayList<String> keywords = indexer
                 .extractKeyWordsInUserInput(userInput);
 
         String[] queries = constructQuery(userInput, keywords);
@@ -163,7 +163,7 @@ public class PrefixMatcher {
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
 
-            suggestion = TextIndexer.getInstance().searchDocument(searchQuery,
+            suggestion = indexer.searchDocument(searchQuery,
                     TYPE_DEFAULT);
         } catch (ParseException e) {
 
@@ -172,24 +172,7 @@ public class PrefixMatcher {
         return suggestion;
     }
 
-    /**
-     * Inherited from the previous iteration Calculate fuzziness value of a
-     * string using the length of the string.
-     *
-     * @param word
-     *            String object.
-     * @return Fuzzy value of the the string.
-     */
-    private static String calcFuzzy(String word) {
-        double wordLength = word.length();
 
-        if (wordLength == 1) // off fuzziness for one letter word
-            return "";
-        else if (FUZZY_ALLOWANCE > wordLength)
-            return "~0.0";
-        else
-            return "~" + (wordLength - FUZZY_ALLOWANCE);
-    }
 
     private static boolean isContainNumberKeyWords(String userInput) {
         return userInput.contains(NUMBER_SEARCH_KEYWORD);
@@ -232,9 +215,7 @@ public class PrefixMatcher {
 
         for (int i = INDEX_ZERO; i < keywords.size(); i++) {
             queries[i + currentIndex] = keywords.get(i)
-                    .replace(SPECIAL_CHARACTERS, NEW_EMPTY_STRING)
-                    + calcFuzzy(keywords.get(i).replace(SPECIAL_CHARACTERS,
-                            NEW_EMPTY_STRING));
+                    .replace(SPECIAL_CHARACTERS, NEW_EMPTY_STRING);
         }
         return queries;
     }

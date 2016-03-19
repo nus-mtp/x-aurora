@@ -25,6 +25,7 @@ import java.io.ObjectOutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 /*
  * Indexing Library 
@@ -258,11 +259,11 @@ public final class TextIndexer {
     /**
      * Singleton constructor
      */
-    private TextIndexer() {
-        this.init();
+    private TextIndexer(DataFileIO io) {
+        this.init(io);
     }
 
-    private void init() {
+    private void init(DataFileIO io) {
         try {
             this.analyzer = new StandardAnalyzer();
             this.storeDirectory = FSDirectory.open(
@@ -275,9 +276,9 @@ public final class TextIndexer {
 
     }
 
-    public static TextIndexer getInstance() {
+    public static TextIndexer getInstance(DataFileIO io) {
         if (instance == null) {
-            instance = new TextIndexer();
+            instance = new TextIndexer(io);
         }
         return instance;
     }
@@ -312,6 +313,7 @@ public final class TextIndexer {
     public synchronized void createIndexDocumentFromWeb(String rawData,
             String url, String filename, long lastModified) {
         // Create analyzer for indexing system
+        
         this.analyzer = new StandardAnalyzer();
         this.config = new IndexWriterConfig(this.analyzer);
         // split paragraphs
