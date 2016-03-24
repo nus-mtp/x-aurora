@@ -20,6 +20,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import xaurora.util.UserPreference;
 
+@SuppressWarnings("deprecation")
 public class VirtualKeyboard {
 
     private final Key[][] keys;

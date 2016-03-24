@@ -4,7 +4,6 @@ import java.io.File;
 import static java.lang.System.exit;
 import java.util.ArrayList;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -41,6 +40,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import xaurora.io.DataFileIO;
+import xaurora.system.SystemManager;
 import xaurora.ui.VirtualKeyboard.Key;
 import xaurora.util.BlockedPage;
 import xaurora.util.UserPreference;
@@ -74,6 +74,7 @@ public class PreferenceUI extends Application{
     private static final String styleSheets = "style.css";
     UserPreference preferences = UserPreference.getInstance();
     DataFileIO dataFile = DataFileIO.instanceOf();
+    SystemManager systemManager = SystemManager.getInstance();
     Stage stage;
     
     public static void main(String[] args) {
@@ -210,32 +211,33 @@ public class PreferenceUI extends Application{
     
     private BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
-        TableView table = new TableView();
-        //TableColumn filenameCol = new TableColumn("Filename");
-        //filenameCol.setCellValueFactory(new PropertyValueFactory<>("filename"));
-        TableColumn urlCol = new TableColumn("Url");
+        TableView<DataFileMetaData> table = new TableView<DataFileMetaData>();
+        TableColumn<DataFileMetaData, String> urlCol = new TableColumn<DataFileMetaData, String>("Url");
         urlCol.setCellValueFactory(new PropertyValueFactory<>("url"));
-        urlCol.setPrefWidth(250);
-        TableColumn sourceCol = new TableColumn("Source");
+        TableColumn<DataFileMetaData, String> sourceCol = new TableColumn<DataFileMetaData, String>("Source");
         sourceCol.setCellValueFactory(new PropertyValueFactory<>("source"));
-        TableColumn lengthCol = new TableColumn("Length");
+        TableColumn<DataFileMetaData, String> lengthCol = new TableColumn<DataFileMetaData, String>("Length");
         lengthCol.setCellValueFactory(new PropertyValueFactory<>("length"));
-        TableColumn lastModifiedCol = new TableColumn("Last Modified");
+        TableColumn<DataFileMetaData, String> lastModifiedCol = new TableColumn<DataFileMetaData, String>("Last Modified");
         lastModifiedCol.setCellValueFactory(new PropertyValueFactory<>("lastModifiedDateTime"));
         lastModifiedCol.setPrefWidth(100);
-        TableColumn deleteCol = new TableColumn("Delete");
-        table.getColumns().addAll(urlCol, sourceCol, lengthCol, lastModifiedCol, deleteCol);
+        TableColumn<DataFileMetaData, Boolean> deleteCol = new TableColumn<DataFileMetaData, Boolean>("Delete");
+        table.getColumns().add(urlCol);
+        table.getColumns().add(sourceCol);
+        table.getColumns().add(lengthCol);
+        table.getColumns().add(lastModifiedCol);
+        table.getColumns().add(deleteCol);
         table.setEditable(false);
         
         ObservableList<DataFileMetaData> browsedPages = FXCollections.observableArrayList();
-        ArrayList<DataFileMetaData> fileData = dataFile.getAllMetaData();
+        ArrayList<DataFileMetaData> fileData = dataFile.getAllMetaData(systemManager);
         browsedPages.addAll(fileData);
         table.setItems(browsedPages);
         
         Callback<TableColumn<DataFileMetaData, Boolean>, TableCell<DataFileMetaData, Boolean>> deleteCellFactory = 
                 new Callback<TableColumn<DataFileMetaData, Boolean>, TableCell<DataFileMetaData, Boolean>>(){
             @Override
-            public TableCell call(TableColumn<DataFileMetaData, Boolean> param) {
+            public TableCell<DataFileMetaData, Boolean> call(TableColumn<DataFileMetaData, Boolean> param) {
                 final TableCell<DataFileMetaData, Boolean> cell =  new TableCell<DataFileMetaData, Boolean>(){
                     Button deleteButton = new Button("X");
                     
@@ -309,7 +311,7 @@ public class PreferenceUI extends Application{
             keyboardBoxes[i].setAlignment(Pos.CENTER);
         }
         
-        ChoiceBox cbHotkeys = new ChoiceBox();
+        ChoiceBox<String> cbHotkeys = new ChoiceBox<String>();
         cbHotkeys.setItems(FXCollections.observableArrayList("extend word", "reduce word", "extend sentence",
                 "reduce sentence", "extend paragraph", "reduce paragraph"));
         cbHotkeys.setValue("extend word");
@@ -365,8 +367,8 @@ public class PreferenceUI extends Application{
         labels[3] = new Label("Text Colour");
         labels[4] = new Label("Box Transparency");
         
-        Spinner spinner = new Spinner();
-        SpinnerValueFactory svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(minMatchingDisplayed, maxMatchingDisplayed);
+        Spinner<Integer> spinner = new Spinner<Integer>();
+        SpinnerValueFactory<Integer> svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(minMatchingDisplayed, maxMatchingDisplayed);
         spinner.setValueFactory(svf);
         spinner.setEditable(true);
         spinner.setPrefWidth(spinnerWidth);
@@ -410,17 +412,19 @@ public class PreferenceUI extends Application{
     
     private BorderPane createBlockedListPane(){
         BorderPane border = new BorderPane();
-        TableView table = new TableView();      
-        TableColumn urlCol = new TableColumn("Website URL");
+        TableView<BlockedPage> table = new TableView<BlockedPage>();      
+        TableColumn<BlockedPage, String> urlCol = new TableColumn<BlockedPage, String>("Website URL");
         urlCol.setCellValueFactory(new PropertyValueFactory<>("url"));
         urlCol.setMinWidth(200);
-        TableColumn toggleCol = new TableColumn("Enable/Disable");
+        TableColumn<BlockedPage, Boolean> toggleCol = new TableColumn<BlockedPage, Boolean>("Enable/Disable");
         toggleCol.setCellValueFactory(new PropertyValueFactory<>("isEnabled"));
         toggleCol.setMinWidth(100);
-        TableColumn deleteCol = new TableColumn("Delete");
+        TableColumn<BlockedPage, Boolean> deleteCol = new TableColumn<BlockedPage, Boolean>("Delete");
         deleteCol.setCellValueFactory(new PropertyValueFactory<>("X"));
         deleteCol.setMinWidth(50);
-        table.getColumns().addAll(urlCol, toggleCol, deleteCol);
+        table.getColumns().add(urlCol);
+        table.getColumns().add(toggleCol);
+        table.getColumns().add(deleteCol);
         table.setEditable(false);
         
         ObservableList<BlockedPage> blockedPages = FXCollections.observableArrayList();
@@ -431,7 +435,7 @@ public class PreferenceUI extends Application{
         Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> toggleCellFactory = 
                 new Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>>(){
             @Override
-            public TableCell call(TableColumn<BlockedPage, Boolean> param) {
+            public TableCell<BlockedPage, Boolean> call(TableColumn<BlockedPage, Boolean> param) {
                 final TableCell<BlockedPage, Boolean> cell =  new TableCell<BlockedPage, Boolean>(){
                     ToggleButton toggleButton = new ToggleButton();
                     
@@ -462,7 +466,7 @@ public class PreferenceUI extends Application{
         Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> deleteCellFactory = 
                 new Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>>(){
             @Override
-            public TableCell call(TableColumn<BlockedPage, Boolean> param) {
+            public TableCell<BlockedPage, Boolean> call(TableColumn<BlockedPage, Boolean> param) {
                 final TableCell<BlockedPage, Boolean> cell =  new TableCell<BlockedPage, Boolean>(){
                     Button deleteButton = new Button("X");
                     
@@ -538,10 +542,10 @@ public class PreferenceUI extends Application{
         checkboxShowPreviewText.setOnAction(event -> {preferences.setIsShowPreviewText(!preferences.isShowPreviewText());});
         
         Label labelClearCachesTime = new Label("Clear caches after ");
-        ChoiceBox cbClearCachesTime = new ChoiceBox();
+        ChoiceBox<String> cbClearCachesTime = new ChoiceBox<String>();
         cbClearCachesTime.setItems(FXCollections.observableArrayList("device is off", "one day", "one week", "never"));
         cbClearCachesTime.setValue(preferences.getClearCachesTime());
-        cbClearCachesTime.setOnAction(event -> {preferences.setClearCachesTime((String) cbClearCachesTime.getSelectionModel().getSelectedItem());});     
+        cbClearCachesTime.setOnAction(event -> {preferences.setClearCachesTime(cbClearCachesTime.getSelectionModel().getSelectedItem());});     
         
         grid.add(labelContentPath, 0, 0);
         grid.add(contentPathField, 0, 1);
@@ -562,16 +566,16 @@ public class PreferenceUI extends Application{
         grid.setAlignment(Pos.CENTER);
         
         Label labelMaxTextSize = new Label("Store single text size of at most");
-        ChoiceBox cbMaxTextSize = new ChoiceBox();
+        ChoiceBox<String> cbMaxTextSize = new ChoiceBox<String>();
         cbMaxTextSize.setItems(FXCollections.observableArrayList("100MB", "500MB", "1GB", "unlimited"));
         cbMaxTextSize.setValue(preferences.getMaxTextSizeStored());
-        cbMaxTextSize.setOnAction(event -> {preferences.setMaxTextSizeStored((String) cbMaxTextSize.getSelectionModel().getSelectedItem());});     
+        cbMaxTextSize.setOnAction(event -> {preferences.setMaxTextSizeStored(cbMaxTextSize.getSelectionModel().getSelectedItem());});     
         
         Label labelPreviewTextLength = new Label("Preview text length");
-        ChoiceBox cbPreviewTextLength = new ChoiceBox();
+        ChoiceBox<String> cbPreviewTextLength = new ChoiceBox<String>();
         cbPreviewTextLength.setItems(FXCollections.observableArrayList("one sentence", "two sentence", "three words", "one paragraph"));
         cbPreviewTextLength.setValue(preferences.getPreviewTextLength());
-        cbPreviewTextLength.setOnAction(event -> {preferences.setPreviewTextLength((String) cbPreviewTextLength.getSelectionModel().getSelectedItem());});     
+        cbPreviewTextLength.setOnAction(event -> {preferences.setPreviewTextLength(cbPreviewTextLength.getSelectionModel().getSelectedItem());});     
         
         float totalSpace = 20; //dummy value
         float usedSpace = 2; //dummy value
