@@ -1,9 +1,13 @@
 package xaurora.io;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Description: this class is mainly in charge of generating MD5 hashed ID for
@@ -12,19 +16,25 @@ import java.util.Calendar;
  * @author GAO RISHENG A0101891L
  *
  */
-public class IDGenerator {
+public final class IDGenerator {
+    private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: {}.";
+    private static final String MSG_START = "An instance of IDGenerator is created. This message should appear only once at every software running flow.";
+    private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+    private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
     private static final String PADDING_ZERO = "0";
     private static final int ID_LENGTH = 32;
     private static final int STRING_LENGTH = 16;
     private static IDGenerator instance = null;
     public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     private static final String HASH_TYPE = "MD5";
+    private Logger logger;
 
     private IDGenerator() {
-
+        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger.info(MSG_START);
     }
 
-    public static IDGenerator instanceOf() {
+    public static final IDGenerator instanceOf() {
         if (instance == null) {
             instance = new IDGenerator();
         }
@@ -37,7 +47,7 @@ public class IDGenerator {
      * @return the String format of the current time
      * @author GAO RISHENG A0101891L
      */
-    private static String getNow() {
+    private static final String getNow() {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
         return sdf.format(cal.getTime());
@@ -53,7 +63,7 @@ public class IDGenerator {
      * @return the MD5 hashed ID for the input
      * @author GAO RISHENG A0101891L
      */
-    public String GenerateID(String url, int type) {
+    public final String GenerateID(final String url, final int type) {
         String output = url + getNow() + type;
         byte[] id = output.getBytes();
         try {
@@ -70,8 +80,44 @@ public class IDGenerator {
             // return id;
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
+            this.logger.error(ERR_MSG_INVALID_HASH_ALGORITHM, e.getMessage());
             return id.toString();
         }
 
+    }
+
+    /**
+     * Secure Programming. Making this Object not-clonable. Object.clone()
+     * allows cloning the data of an object without initialize it which may leak
+     * the chances for attacker to access the data internally
+     * 
+     * @Author GAO RISHENG A0101891L
+     */
+    public final Object clone() throws java.lang.CloneNotSupportedException {
+        throw new java.lang.CloneNotSupportedException();
+    }
+
+    /**
+     * Secure Programming. Disable the serialize option of the object which
+     * avoid attacker to print the object in serialize manner and inspect the
+     * internal status of the object
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    private final void writeObject(ObjectOutputStream out)
+            throws java.io.IOException {
+        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+    }
+
+    /**
+     * Secure Programming. Disable the de-serialize option of the object which
+     * avoid attacker to de-serialize the object stores in the file system and
+     * inspect the internal status of the object
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    private final void readObject(ObjectInputStream in)
+            throws java.io.IOException {
+        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
     }
 }

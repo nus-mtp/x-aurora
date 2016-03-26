@@ -8,11 +8,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import xaurora.system.SecurityManager;
+
 /**
  * Description: This Class is mainly in charge of maintaining the
  * confidentiality of the extracted text data by applying AES Encryption
@@ -23,6 +25,11 @@ import xaurora.system.SecurityManager;
  *
  */
 public final class Security {
+    private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: {}.";
+    private static final String ERR_MSG_INVALID_GENERATED = "Invalid Key is generated due to errors.";
+    private static final String ERR_MSG_UNABLE_TO_GENERATE_KEY = "Error occurs in secret key generation with error message {}.";
+    private static final String ERR_MSG_DECRYPTION_FAIL = "Decryption fail. Error occurs at decrypting process with error Message {}.";
+    private static final String ERR_MSG_ENCRYPTION_FAIL = "Encryption fail. Error occurs at encrypting process with error Message {}.";
     private static final String HASH_TYPE_SHA_1 = "SHA-1";
     private static final int CASE_DIFFERENCE = 32;
     private static final int SUM_OF_DIGITS = 105;
@@ -40,8 +47,8 @@ public final class Security {
     private static final int IV_LENGTH = 16;
     private static final int SALT_LENGTH = 32;
     private static final int KEY_LENGTH_IN_BYTES = 16;
-    
-    
+    private static Logger logger = LoggerFactory.getLogger(Security.class);
+
     /**
      * Description: encrypt the plain text content with given IV
      * 
@@ -52,11 +59,12 @@ public final class Security {
      * @return Cipher text data in bytes
      * @author GAO RISHENG A0101891L
      */
-    public static byte[] encrypt(byte[] content, String initVector,SecurityManager secure) {
+    public static final byte[] encrypt(final byte[] content,
+            final String initVector, final SecurityManager secure) {
         try {
             String hash = secure.getCurrentHash();
             byte[] currentSalt = secure.getSalt(hash);
-            byte[] secretKey = generateKey(hash,currentSalt);
+            byte[] secretKey = generateKey(hash, currentSalt);
             SecretKeySpec skeySpec = new SecretKeySpec(secretKey,
                     ENCRYPT_ALGORITHM);
             Cipher cipher = Cipher.getInstance(ENCRYPT_METHOD);
@@ -65,9 +73,8 @@ public final class Security {
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, ivspec);
             return cipher.doFinal(content);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ERR_MSG_ENCRYPTION_FAIL, e.getMessage());
         }
-        // log the error message (Encryption failed)
         return content;
     }
 
@@ -81,11 +88,12 @@ public final class Security {
      * @return Plain text data in bytes
      * @author GAO RISHENG A0101891L
      */
-    public static byte[] decrypt(byte[] content, String initVector,SecurityManager secure) {
+    public static final byte[] decrypt(final byte[] content,
+            final String initVector, final SecurityManager secure) {
         try {
             String hash = secure.getCurrentHash();
             byte[] currentSalt = secure.getSalt(hash);
-            byte[] secretKey = generateKey(hash,currentSalt);
+            byte[] secretKey = generateKey(hash, currentSalt);
             SecretKeySpec skeySpec = new SecretKeySpec(secretKey,
                     ENCRYPT_ALGORITHM);
             Cipher cipher = Cipher.getInstance(ENCRYPT_METHOD);
@@ -94,9 +102,8 @@ public final class Security {
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivspec);
             return cipher.doFinal(content);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(ERR_MSG_DECRYPTION_FAIL, e.getMessage());
         }
-        // log the error message (Encryption failed)
         return content;
     }
 
@@ -108,7 +115,7 @@ public final class Security {
      *            is usually the file name of a text file
      * @return the IV of AES Encryption in byte array
      */
-    private static byte[] createIV(String initVector) {
+    private static final byte[] createIV(final String initVector) {
         char[] characters = initVector.toCharArray();
         byte[] output = new byte[IV_LENGTH];
         for (int index = INDEX_ZERO; index < characters.length; index++) {
@@ -132,56 +139,68 @@ public final class Security {
         return output;
 
     }
+
     /**
-     * Description: generate a secure random 32 byte salt value 
+     * Description: generate a secure random 32 byte salt value
+     * 
      * @return a 32 byte secure random salt
      */
-    private static final byte[] generateSalt(){
+    private static final byte[] generateSalt() {
         final Random r = new SecureRandom();
         byte[] salt = new byte[SALT_LENGTH];
         r.nextBytes(salt);
         return salt;
     }
-    private static final byte[] generateKey(String hashName,byte[] salt){
-        try{
+
+    private static final byte[] generateKey(final String hashName,
+            final byte[] salt) {
+        try {
             byte[] temp = hashName.getBytes(DEFAULT_CHARSET);
-            //input contains hashed userName + salt
-            byte[] input = new byte[temp.length+salt.length];
-            for(int index = INDEX_ZERO;index<salt.length;index++){
+            // input contains hashed userName + salt
+            byte[] input = new byte[temp.length + salt.length];
+            for (int index = INDEX_ZERO; index < salt.length; index++) {
                 input[index] = salt[index];
             }
-            for(int index = INDEX_ZERO;index<temp.length;index++){
+            for (int index = INDEX_ZERO; index < temp.length; index++) {
                 input[index] = temp[index];
             }
             MessageDigest sha = MessageDigest.getInstance(HASH_TYPE_SHA_1);
             input = sha.digest(input);
             input = Arrays.copyOf(input, KEY_LENGTH_IN_BYTES);
             return input;
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            logger.error(ERR_MSG_UNABLE_TO_GENERATE_KEY, e.getMessage());
         }
-        //default invalid return key
-        //should be logged in this case
+        logger.info(ERR_MSG_INVALID_GENERATED);
         return new byte[KEY_LENGTH_IN_BYTES];
     }
-    public static final byte[] generateLocalKey(String userName){
-        return generateUserKey(userName,EMPTY_STRING);
+
+    public static final byte[] generateLocalKey(final String userName) {
+        assert userName != null;
+        return generateUserKey(userName, EMPTY_STRING);
     }
-    public static final byte[] generateUserKey(String userName,String userEmail){
-        String hash = hashUserName(userName,userEmail);
+
+    public static final byte[] generateUserKey(final String userName,
+            final String userEmail) {
+        assert userName != null && !userName.trim().equals(EMPTY_STRING);
+        assert userEmail != null;
+        String hash = hashUserName(userName, userEmail);
         assert hash.length() == ID_LENGTH;
         byte[] hashes = hash.getBytes();
         byte[] salt = generateSalt();
         // 64 bytes entry
-        byte[] entry = new byte[ID_LENGTH+SALT_LENGTH];
-        for(int index = INDEX_ZERO;index<ID_LENGTH;index++){
+        byte[] entry = new byte[ID_LENGTH + SALT_LENGTH];
+        for (int index = INDEX_ZERO; index < ID_LENGTH; index++) {
             entry[index] = hashes[index];
-            entry[ID_LENGTH+index] = salt[index];
+            entry[ID_LENGTH + index] = salt[index];
         }
         return entry;
     }
-    public static final String hashUserName(final String userName,final String email){
-        byte[] id = (userName+email).getBytes();
+
+    public static final String hashUserName(final String userName,
+            final String email) {
+        byte[] id = (userName + email).getBytes();
         try {
             MessageDigest md = MessageDigest.getInstance(HASH_TYPE_MD5);
             md.reset();
@@ -196,9 +215,11 @@ public final class Security {
             // return id;
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
+            logger.error(ERR_MSG_INVALID_HASH_ALGORITHM, e.getMessage());
             return id.toString();
         }
     }
+
     /**
      * Secure Programming. Making this Object not-clonable. Object.clone()
      * allows cloning the data of an object without initialize it which may leak

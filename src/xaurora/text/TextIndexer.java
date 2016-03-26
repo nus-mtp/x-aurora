@@ -25,7 +25,6 @@ import java.io.ObjectOutputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 /*
  * Indexing Library 
@@ -58,15 +57,32 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 /*
+ *  Log Library
+ */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+/*
  * Software Internal Import
  */
 import xaurora.io.DataFileIO;
 
 public final class TextIndexer {
+    
     /**
      * Constant used
      */
-
+    private static final String ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM = "Unable to access local indexing system. Error Message: {}";
+    private static final String ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER = "Error occurs at updating non-positive display number {}.";
+    private static final String ERR_MSG_UNABLE_PROCESS_DELETE = "Unable to process deletion at local file. Error Message : {}.";
+    private static final String ERR_MSG_UNABLE_TO_PARSE_DELETE_QUERY = "Unable to process the deletion query with query string and error message {}.";
+    private static final String MSG_DELETE_QUERY_CREATED = "A Delete Query is triggered with selection field {} and input {}.";
+    private static final String ERR_MSG_FAIL_TO_EXTRACT_URL = "Unable to extract URL from input {},with error message.";
+    private static final String ERR_MSG_FAIL_TO_PARSE_INPUT = "Error occurs at parsing the raw Text Input with error message {}.";
+    private static final String ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS = "Error occurs at extracting terms within raw text input. Error Message : {}.";
+    private static final String ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT = "Error occurs at attempting to create a lucene document with error message {}.";
+    private static final String MSG_INIT_COMPLETE = "Initialization Complete.";
+    private static final String ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY = "Error raised at opening the local indexing directory {}, the error message is {}.";
+    private static final String MSG_START = "An instance of Text Indexer is created. This message should appear only once at every software running flow.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
     /**
@@ -98,7 +114,7 @@ public final class TextIndexer {
     private static final int TYPE_EMAIL_SEARCH = 1;
     private static final int TYPE_NUMBER_SEARCH = 2;
     private static final int NUM_OF_SORT_RULES = 2;
-
+    private static final int MINIMUM_NON_NEGATIVE = 0;
     /**
      * String Constants
      */
@@ -255,28 +271,32 @@ public final class TextIndexer {
      * Parsing text input from raw text extracted from web-browser
      */
     private XauroraParser parser;
+    private Logger logger;
 
     /**
      * Singleton constructor
      */
     private TextIndexer(DataFileIO io) {
+        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger.info(MSG_START);
         this.init(io);
     }
 
-    private void init(DataFileIO io) {
+    private final void init(DataFileIO io) {
         try {
             this.analyzer = new StandardAnalyzer();
-            this.storeDirectory = FSDirectory.open(
-                    Paths.get(DataFileIO.instanceOf().getIndexDirectory()));
+            this.storeDirectory = FSDirectory
+                    .open(Paths.get(io.getIndexDirectory()));
 
         } catch (IOException e1) {
-            e1.printStackTrace();
+            this.logger.error(ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY,
+                    io.getIndexDirectory(), e1.getMessage());
         }
         this.displayNumber = DEFAULT_DISPLAY_NUMBER;
-
+        this.logger.info(MSG_INIT_COMPLETE);
     }
 
-    public static TextIndexer getInstance(DataFileIO io) {
+    public static final TextIndexer getInstance(DataFileIO io) {
         if (instance == null) {
             instance = new TextIndexer(io);
         }
@@ -310,10 +330,11 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public synchronized void createIndexDocumentFromWeb(String rawData,
-            String url, String filename, long lastModified) {
+    public synchronized final void createIndexDocumentFromWeb(
+            final String rawData, final String url, final String filename,
+            final long lastModified) {
         // Create analyzer for indexing system
-        
+
         this.analyzer = new StandardAnalyzer();
         this.config = new IndexWriterConfig(this.analyzer);
         // split paragraphs
@@ -356,7 +377,8 @@ public final class TextIndexer {
             // printAll();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT,
+                    e.getMessage());
         }
     }
 
@@ -372,7 +394,8 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public ArrayList<String> extractKeyWordsInUserInput(String input) {
+    public final ArrayList<String> extractKeyWordsInUserInput(
+            final String input) {
         ArrayList<String> result = new ArrayList<String>();
         // Load the stop words sets
         TokenStream stream = this.analyzer.tokenStream(FIELD_TERMS,
@@ -387,8 +410,9 @@ public final class TextIndexer {
             }
             stream.close();
         } catch (IOException e) {
-            // Log here
-            e.printStackTrace();
+
+            this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS,
+                    e.getMessage());
         }
         return result;
     }
@@ -406,8 +430,8 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private void insertSentencesIntoDocument(String[] sentences, int i,
-            Document data) {
+    private final void insertSentencesIntoDocument(final String[] sentences,
+            final int i, Document data) {
         addContent(data, sentences[i]);
     }
 
@@ -422,7 +446,8 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private void insertParagraphIntoDocument(String input, Document data) {
+    private final void insertParagraphIntoDocument(final String input,
+            Document data) {
 
         addData(data, input);
     }
@@ -440,11 +465,8 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private void extractNumbersAndEmails(String[] paragraphs, int i,
+    private void extractNumbersAndEmails(final String[] paragraphs, final int i,
             Document data) {
-        // InputStream is = new
-        // ByteArrayInputStream(Charset.forName("UTF-8").encode((paragraphs[i]+".
-        // ").replaceAll(PATTERN_NON_ASCII_CHARACTERS, EMPTY_STRING)).array());
         InputStream is = new ByteArrayInputStream((paragraphs[i])
                 .replaceAll(PATTERN_NON_ASCII_CHARACTERS, EMPTY_STRING)
                 .getBytes());
@@ -458,9 +480,7 @@ public final class TextIndexer {
         try {
             XauroraParser.parseEmailInSentence(data);
         } catch (xaurora.text.ParseException e) {
-            System.out.println(data.getField(FIELD_FILENAME));
-            System.out.println(paragraphs[i]);
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_FAIL_TO_PARSE_INPUT, e.getMessage());
         }
     }
 
@@ -474,14 +494,15 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private static String getHostFromURL(String url) {
+    private final String getHostFromURL(final String url) {
+        assert url != null;
         String host = SOURCE_UNKNOWN;
         try {
             URL sourceURL = new URL(url);
             host = sourceURL.getHost();
         } catch (MalformedURLException e) {
 
-            // e.printStackTrace(); log here
+            this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_URL, url, e.getMessage());
         }
         return host;
     }
@@ -497,7 +518,8 @@ public final class TextIndexer {
      * @author GAO RISHENG A0101891L
      */
 
-    public static void addURL(Document doc, String url) {
+    public final static void addURL(Document doc, final String url) {
+        assert url != null;
         addTextField(doc, FIELD_URL, url);
     }
 
@@ -512,7 +534,8 @@ public final class TextIndexer {
      * @author GAO RISHENG A0101891L
      */
 
-    public static void addSource(Document doc, String source) {
+    public final static void addSource(Document doc, final String source) {
+        assert source != null;
         addStringField(doc, FIELD_SOURCE, source);
     }
 
@@ -528,7 +551,8 @@ public final class TextIndexer {
      * @author GAO RISHENG A0101891L
      */
 
-    public static void addFilename(Document doc, String filename) {
+    public final static void addFilename(Document doc, final String filename) {
+        assert filename != null && !filename.trim().equals(EMPTY_STRING);
         addStringField(doc, FIELD_FILENAME, filename);
     }
 
@@ -544,7 +568,8 @@ public final class TextIndexer {
      * @author GAO RISHENG A0101891L
      */
 
-    public static void addContent(Document doc, String content) {
+    public final static void addContent(Document doc, final String content) {
+        assert content != null;
         addTextField(doc, FIELD_CONTENT, content);
     }
 
@@ -560,7 +585,8 @@ public final class TextIndexer {
      * @author GAO RISHENG A0101891L
      */
 
-    public static void addData(Document doc, String content) {
+    public final static void addData(Document doc, final String content) {
+        assert content != null;
         addStringField(doc, FIELD_EXTENDED_DATA, content);
     }
 
@@ -574,7 +600,7 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public static void addNumber(Document doc, String number) {
+    public final static void addNumber(Document doc, final String number) {
         addStringField(doc, FIELD_NUMBER, number);
     }
 
@@ -588,7 +614,8 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public static void addEmail(Document doc, String email) {
+    public final static void addEmail(Document doc, final String email) {
+        assert email != null;
         addStringField(doc, FIELD_EMAIL, email);
     }
 
@@ -603,7 +630,8 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public static void addTerms(Document doc, String term) {
+    public final static void addTerms(Document doc, final String term) {
+        assert term != null && !term.trim().equals(EMPTY_STRING);
         addTextField(doc, FIELD_TERMS, term);
     }
 
@@ -618,7 +646,8 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public static void addLastModified(Document doc, long value) {
+    public final static void addLastModified(Document doc, final long value) {
+        assert value > MINIMUM_NON_NEGATIVE;
         addLongField(doc, FIELD_LAST_MODIFIED, value);
     }
 
@@ -634,7 +663,9 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private static void addTextField(Document doc, String field, String value) {
+    private final static void addTextField(Document doc, final String field,
+            final String value) {
+        assert value != null && !value.trim().equals(EMPTY_STRING);
         doc.add(new TextField(field, value, Field.Store.YES));
     }
 
@@ -651,8 +682,9 @@ public final class TextIndexer {
      * @author GAO RISHENG A0101891L
      */
 
-    private static void addStringField(Document doc, String field,
-            String value) {
+    private final static void addStringField(Document doc, final String field,
+            final String value) {
+        assert value != null && !value.trim().equals(EMPTY_STRING);
         doc.add(new StringField(field, value, Field.Store.YES));
     }
 
@@ -673,7 +705,9 @@ public final class TextIndexer {
      *
      * @author GAO RISHENG A0101891L
      */
-    private static void addLongField(Document doc, String field, long value) {
+    private final static void addLongField(Document doc, final String field,
+            final long value) {
+        assert value > MINIMUM_NON_NEGATIVE;
         doc.add(new LongField(field, value, LONG_FIELD_TYPE_STORED_SORTED));
     }
 
@@ -690,10 +724,12 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public synchronized void deleteByField(String field, String inputQuery) {
-
+    public final synchronized void deleteByField(final String field,
+            final String inputQuery) {
+        assert inputQuery != null && !inputQuery.trim().equals(EMPTY_STRING);
+        assert field != null && field.trim().equals(EMPTY_STRING);
         this.analyzer = new StandardAnalyzer();
-
+        this.logger.info(MSG_DELETE_QUERY_CREATED, field, inputQuery);
         try {
             // open the current indexing directory
             this.reader = DirectoryReader.open(this.storeDirectory);
@@ -722,10 +758,10 @@ public final class TextIndexer {
             this.writer.close();
             // change to log
         } catch (ParseException e) {
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_UNABLE_TO_PARSE_DELETE_QUERY,
+                    e.getMessage());
         } catch (IOException e) {
-
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_UNABLE_PROCESS_DELETE, e.getMessage());
         }
     }
 
@@ -739,8 +775,11 @@ public final class TextIndexer {
      *            return will be changed
      * @author GAO RISHENG A0101891L
      */
-    public void setDisplayNumber(int number) {
-        this.displayNumber = number;
+    public final void setDisplayNumber(final int number) {
+        if (number <= MINIMUM_NON_NEGATIVE) {
+            this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER, number);
+        } else
+            this.displayNumber = number;
     }
 
     /**
@@ -753,7 +792,8 @@ public final class TextIndexer {
      *         documents
      * @author GAO RISHENG A0101891L
      */
-    public synchronized ArrayList<String> searchDocument(Query q, int type) {
+    public final synchronized ArrayList<String> searchDocument(Query q,
+            final int type) {
         ArrayList<String> result = new ArrayList<String>();
         try {
             this.reader = DirectoryReader.open(this.storeDirectory);
@@ -784,7 +824,8 @@ public final class TextIndexer {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM,
+                    e.getMessage());
         }
         return result;
     }
@@ -798,7 +839,7 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private SortField[] setSortingRules() {
+    private final SortField[] setSortingRules() {
         SortField[] filters = new SortField[NUM_OF_SORT_RULES];
         filters[INDEX_SCORE] = SortField.FIELD_SCORE;
         filters[INDEX_LAST_MODIFIED] = new SortField(FIELD_LAST_MODIFIED,
@@ -813,7 +854,7 @@ public final class TextIndexer {
      * @author GAO RISHENG A0101891L
      * 
      */
-    public synchronized void printAll() {
+    public final synchronized void printAll() {
         try {
             this.reader = DirectoryReader.open(this.storeDirectory);
             for (int i = INDEX_ZERO; i < reader.maxDoc(); i++) {
@@ -823,8 +864,8 @@ public final class TextIndexer {
                 // do something with docId here...
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM,
+                    e.getMessage());
         }
     }
 

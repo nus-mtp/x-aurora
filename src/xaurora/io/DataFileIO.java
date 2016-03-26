@@ -17,14 +17,30 @@ import java.nio.file.Paths;
 
 import xaurora.security.*;
 import xaurora.system.SystemManager;
-import xaurora.system.TimeManager;
+import xaurora.system.DBManager;
 import xaurora.system.SecurityManager;
 import xaurora.text.TextIndexer;
 import xaurora.util.DataFileMetaData;
 
-import java.util.*;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import java.util.Stack;
 
 public final class DataFileIO {
+    private static final String MSG_NEW_LUCENE_ENTRY_IS_CREATE = "A new lucene document is created, its source data file name is {}.";
+    private static final String MSG_NEW_FILE_IS_FOUND = "{} new file(s) is/are found after the last update.";
+    private static final String MSG_META_DATA_RETRIEVE = "A request of reading all meta data is raised. The number of files in the current system is {}.";
+    private static final String MSG_NEW_DATA_FILE_PATH_CREATE = "A new data file path {} is created.";
+    private static final String MSG_UPDATE_INDEX_DIRECTORY_SUCCESS = "Update local index directory successfully at location {}.";
+    private static final String MSG_UPDATE_SYNC_DIRECTORY_SUCCESS = "Update local sync directory successfully at location {}.";
+    private static final String MSG_START = "An instance of DataFileIO is created. This message should appear only once at every software running flow.";
+    private static final String ERR_MSG_UNABLE_TO_DELETE_DATA_FILE = "Error occurs at attempting to delete a local data file {}, the error message is {}.";
+    private static final String ERR_MSG_UNABLE_TO_READ_DATA_FILE = "Error occurs at reading data file {}, the error messag is {}.";
+    private static final String ERR_MSG_UNABLE_TO_WRITE_DATA_FILE = "Error occurs at writing data file {}, the error messag is {}.";
+    private static final String ERR_MSG_UNABLE_TO_SET_SYNC_FILE = "Error,unable to set the local sync directory because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
+    private static final String ERR_MSG_UNABLE_TO_SET_INDEX_FILE = "Error,unable to set the local index directory because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
     private static final String PATH_SEPARATOR = "\\";
@@ -36,66 +52,57 @@ public final class DataFileIO {
     private static final String ERR_MSG_MD5_COLLISION = "ERROR MESSAGE: MD5 COLLISION";
     private static final String ERR_INVALID_FILE_TYPE = "INVALID FILE TYPE";
     private static final int INDEX_ZERO = 0;
+    private static final int UNIQUE = 1;
     private static final String NEW_EMPTY_STRING = "";
     private static final char FILE_EXTENSION_DELIMITER = '.';
-
     private String syncDirectory = DEFAULT_SYNC_DIRECTORY;
     private String indexDirectory = DEFAULT_INDEX_DIRECTORY;
     private static DataFileIO instance = null;
+    private Logger logger;
 
     // Singleton Class constructor
     // This is to limits that only 1 instance of DataFileIO will be created
     private DataFileIO() {
-        //this.createLocalDirectories();
+        this.logger = LoggerFactory.getLogger(this.getClass());
     }
 
     public static final DataFileIO instanceOf() {
         if (instance == null) {
             instance = new DataFileIO();
+            instance.logger.info(MSG_START);
         }
 
         return instance;
     }
 
     /**
-     * Create local synchronization path and Lucene Indexing directory Default
-     * Sync Directory: /project_directory/local_data/ Default Indexing
-     * Directory: /project_directory/index_data/
-     */
-    public final void createLocalDirectories() {
-        File storeDir = new File(this.syncDirectory);
-        File indexDir = new File(this.indexDirectory);
-        if (storeDir.mkdir() || storeDir.exists()) {
-            this.syncDirectory = storeDir.getAbsolutePath();
-        }
-        if (indexDir.mkdir() || indexDir.exists()) {
-            this.indexDirectory = indexDir.getAbsolutePath();
-        }
-    }
-
-    /**
      * Description: this method is to update the sync directory
      * 
-     * @param path,must
-     *            be a valid directory
+     * @param path
+     *            must be a valid directory
      * @return true if the path is successfully updated, else return false
      * 
      * @author GAO RISHENG A0101891L
      * 
      */
-    public final void setDirectory(String path) {
+    public final void setDirectory(final String path) {
         if (!new File(path).exists() || !new File(path).isDirectory()) {
-            //log error
+            this.logger.error(ERR_MSG_UNABLE_TO_SET_SYNC_FILE);
         } else {
+
             this.syncDirectory = path;
+            this.logger.info(MSG_UPDATE_SYNC_DIRECTORY_SUCCESS,
+                    this.syncDirectory);
         }
     }
 
-    public final void setIndexDirectory(String path) {
+    public final void setIndexDirectory(final String path) {
         if (!new File(path).exists() || !new File(path).isDirectory()) {
-
+            this.logger.error(ERR_MSG_UNABLE_TO_SET_INDEX_FILE);
         } else {
             this.indexDirectory = path;
+            this.logger.info(MSG_UPDATE_INDEX_DIRECTORY_SUCCESS,
+                    this.indexDirectory);
         }
     }
 
@@ -128,9 +135,10 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private String generateDataFilePath(String id) {
+    private final String generateDataFilePath(final String id) {
         String dstpath = this.syncDirectory + PATH_SEPARATOR + new String(id)
                 + DEFAULT_FILE_EXTENSION;
+        this.logger.info(MSG_NEW_DATA_FILE_PATH_CREATE,dstpath);
         return dstpath;
     }
 
@@ -151,16 +159,20 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private void writeDataFileWithEncryption(String url, byte[] content,
-            File dstFile,SecurityManager secure) throws IOException {
+    private final void writeDataFileWithEncryption(final String url,
+            final byte[] content, File dstFile, final SecurityManager secure)
+                    throws IOException {
         dstFile.createNewFile();
         FileOutputStream fos = new FileOutputStream(dstFile.getAbsolutePath());
         String overallContent = url + NEWLINE + new String(content);
         // Use the filename of the data file as the IV of the encryption
         fos.write(Security.encrypt(overallContent.getBytes(), dstFile.getName()
-                .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING),secure));
-        // fos.write(overallContent.getBytes());
+                .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING), secure));
+
         fos.close();
+        dstFile.setReadOnly();
+        dstFile.setReadable(true);
+
     }
 
     /**
@@ -175,7 +187,8 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public void createDataFile(String url, String id, byte[] content,SystemManager manager) {
+    public final void createDataFile(final String url, final String id,
+            final byte[] content, SystemManager manager, DBManager dbManager) {
         String dstpath = generateDataFilePath(id);
         // Store the data in the lucene indexing system.
         long currentTime = System.currentTimeMillis();
@@ -183,62 +196,18 @@ public final class DataFileIO {
                 new String(content), url, dstpath, currentTime);
         File dstFile = new File(dstpath);
         if (dstFile.exists()) {
-            System.err.println(ERR_MSG_MD5_COLLISION);
+            this.logger.error(ERR_MSG_MD5_COLLISION);
 
         } else {
             try {
-                writeDataFileWithEncryption(url, content, dstFile,manager.getSecurityManagerInstance());
-
+                writeDataFileWithEncryption(url, content, dstFile,
+                        manager.getSecurityManagerInstance());
+                // register this file into DBSystem
+                dbManager.addMonitorToAFile(dstFile.getName()
+                        .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING));
             } catch (IOException e) {
-
-            }
-        }
-    }
-
-    /**
-     * Description: get all the content from all the data files within the sync
-     * directory
-     * 
-     * @return the arraylist that stores all the text content extracted from the
-     *         folder
-     * 
-     * @author GAO RISHENG A0101891L
-     */
-    public ArrayList<String> getContent(SystemManager manager) {
-        ArrayList<String> content = new ArrayList<String>();
-
-        extractFolder(content,manager);
-
-        return content;
-    }
-
-    /**
-     * Description: Get all the content from all the data files within the sync
-     * directory
-     * 
-     * @param content,
-     *            the arraylist that used to store all the extracted content in
-     *            the local folder
-     * 
-     * @author GAO RISHENG A0101891L
-     */
-    private void extractFolder(ArrayList<String> content,SystemManager manager) {
-        File dir = new File(this.syncDirectory);
-        Stack<File> s = new Stack<File>();
-        s.push(dir);
-        while (!s.isEmpty()) {
-            File f = s.pop();
-            if (f.exists()) {
-                if (f.isDirectory()) {
-                    File[] subDir = f.listFiles();
-                    for (int i = INDEX_ZERO; i < subDir.length; i++) {
-                        s.push(subDir[i]);
-                    }
-                } else {
-                    if (getExtension(f).equals(TEXT_FILE_TYPE)) {
-                        content.add(readFileContent(f,manager));
-                    }
-                }
+                this.logger.error(ERR_MSG_UNABLE_TO_WRITE_DATA_FILE, dstFile,
+                        e.getMessage());
             }
         }
     }
@@ -254,45 +223,55 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private String readFileContent(File f,SystemManager system) {
-        assert (f.isFile() && f.exists() && !f.isDirectory() && !getExtension(f)
+    private final String readFileContent(final File f, SystemManager system) {
+        assert (f.isFile() && f.exists() && !f.isDirectory() && !FilenameUtils.getExtension(f.getAbsolutePath())
                 .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
         StringBuilder output = new StringBuilder(NEW_EMPTY_STRING);
         try {
             Path path = Paths.get(f.getAbsolutePath());
             byte[] data = Files.readAllBytes(path);
 
-            byte[] decrypted = Security.decrypt(data, f.getName()
-                    .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING),system.getSecurityManagerInstance());
+            byte[] decrypted = Security.decrypt(data,
+                    f.getName().replace(DEFAULT_FILE_EXTENSION,
+                            NEW_EMPTY_STRING),
+                    system.getSecurityManagerInstance());
 
             for (int i = INDEX_ZERO; i < decrypted.length; i++) {
                 output.append(String.valueOf((char) decrypted[i]));
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_UNABLE_TO_READ_DATA_FILE,
+                    f.getAbsolutePath(), e.getMessage());
         }
         return output.toString();
     }
 
     /**
-     * 
      * Description: Check for expired file and delete its local data file and
      * indexing entity
      * 
+     * @param manager,
+     *            the System Manager instance that needs to be updated
+     * @return the arrayList of data file meta data that to be deleted
+     * 
      * @author GAO RISHENG A0101891L
      */
-    public synchronized void autoCheckForExpiredFile(SystemManager manager) {
+    public final synchronized ArrayList<DataFileMetaData> autoCheckForExpiredFile(
+            SystemManager manager) {
+        ArrayList<DataFileMetaData> deleteMetaData = new ArrayList<DataFileMetaData>();
         ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData(manager);
         for (int index = INDEX_ZERO; index < allMetaData.size(); index++) {
             if (manager.getTimeManagerInstance()
                     .isExpired(allMetaData.get(index).getLastModified())) {
-                // System.out.println(allMetaData.get(index).getFilename());
+
                 manager.getIndexerInstance().deleteByField(
                         TextIndexer.FIELD_FILENAME,
                         allMetaData.get(index).getFilename());
+                deleteMetaData.add(allMetaData.get(index));
             }
         }
+        return deleteMetaData;
     }
 
     /**
@@ -305,13 +284,17 @@ public final class DataFileIO {
      * @author GAO RISHENG A0101891L
      * 
      */
-    public void removeDataFile(String filename) {
+    public final void removeDataFile(final String filename) {
+        // This should never be triggered. => use Assert
+        assert filename != null && !filename.trim().equals(NEW_EMPTY_STRING);
+
         Path filePath = Paths.get(this.syncDirectory + PATH_SEPARATOR + filename
                 + DEFAULT_FILE_EXTENSION);
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_UNABLE_TO_DELETE_DATA_FILE,
+                    filePath.toString(), e.getMessage());
         }
 
     }
@@ -325,10 +308,12 @@ public final class DataFileIO {
      * 
      * @author GAO RISHENG A0101891L.
      */
-    private String getUrlFromFile(File f,SystemManager manager) {
+    private final String getUrlFromFile(final File f, SystemManager manager) {
+        // Assertion: thie method must read a txt file with valid file path
         assert (f.isFile() && f.exists()
-                && !f.isDirectory()) : ERR_INVALID_FILE_TYPE;
-        String textContent = readFileContent(f,manager);
+                && !f.isDirectory()&&!FilenameUtils.getExtension(f.getAbsolutePath())
+                .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
+        String textContent = readFileContent(f, manager);
         String[] paragraphs = textContent.split(NEWLINE);
         String result = NEW_EMPTY_STRING;
         if (paragraphs.length > INDEX_ZERO) {
@@ -340,28 +325,6 @@ public final class DataFileIO {
     }
 
     /**
-     * Description: read the file extension from the absolute path of the file
-     * 
-     * @param f,a
-     *            valid file
-     * @return the file extension of the file.
-     * 
-     * @author GAO RISHENG A0101891L
-     */
-    private static String getExtension(File f) {
-        assert (f.isFile() && f.exists()
-                && !f.isDirectory()) : ERR_INVALID_FILE_TYPE;
-        String ext = NEW_EMPTY_STRING;
-        String s = f.getName();
-        int i = s.lastIndexOf(FILE_EXTENSION_DELIMITER);
-
-        if (i > INDEX_ZERO && i < s.length() - 1) {
-            ext = s.substring(i + 1).toLowerCase();
-        }
-        return ext;
-    }
-
-    /**
      * 
      * Description: read all the useful meta data from all the data files in the
      * system in the current synchronization directory
@@ -370,7 +333,8 @@ public final class DataFileIO {
      *         data: Filename URL Host name of the source Length of file
      * @author GAO RISHENG A0101891L
      */
-    public ArrayList<DataFileMetaData> getAllMetaData(SystemManager manager) {
+    public final ArrayList<DataFileMetaData> getAllMetaData(
+            SystemManager manager) {
         ArrayList<DataFileMetaData> result = new ArrayList<DataFileMetaData>();
         File dir = new File(this.syncDirectory);
         Stack<File> s = new Stack<File>();
@@ -386,38 +350,63 @@ public final class DataFileIO {
                     }
 
                 } else {
-                    DataFileMetaData tempEntity = new DataFileMetaData(
-                            f.getName().substring(INDEX_ZERO,
-                                    f.getName().lastIndexOf(
-                                            FILE_EXTENSION_DELIMITER)),
-                            getUrlFromFile(f,manager));
-                    tempEntity.addFileMetaData(f.length(), f.lastModified());
-                    result.add(tempEntity);
+                    if (FilenameUtils.getExtension(f.getAbsolutePath())
+                            .equals(TEXT_FILE_TYPE)) {
+                        DataFileMetaData tempEntity = new DataFileMetaData(
+                                f.getName().substring(INDEX_ZERO,
+                                        f.getName().lastIndexOf(
+                                                FILE_EXTENSION_DELIMITER)-1),
+                                getUrlFromFile(f, manager));
+                        tempEntity.addFileMetaData(f.length(),
+                                f.lastModified());
+                        result.add(tempEntity);
+                    }
                 }
             }
         }
+        //this log is to keep track of the number of data files in the current system.
+        this.logger.info(MSG_META_DATA_RETRIEVE,result.size());
         return result;
     }
 
     /**
-     * Description: This is to recreate the whole indexing system from the
-     * current sync directory Post-condition:construct the indexing system with
-     * all data read successfully from the sync directory
+     * Description: Update the indexing system when new data enters the sync
+     * directory
      * 
-     * @author GAORISHENG A0101891L
+     * @param manager,
+     *            the System Manager that needs to update
+     * @param updateData,
+     *            the ArrayList of file meta data that specifies the files to be
+     *            added into the indexing system
+     * 
+     * @author GAO RISHENG A0101891L
      */
-    public synchronized void updateIndexingFromFiles(SystemManager manager) {
-        System.out.println("reading meta data");
-        ArrayList<DataFileMetaData> allMetaData = this.getAllMetaData(manager);
-        System.out.println("reading content");
-        ArrayList<String> content = this.getContent(manager);
+    public final synchronized void updateIndexingFromFiles(
+            SystemManager manager,
+            final ArrayList<DataFileMetaData> updateData) {
+        this.logger.info(MSG_NEW_FILE_IS_FOUND,updateData.size());
+        ArrayList<String> content = new ArrayList<String>();
+        File f = new File(this.syncDirectory);
+        for (int index = INDEX_ZERO; index < updateData.size(); index++) {
+            String filename = updateData.get(index).getFilename();
+            File[] matchingFiles = f.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.startsWith(filename)
+                            && name.endsWith(TEXT_FILE_TYPE);
+                }
+            });
+            assert matchingFiles.length == UNIQUE;
+            for (File temp : matchingFiles) {
+                content.add(this.readFileContent(temp, manager));
+            }
+        }
 
-        for (int index = INDEX_ZERO; index < allMetaData.size(); index++) {
-            System.out.println("creating lucene document");
+        for (int index = INDEX_ZERO; index < updateData.size(); index++) {
+            this.logger.info(MSG_NEW_LUCENE_ENTRY_IS_CREATE,updateData.get(index).getFilename());
             manager.getIndexerInstance().createIndexDocumentFromWeb(
-                    content.get(index), allMetaData.get(index).getUrl(),
-                    allMetaData.get(index).getFilename(),
-                    allMetaData.get(index).getLastModified());
+                    content.get(index), updateData.get(index).getUrl(),
+                    updateData.get(index).getFilename(),
+                    updateData.get(index).getLastModified());
 
         }
     }

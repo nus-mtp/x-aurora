@@ -5,7 +5,8 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -18,8 +19,12 @@ import org.apache.lucene.search.Query;
  * @author GAO RISHENG A10101891L
  */
 public class PrefixMatcher {
-
-    private static final double FUZZY_ALLOWANCE = 1.5;
+    
+    private static final String ERR_MSG_FAIL_TO_PARSE_QUERY = "Error occurs in parsing the search query, the error message is {}.";
+    private static final String MSG_NEW_NORMAL_QUERY = "New Normal Term/Prefix Query is created with query string {}.";
+    private static final String MSG_NEW_NUMBER_QUERY = "New Number Query is created with query string {}.";
+    private static final String MSG_NEW_EMAIL_QUERY = "New Email Query is created with query string {}.";
+    private static final String MSG_NEW_SEARCH_REQUEST_RECEIVED = "New search request received, the user input is {}";
     private static final int CAPITAL_DIFFERENCE = 55;
     private static final int CAPTICAL_BOUNDARY = 36;
     private static final int DITIT_BOUNDARY = 10;
@@ -43,7 +48,7 @@ public class PrefixMatcher {
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String NEW_EMPTY_STRING = "";
     private static final String SPECIAL_CHARACTERS = "~[0-9,a-z]";
-
+    private static Logger logger = LoggerFactory.getLogger(PrefixMatcher.class);
     /**
      * Description: The method that receive an user text input and returns the
      * search result.
@@ -54,14 +59,16 @@ public class PrefixMatcher {
      * @return all the relevance search result in the indexing system in Strings
      * @author GAO RISHENG A0101891L
      */
-    public static ArrayList<String> getResult(String userInput,TextIndexer indexer) {
+    public static final ArrayList<String> getResult(String userInput,
+            TextIndexer indexer) {
         ArrayList<String> suggestion = new ArrayList<String>();
+        logger.info(MSG_NEW_SEARCH_REQUEST_RECEIVED,userInput);
         if (userInput.equals(PRESET_NUMBER_SEARCH_INPUT)) {
-            suggestion = generateNumberQuery(suggestion,indexer);
+            suggestion = generateNumberQuery(suggestion, indexer);
         } else if (userInput.equals(PRESET_EMAIL_SEARCH_INPUT)) {
-            suggestion = generateEmailQuery(suggestion,indexer);
+            suggestion = generateEmailQuery(suggestion, indexer);
         } else {
-            suggestion = generatreNormalQuery(userInput, suggestion,indexer);
+            suggestion = generatreNormalQuery(userInput, suggestion, indexer);
         }
         return suggestion;
     }
@@ -75,8 +82,8 @@ public class PrefixMatcher {
      * @return the search results in String
      * @author GAO RISHENG A0101891L
      */
-    private static ArrayList<String> generateEmailQuery(
-            ArrayList<String> suggestion,TextIndexer indexer) {
+    private static final ArrayList<String> generateEmailQuery(
+            ArrayList<String> suggestion, TextIndexer indexer) {
         String[] queries = new String[EMAIL_LEGAL_CHARACTERS];
         String[] fields = new String[EMAIL_LEGAL_CHARACTERS];
         for (int i = INDEX_ZERO; i < EMAIL_LEGAL_CHARACTERS; i++) {
@@ -96,12 +103,11 @@ public class PrefixMatcher {
 
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
-
-            suggestion = indexer.searchDocument(searchQuery,
-                    TYPE_EMAIL);
+            logger.info(MSG_NEW_EMAIL_QUERY,searchQuery.toString());
+            suggestion = indexer.searchDocument(searchQuery, TYPE_EMAIL);
         } catch (ParseException e) {
 
-            e.printStackTrace();
+            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY,e.getMessage());
         }
         return suggestion;
     }
@@ -116,8 +122,8 @@ public class PrefixMatcher {
      * @return the search result
      * @author GAO RISHENG A0101891L
      */
-    private static ArrayList<String> generateNumberQuery(
-            ArrayList<String> suggestion,TextIndexer indexer) {
+    private static final ArrayList<String> generateNumberQuery(
+            ArrayList<String> suggestion, TextIndexer indexer) {
         String[] queries = new String[DITIT_BOUNDARY];
         String[] fields = new String[DITIT_BOUNDARY];
         for (int i = INDEX_ZERO; i < DITIT_BOUNDARY; i++) {
@@ -128,12 +134,11 @@ public class PrefixMatcher {
 
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
-
-            suggestion = indexer.searchDocument(searchQuery,
-                    TYPE_NUMBER);
+            logger.info(MSG_NEW_NUMBER_QUERY,searchQuery.toString());
+            suggestion = indexer.searchDocument(searchQuery, TYPE_NUMBER);
         } catch (ParseException e) {
 
-            e.printStackTrace();
+            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY,e.getMessage());
         }
         return suggestion;
     }
@@ -148,8 +153,9 @@ public class PrefixMatcher {
      * @return all the relevance suggestion obtains from the indexing system
      * @author GAO RISHENG A0101891L
      */
-    private static ArrayList<String> generatreNormalQuery(String userInput,
-            ArrayList<String> suggestion,TextIndexer indexer) {
+    private static final ArrayList<String> generatreNormalQuery(
+            String userInput, ArrayList<String> suggestion,
+            TextIndexer indexer) {
         ArrayList<String> keywords = indexer
                 .extractKeyWordsInUserInput(userInput);
 
@@ -162,23 +168,20 @@ public class PrefixMatcher {
 
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
-
-            suggestion = indexer.searchDocument(searchQuery,
-                    TYPE_DEFAULT);
+            logger.info(MSG_NEW_NORMAL_QUERY,searchQuery.toString());
+            suggestion = indexer.searchDocument(searchQuery, TYPE_DEFAULT);
         } catch (ParseException e) {
 
-            e.printStackTrace();
+            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY,e.getMessage());
         }
         return suggestion;
     }
 
-
-
-    private static boolean isContainNumberKeyWords(String userInput) {
+    private static final boolean isContainNumberKeyWords(String userInput) {
         return userInput.contains(NUMBER_SEARCH_KEYWORD);
     }
 
-    private static boolean isContainEmailKeyWords(String userInput) {
+    private static final boolean isContainEmailKeyWords(String userInput) {
         Pattern p = Pattern.compile(E_MAIL_ADDRESS_KEYWORD_EXPRESSION);
         Matcher m = p.matcher(userInput);
         return m.find();
@@ -198,7 +201,7 @@ public class PrefixMatcher {
      * 
      * @author GAO RISHENG
      */
-    private static String[] constructQuery(String userInput,
+    private static final String[] constructQuery(String userInput,
             ArrayList<String> keywords) {
 
         int length = keywords.size();

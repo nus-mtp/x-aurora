@@ -1,22 +1,45 @@
 package xaurora.system;
 
 import java.io.IOException;
-
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xaurora.io.DataFileIO;
 import xaurora.io.SystemIO;
 import xaurora.security.Security;
 import xaurora.text.TextIndexer;
 
-public class SystemManager {
+/**
+ * Thie class is the main controller of the Logic component that controls all
+ * the initialization of all the controller within Logic Component
+ * 
+ * @author GAO RISHENG A0101891L
+ *
+ */
+public final class SystemManager {
+    private static final String ERR_MSG_INVALID_UPDATE_EMAIL = "Error, the system is trying to update a null email.";
+    private static final String ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER = "Error, system is trying to update display number with a non-positive number {}.";
+    private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS = "Error, system is trying to update a non-positive expiry time in hours {}";
+    private static final String ERR_MSG_INVALID_UPDATE_STORE_DIRECTORY = "Error, system is trying to set an invalid(null) store path.";
+    private static final String ERR_MSG_INVALID_UPDATE_USERNAME = "Error, system is trying to set an invalid userName {}.";
+    private static final String MSG_USER_INIT_COMPLETE = "User Setting Initialization Complete.";
+    private static final String MSG_USER_INIT = "Start initializing for user settings.";
+    private static final String ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY = "Error occurs when trying to check for network accessibility. The error message is {}.";
+    private static final String ERR_MSG_NET_ACCESS_INTERRUPT = "Error occurs when trying to get response from the remote server. The error message is {}.";
+    private static final String MSG_FOUNDATION_COMPLETE = "Primary Initialization Complete.";
+    private static final String MSG_FOUNDATION_INIT = "Primary Initialization starts. This is the initialization that construct the foundation before user login.";
+    private static final String MSG_START = "An instance of System Manager is created. This message should appear only once at every software running flow.";
+    private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+    private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
     private static final String HOST_DROPBOX = "www.dropbox.com";
     private static final String COMMAND_PING = "ping ";
-    private static final String UNSYNC_DATA_PATH = "\\local_data\\";
     private static final String DEFAULT_USERNAME = "default";
+    private static final int MINIMUM_NON_NEGATIVE = 0;
     private static final int DEFAULT_DISPLAY_NUMBER = 5;
     private static final int DEFAULT_EXPIRY_HOURS = 72;
     private static final int INTERNAL_SUCCESS = 0;
     private static final String EMPTY_STRING = "";
-    private boolean isLogin;
     private DataFileIO io;
     private static SystemManager s;
     private String currentUserName;
@@ -29,17 +52,28 @@ public class SystemManager {
     private TextIndexer indexer;
     private TimeManager timeManager;
     private boolean isInitialized = false;
+    private Logger logger;
     private SystemManager() {
+        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger.info(MSG_START);
+        this.logger.info(MSG_FOUNDATION_INIT);
         this.io = DataFileIO.instanceOf();
         this.systemIo = SystemIO.getClassInstance();
-        if(!systemIo.isLocalKeyCreated()){
+        if (!systemIo.isLocalKeyCreated()) {
             byte[] entry = Security.generateLocalKey(DEFAULT_USERNAME);
-            this.systemIo.registerNewUser(DEFAULT_USERNAME, EMPTY_STRING, entry, io);
+            this.systemIo.registerNewUser(DEFAULT_USERNAME, EMPTY_STRING, entry,
+                    io);
         }
         this.secure = SecurityManager.getClassInstance(this.systemIo);
         this.timeManager = TimeManager.getInstance();
+        this.logger.info(MSG_FOUNDATION_COMPLETE);
     }
 
+    /**
+     * Singleton class instance getter
+     * 
+     * @return the un-initialized instance of System Manager (before user login)
+     */
     public static SystemManager getInstance() {
         if (s == null) {
             s = new SystemManager();
@@ -47,19 +81,14 @@ public class SystemManager {
         return s;
     }
 
-    public void login(boolean isLogin) {
-        this.isLogin = isLogin;
-        if (this.isLogin) {
-            this.io.setDirectory(UNSYNC_DATA_PATH);
-        } else {
-            this.io.setDirectory(UNSYNC_DATA_PATH);
-        }
-    }
-
-    // Description: check whether the Internet is available by trying to ping
-    // the dropbox host
-    // post-condition: return true if response is obtain by pinging the dropbox
-    // host, else return false
+    /**
+     * Description: check whether the Internet is available by trying to ping
+     * the drop-box host
+     * 
+     * @return true if response is obtained by pinging the drop-box other wise
+     *         return false
+     * @author GAO RISHENG A0101891L
+     */
     public boolean isNetAccessible() {
         boolean result = false;
         try {
@@ -70,67 +99,206 @@ public class SystemManager {
 
                 pingProcess.destroy();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                this.logger.error(ERR_MSG_NET_ACCESS_INTERRUPT,e.getMessage());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.error(ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY,e.getMessage());
         }
         return result;
     }
+
     /**
-     * This should only be call after finish login
-     * and finish data synchronization from drop-box 
+     * This should only be call after finish login and finish data
+     * synchronization from drop-box Description: initializing all internal
+     * manager to setting up the file system , building the indexing database,
+     * reading user secret keys
+     * 
+     * @author GAO RISHENG A0101891L
      */
-    public synchronized void triggerInitialization(){
-        assert this.currentUserName !=null;
+    public synchronized void triggerInitialization() {
+        //3 assertions that must be fulfilled
+        assert this.currentUserName != null&&!this.currentUserName.trim().equals(EMPTY_STRING);
         assert this.userEmail != null;
         assert this.storeDirectory != null;
+        this.logger.info(MSG_USER_INIT);
         this.secure = SecurityManager.getClassInstance(this.systemIo);
-        if(this.secure.isNewUser(this.currentUserName, this.userEmail)){
-            byte[] entry = Security.generateUserKey(this.currentUserName, this.userEmail);
-            this.systemIo.registerNewUser(this.currentUserName, this.userEmail, entry, io);
+        if (this.secure.isNewUser(this.currentUserName, this.userEmail)) {
+            byte[] entry = Security.generateUserKey(this.currentUserName,
+                    this.userEmail);
+            this.systemIo.registerNewUser(this.currentUserName, this.userEmail,
+                    entry, io);
             this.secure.reInit(this.systemIo);
-        } 
-        this.secure.setCurrentHash(Security.hashUserName(this.currentUserName, this.userEmail));
-        this.systemIo.setUpUserIndexDirectory(this.secure.getCurrentHash(), this.io);
+        }
+        this.secure.setCurrentHash(
+                Security.hashUserName(this.currentUserName, this.userEmail));
+        this.systemIo.setUpUserIndexDirectory(this.secure.getCurrentHash(),
+                this.io);
         this.io.setDirectory(this.storeDirectory);
         this.indexer = TextIndexer.getInstance(this.io);
         this.indexer.setDisplayNumber(this.displayNumber);
         this.timeManager.setExpiredInterval(this.expiryHours);
         this.isInitialized = true;
+        this.logger.info(MSG_USER_INIT_COMPLETE);
     }
-    public final TextIndexer getIndexerInstance(){
+
+    /**
+     * Attribute Getter for Text Indexer
+     * 
+     * @return a text indexer instance
+     * @author GAO RISHENG A0101891L
+     */
+    public final TextIndexer getIndexerInstance() {
         assert this.isInitialized;
         return this.indexer;
     }
-    public final SecurityManager getSecurityManagerInstance(){
+
+    /**
+     * Attribute Getter for Security Manager
+     * 
+     * @return a security Manager instance
+     * @author GAO RISHENG A0101891L
+     */
+    public final SecurityManager getSecurityManagerInstance() {
         assert this.isInitialized;
         return this.secure;
     }
-    public final DataFileIO getDataFileIOInstance(){
+
+    /**
+     * Attribute Getter for Data FileIO
+     * 
+     * @return a data file IO instance
+     * @author GAO RISHENG A0101891L
+     */
+    public final DataFileIO getDataFileIOInstance() {
         assert this.isInitialized;
         return this.io;
     }
-    public final TimeManager getTimeManagerInstance(){
+
+    /**
+     * Attribute Getter for Time Manager
+     * 
+     * @return a time manager instance
+     * @author Gao Risheng A0101891L
+     */
+    public final TimeManager getTimeManagerInstance() {
         assert this.isInitialized;
         return this.timeManager;
     }
-    public final boolean isManagerInitialize(){
+
+    /**
+     * Description: Check whether this instance is initialized
+     * 
+     * @return true if and only if this instance is initialized
+     * @author GAO RISHENG A0101891L
+     */
+    public final boolean isManagerInitialize() {
         return this.isInitialized;
     }
-    public final void setCurrentUser(final String userName){
-        this.currentUserName = userName;
+
+    /**
+     * Description: Setting the current user name
+     * 
+     * @param userName,
+     *            the user name of the current user
+     * @author GAO RISHENG A0101891L
+     */
+    public final void setCurrentUser(final String userName) {
+        if(userName!=null&&userName.trim()!=EMPTY_STRING)
+            this.currentUserName = userName;
+        else
+            this.logger.error(ERR_MSG_INVALID_UPDATE_USERNAME,userName);
     }
-    public final void setSyncDirectory(final String directory){
-        this.storeDirectory = directory;
+
+    /**
+     * Description: Setting the directory that stores the data
+     * 
+     * @param directory,
+     *            the path name of the directory
+     * @author GAO RISHENG A0101891L
+     */
+    public final void setSyncDirectory(final String directory) {
+        if(directory!=null){
+            this.storeDirectory = directory;
+        } else {
+            this.logger.error(ERR_MSG_INVALID_UPDATE_STORE_DIRECTORY);
+        }
     }
-    public final void setExpireTime(final int numOfHours){
-        this.expiryHours = numOfHours;
+
+    /**
+     * Description: Setting the expire time for extracted text
+     * 
+     * @param numOfHours,number
+     *            of hours for extracted file to be deleted
+     * @author GAO RISHENG A0101891L
+     */
+    public final void setExpireTime(final int numOfHours) {
+        if(numOfHours>MINIMUM_NON_NEGATIVE){
+            this.expiryHours = numOfHours;
+        } else {
+            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS,numOfHours);
+        }
     }
-    public final void setDisplayNumber(final int displayNumber){
-        this.displayNumber = displayNumber;
+
+    /**
+     * Description: setting the number of item to be displayed as the search
+     * result
+     * 
+     * @param displayNumber
+     * @author GAO RISHENG A0101891L
+     */
+    public final void setDisplayNumber(final int displayNumber) {
+        if(displayNumber>MINIMUM_NON_NEGATIVE)
+            this.displayNumber = displayNumber;
+        else 
+            this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER,displayNumber);
     }
-    public final void setUserEmail(final String email){
-        this.userEmail = email;
+
+    /**
+     * Description: Setting the user Email for current user
+     * 
+     * @param email,
+     *            user Email
+     * @author Gao Risheng A0101891L
+     */
+    public final void setUserEmail(final String email) {
+        if(email!=null)
+            this.userEmail = email;
+        else
+            this.logger.error(ERR_MSG_INVALID_UPDATE_EMAIL);
+    }
+
+    /**
+     * Secure Programming. Making this Object not-clonable. Object.clone()
+     * allows cloning the data of an object without initialize it which may leak
+     * the chances for attacker to access the data internally
+     * 
+     * @Author GAO RISHENG A0101891L
+     */
+    public final Object clone() throws java.lang.CloneNotSupportedException {
+        throw new java.lang.CloneNotSupportedException();
+    }
+
+    /**
+     * Secure Programming. Disable the serialize option of the object which
+     * avoid attacker to print the object in serialize manner and inspect the
+     * internal status of the object
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    private final void writeObject(ObjectOutputStream out)
+            throws java.io.IOException {
+        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+    }
+
+    /**
+     * Secure Programming. Disable the de-serialize option of the object which
+     * avoid attacker to de-serialize the object stores in the file system and
+     * inspect the internal status of the object
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    private final void readObject(ObjectInputStream in)
+            throws java.io.IOException {
+        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
     }
 }

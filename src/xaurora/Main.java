@@ -25,7 +25,7 @@ public class Main {
                 "E:\\study\\study2015sem1\\CS3283\\x-aurora\\local_data\\");
         sa.triggerInitialization();
         assert sa.isManagerInitialize();
-        DBManager dbManager = new DBManager();
+        DBManager dbManager = DBManager.getClassInstance();
         Thread autoUpdatingThread = new Thread(dbManager);
         autoUpdatingThread.start();
         if (sa.isNetAccessible()) {
@@ -52,8 +52,6 @@ public class Main {
         for (int i = 0; i < actualResult.size(); i++) {
             System.out.println(actualResult.get(i));
         }
-
-        // sa.login(false);
 
     }
 
