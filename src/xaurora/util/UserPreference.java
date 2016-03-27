@@ -2,6 +2,7 @@ package xaurora.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -226,12 +227,17 @@ public class UserPreference {
             }catch(NullPointerException ex){
             	blockedList = new ArrayList<BlockedPage>();
             }
-            
+
             //Path Pane
             try{
-            	Paths.get(settings[index]);
-            	contentPath = settings[index++];
-            }catch(InvalidPathException | NullPointerException ex){
+            	String filepath = settings[index++];
+            	File file = new File(filepath);
+            	if (file.isDirectory()){
+            		contentPath = filepath;
+            	}else{
+            		contentPath = getDefaultContentPath();
+            	}
+            }catch(NullPointerException | IllegalArgumentException ex){
             	contentPath = getDefaultContentPath();
             }
             isShowPreviewText = toBoolean(settings[index++]);
