@@ -575,7 +575,7 @@ public class PreferenceUI extends Application{
         
         Label labelPreviewTextLength = new Label("Preview text length");
         ChoiceBox<String> cbPreviewTextLength = new ChoiceBox<String>();
-        cbPreviewTextLength.setItems(FXCollections.observableArrayList("one sentence", "two sentence", "three words", "one paragraph"));
+        cbPreviewTextLength.setItems(FXCollections.observableArrayList("one sentence", "two sentences", "three words", "one paragraph"));
         cbPreviewTextLength.setValue(preferences.getPreviewTextLength());
         cbPreviewTextLength.setOnAction(event -> {preferences.setPreviewTextLength(cbPreviewTextLength.getSelectionModel().getSelectedItem());});     
         

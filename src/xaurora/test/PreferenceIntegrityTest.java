@@ -12,7 +12,6 @@ public class PreferenceIntegrityTest {
 	private static String EMPTY_FILE = "empty";
 	private static String INITIAL_FILE = "initial";
 	private static String INPUT_FILE_EXTENSION = ".in";
-	private static final int numPreferences = 19;
 
 	@Test
 	public void testInit() throws IOException{
@@ -31,6 +30,10 @@ public class PreferenceIntegrityTest {
 		//check if initialization is done correctly
 		boolean isEqual = FileUtils.contentEquals(emptyFile, initialFile);
 		assertEquals(isEqual, true);	
+		
+		//delete after done testing
+		emptyFile.delete();
+		initialFile.delete();
 	}
 
 

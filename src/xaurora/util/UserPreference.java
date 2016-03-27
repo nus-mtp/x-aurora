@@ -95,8 +95,8 @@ public class UserPreference {
             
             int index = 0;
             //System Pane
-            isRunOnStartUp = Boolean.valueOf(settings[index++]);
-            isHideInToolbar = Boolean.valueOf(settings[index++]);
+            isRunOnStartUp = toBoolean(settings[index++]);
+            isHideInToolbar = toBoolean(settings[index++]);
 
             //Hotkeys Pane
             String[] hotkey;
@@ -198,7 +198,7 @@ public class UserPreference {
             }catch(NumberFormatException ex){
                 numMatchingTextDisplay = getDefaultNumMatchingTextDisplay();
             }
-            isShowTextSource = Boolean.valueOf(settings[index++]);
+            isShowTextSource = toBoolean(settings[index++]);
             try{
                 boxColour = Color.valueOf(settings[index++]);
             }catch(NullPointerException | IllegalArgumentException ex){
@@ -234,15 +234,15 @@ public class UserPreference {
             }catch(InvalidPathException | NullPointerException ex){
             	contentPath = getDefaultContentPath();
             }
-            isShowPreviewText = Boolean.valueOf(settings[index++]);
+            isShowPreviewText = toBoolean(settings[index++]);
             clearCachesTime = settings[index++];
-            //clearCachesTime = getDefaultClearCachesTime();
+            checkClearCachesTime();
             
             //Storage Pane
             maxTextSizeStored = settings[index++];
-            //maxTextSizeStored = getDefaultMaxTextSizeStored();
+            checkMaxTextSizeStored();
             previewTextLength = settings[index++];
-            //previewTextLength = getDefaultPreviewTextLength();
+            checkPreviewTextLength();
 
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
@@ -251,6 +251,43 @@ public class UserPreference {
             System.out.println("Error reading file " + filename);
         }
     }
+    
+    private boolean toBoolean(String str){
+    	if (str != null && str.equalsIgnoreCase("FALSE")){
+    		return false;
+    	}else{
+    		return true;
+    	}
+    }
+    
+	private void checkClearCachesTime() {
+		if (clearCachesTime == null || 
+				!clearCachesTime.equals("device is off") || 
+				!clearCachesTime.equals("one day") ||
+				!clearCachesTime.equals("one week") ||
+				!clearCachesTime.equals("never")){
+			clearCachesTime = getDefaultClearCachesTime();
+		}	
+	}
+	
+
+	private void checkMaxTextSizeStored() {
+		if (maxTextSizeStored == null ||
+				!maxTextSizeStored.equals("100MB") || 
+				!maxTextSizeStored.equals("500MB") ||
+				!maxTextSizeStored.equals("1GB") ||
+				!maxTextSizeStored.equals("unlimited"))
+		maxTextSizeStored = getDefaultMaxTextSizeStored();
+	}
+
+    private void checkPreviewTextLength() {
+    	if (previewTextLength == null || 
+    			!previewTextLength.equals("one sentence") || 
+				!previewTextLength.equals("two sentences") ||
+				!previewTextLength.equals("three words") ||
+				!previewTextLength.equals("one paragraph"))
+		previewTextLength = getDefaultPreviewTextLength();
+	}
 
     public void writePreferences(String username) {
         String filename = username + ".in";
