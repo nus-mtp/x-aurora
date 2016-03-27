@@ -39,6 +39,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import xaurora.dropboxV2.User;
 import xaurora.io.DataFileIO;
 import xaurora.system.SystemManager;
 import xaurora.ui.VirtualKeyboard.Key;
@@ -72,6 +73,7 @@ public class PreferenceUI extends Application{
     private static final int maxMatchingDisplayed = 20;
     private static final int majorTickUnit = 50;
     private static final String styleSheets = "style.css";
+    private String username;
     UserPreference preferences = UserPreference.getInstance();
     DataFileIO dataFile = DataFileIO.instanceOf();
     SystemManager systemManager = SystemManager.getInstance();
@@ -127,7 +129,7 @@ public class PreferenceUI extends Application{
     }
 
     public BorderPane createSettingPane(){
-        preferences.readPreferences();
+        preferences.readPreferences(username);
         BorderPane border = new BorderPane();
         
         TabPane tabs = new TabPane();
@@ -156,13 +158,13 @@ public class PreferenceUI extends Application{
         HBox hbox = new HBox();
         Button okButton = new Button("OK");
         okButton.setPrefWidth(buttonWidth);
-        okButton.setOnAction(event -> {preferences.writePreferences(); exit(0);});
+        okButton.setOnAction(event -> {preferences.writePreferences(username); exit(0);});
         Button cancelButton = new Button("Cancel");
         cancelButton.setPrefWidth(buttonWidth);
         cancelButton.setOnAction(event -> {exit(1);});
         Button applyButton = new Button("Apply");
         applyButton.setPrefWidth(buttonWidth);
-        applyButton.setOnAction(event -> {preferences.writePreferences();});
+        applyButton.setOnAction(event -> {preferences.writePreferences(username);});
         hbox.getChildren().addAll(okButton, cancelButton, applyButton);
         hbox.setAlignment(Pos.CENTER_RIGHT);
         
@@ -597,5 +599,9 @@ public class PreferenceUI extends Application{
         grid.add(labelUsedPercentage, 1, 4);
         
         return grid;
+    }
+    
+    public void setUsername(String username){
+    	this.username = username;
     }
 }

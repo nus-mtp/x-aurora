@@ -21,7 +21,6 @@ import xaurora.util.UserPreference;
 
 public class LoginUI extends Application{
     
-    PreferenceUI preferenceUI = new PreferenceUI();
     private Stage stage;
     private static final String stageTitle = "x-aurora";
     private static final String name = "x-aurora: simplify copy and paste";
@@ -34,6 +33,7 @@ public class LoginUI extends Application{
     private static final int bottomOffset = 15;
     private static final int leftOffset = 10;  
     private static final String loginPage = "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
+    PreferenceUI preferenceUI = new PreferenceUI();
     SystemManager systemManager = SystemManager.getInstance(); 
    
     public static void main(String[] args) {
@@ -130,6 +130,7 @@ public class LoginUI extends Application{
     private void buildDropboxUser(){
     	User user = new User();
     	UserPreference preferences = UserPreference.getInstance();
+    	preferenceUI.setUsername(user.username);
     	systemManager.setCurrentUser(user.username);
     	systemManager.setUserEmail(user.email);
     	systemManager.setDisplayNumber(preferences.getNumMatchingTextDisplay());
@@ -139,11 +140,11 @@ public class LoginUI extends Application{
     
     private void buildDefaultUser(){
     	UserPreference preferences = UserPreference.getInstance();
-    	systemManager.setCurrentUser("default user");
+    	preferenceUI.setUsername("defaultUser");
+    	systemManager.setCurrentUser("defaultUser");
     	systemManager.setUserEmail(null);
     	systemManager.setDisplayNumber(preferences.getNumMatchingTextDisplay());
     	systemManager.setExpireTime(preferences.getClearCachesTimeInHours());
     	systemManager.setSyncDirectory(preferences.getContentPath());
     }
-    
 }

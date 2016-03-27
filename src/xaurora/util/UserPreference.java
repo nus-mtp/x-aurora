@@ -34,7 +34,6 @@ public class UserPreference {
     private String contentPath;
     private boolean isShowPreviewText;
     private String clearCachesTime;
-    private int clearCachesTimeInHours;
     //Storage Pane
     private String maxTextSizeStored;
     private String previewTextLength;
@@ -81,8 +80,8 @@ public class UserPreference {
         previewTextLength = "one sentence";
     }
     
-    public void readPreferences() {
-        String filename = "preferences.txt";
+    public void readPreferences(String username) {
+        String filename = username + ".in";
 
         try {
             FileReader fileReader = new FileReader(filename);
@@ -212,8 +211,8 @@ public class UserPreference {
         }
     }
 
-    public void writePreferences() {
-        String filename = "preferences.txt";
+    public void writePreferences(String username) {
+        String filename = username + ".in";
 
         try {
             FileWriter fileWriter = new FileWriter(filename);
