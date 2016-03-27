@@ -34,6 +34,7 @@ public class UserPreference {
     private String contentPath;
     private boolean isShowPreviewText;
     private String clearCachesTime;
+    private int clearCachesTimeInHours;
     //Storage Pane
     private String maxTextSizeStored;
     private String previewTextLength;
@@ -355,6 +356,20 @@ public class UserPreference {
 
     public String getClearCachesTime() {
         return clearCachesTime;
+    }
+    
+    public int getClearCachesTimeInHours(){
+    	int time;
+    	
+    	switch(clearCachesTime){
+    	case "device is off": time = -1;
+    	case "one day": time = 24;
+    	case "one week": time = 24*7;
+    	case "never": time = Integer.MAX_VALUE;
+    	default: time = 24;	
+    	}
+    	
+    	return time;
     }
 
     public String getMaxTextSizeStored() {

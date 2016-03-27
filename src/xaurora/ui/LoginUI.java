@@ -15,7 +15,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import xaurora.dropboxV2.User;
 import xaurora.system.SystemManager;
+import xaurora.util.UserPreference;
 
 public class LoginUI extends Application{
     
@@ -32,7 +34,7 @@ public class LoginUI extends Application{
     private static final int bottomOffset = 15;
     private static final int leftOffset = 10;  
     private static final String loginPage = "https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=4tpptik431fwlqo&redirect_uri=https://www.dropbox.com/home";
-    
+    SystemManager systemManager = SystemManager.getInstance(); 
    
     public static void main(String[] args) {
         launch(args);
@@ -92,13 +94,15 @@ public class LoginUI extends Application{
         Button loginButton = new Button("Login to Dropbox");
         loginButton.setOnAction(event -> {
             getHostServices().showDocument(loginPage);
-            SystemManager.getInstance().login(true);
             grid.getChildren().clear();
             
             ProgressIndicator loadingIndicator = new ProgressIndicator();
         	Label labelLoading = new Label("Waiting for login");
         	grid.add(loadingIndicator, 0, 0);
         	grid.add(labelLoading, 0, 1);
+        	
+        	//after successful login
+        	buildDropboxUser();
         });
         grid.add(loginButton, 1, 0);
         
@@ -115,11 +119,31 @@ public class LoginUI extends Application{
         warning.setWrapText(true);
         Button skipButton = new Button("Skip login");
         skipButton.setOnAction(event -> {
-            SystemManager.getInstance().login(false);
+        	buildDefaultUser();
             stage.setScene(preferenceUI.createPreferenceScene());
         });
         hbox.getChildren().addAll(warning, skipButton);
         
         return hbox;
     }
+    
+    private void buildDropboxUser(){
+    	User user = new User();
+    	UserPreference preferences = UserPreference.getInstance();
+    	systemManager.setCurrentUser(user.username);
+    	systemManager.setUserEmail(user.email);
+    	systemManager.setDisplayNumber(preferences.getNumMatchingTextDisplay());
+    	systemManager.setExpireTime(preferences.getClearCachesTimeInHours());
+    	systemManager.setSyncDirectory(preferences.getContentPath());
+    }
+    
+    private void buildDefaultUser(){
+    	UserPreference preferences = UserPreference.getInstance();
+    	systemManager.setCurrentUser("default user");
+    	systemManager.setUserEmail(null);
+    	systemManager.setDisplayNumber(preferences.getNumMatchingTextDisplay());
+    	systemManager.setExpireTime(preferences.getClearCachesTimeInHours());
+    	systemManager.setSyncDirectory(preferences.getContentPath());
+    }
+    
 }
