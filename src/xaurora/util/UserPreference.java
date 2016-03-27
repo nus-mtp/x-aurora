@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javafx.scene.input.KeyCode;
@@ -97,75 +99,102 @@ public class UserPreference {
             isHideInToolbar = Boolean.valueOf(settings[index++]);
 
             //Hotkeys Pane
-            String[] hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            extendWordHotkey = new KeyCode[hotkey.length];
-            for (int i = 0; i < hotkey.length; i++){
-                try{
-                    extendWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
-                }catch(IllegalArgumentException | NullPointerException ex){
-                    extendWordHotkey = getDefaultExtendWordHotkey();
-                    break;
-                }
+            String[] hotkey;
+            try{
+            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            	extendWordHotkey = new KeyCode[hotkey.length];
+
+            	for (int i = 0; i < hotkey.length; i++){
+            		try{
+            			extendWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            		}catch(IllegalArgumentException | NullPointerException ex){
+            			extendWordHotkey = getDefaultExtendWordHotkey();
+            			break;
+            		}
+            	}
+            }catch(IndexOutOfBoundsException | NullPointerException ex){
+            	extendWordHotkey = getDefaultExtendWordHotkey();
             }
             
-            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            reduceWordHotkey = new KeyCode[hotkey.length];
-            for (int i = 0; i < hotkey.length; i++){
-                try{
-                    reduceWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
-                }catch(IllegalArgumentException | NullPointerException ex){
-                    reduceWordHotkey = getDefaultReduceWordHotkey();
-                    break;
-                }
+            try{
+            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            	reduceWordHotkey = new KeyCode[hotkey.length];
+            	for (int i = 0; i < hotkey.length; i++){
+            		try{
+            			reduceWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            		}catch(IllegalArgumentException | NullPointerException ex){
+            			reduceWordHotkey = getDefaultReduceWordHotkey();
+            			break;
+            		}
+            	}
+            }catch(IndexOutOfBoundsException | NullPointerException ex){
+            	reduceWordHotkey = getDefaultReduceWordHotkey();
             }
-            
-            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            extendSentenceHotkey = new KeyCode[hotkey.length];
-            for (int i = 0; i < hotkey.length; i++){
-                try{
-                    extendSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
-                }catch(IllegalArgumentException | NullPointerException ex){
-                    extendSentenceHotkey = getDefaultExtendSentenceHotkey();
-                    break;
-                }
+
+            try{
+            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            	extendSentenceHotkey = new KeyCode[hotkey.length];
+            	for (int i = 0; i < hotkey.length; i++){
+            		try{
+            			extendSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            		}catch(IllegalArgumentException | NullPointerException ex){
+            			extendSentenceHotkey = getDefaultExtendSentenceHotkey();
+            			break;
+            		}
+            	}
+            }catch(IndexOutOfBoundsException | NullPointerException ex){
+            	extendSentenceHotkey = getDefaultExtendSentenceHotkey();
             }
-            
-            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            reduceSentenceHotkey = new KeyCode[hotkey.length];
-            for (int i = 0; i < hotkey.length; i++){
-                try{
-                    reduceSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
-                }catch(IllegalArgumentException | NullPointerException ex){
-                    reduceSentenceHotkey = getDafaultReduceSentenceHotkey();
-                    break;
-                }
+
+            try{
+            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            	reduceSentenceHotkey = new KeyCode[hotkey.length];
+            	for (int i = 0; i < hotkey.length; i++){
+            		try{
+            			reduceSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            		}catch(IllegalArgumentException | NullPointerException ex){
+            			reduceSentenceHotkey = getDafaultReduceSentenceHotkey();
+            			break;
+            		}
+            	}
+            }catch(IndexOutOfBoundsException | NullPointerException ex){
+            	reduceSentenceHotkey = getDafaultReduceSentenceHotkey();
             }
-            
-            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            extendParagraphHotkey = new KeyCode[hotkey.length];
-            for (int i = 0; i < hotkey.length; i++){
-                try{
-                    extendParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
-                }catch(IllegalArgumentException | NullPointerException ex){
-                    extendParagraphHotkey = getDefaultExtendParagraphHotkey();
-                    break;
-                }
+
+            try{
+            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            	extendParagraphHotkey = new KeyCode[hotkey.length];
+            	for (int i = 0; i < hotkey.length; i++){
+            		try{
+            			extendParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            		}catch(IllegalArgumentException | NullPointerException ex){
+            			extendParagraphHotkey = getDefaultExtendParagraphHotkey();
+            			break;
+            		}
+            	}
+            }catch(IndexOutOfBoundsException | NullPointerException ex){
+            	extendParagraphHotkey = getDefaultExtendParagraphHotkey();
             }
-            
-            hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            reduceParagraphHotkey = new KeyCode[hotkey.length];
-            for (int i = 0; i < hotkey.length; i++){
-                try{
-                    reduceParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
-                }catch(IllegalArgumentException | NullPointerException ex){
-                    reduceParagraphHotkey = getDefaultReduceParagraphHotkey();
-                    break;
-                }
+
+
+            try{
+            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            	reduceParagraphHotkey = new KeyCode[hotkey.length];
+            	for (int i = 0; i < hotkey.length; i++){
+            		try{
+            			reduceParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
+            		}catch(IllegalArgumentException | NullPointerException ex){
+            			reduceParagraphHotkey = getDefaultReduceParagraphHotkey();
+            			break;
+            		}
+            	}
+            }catch(IndexOutOfBoundsException | NullPointerException ex){
+            	reduceParagraphHotkey = getDefaultReduceParagraphHotkey();
             }
-            
+
             //Text Editor Pane
             try{
-                numMatchingTextDisplay = Integer.valueOf(settings[index++]);
+            	numMatchingTextDisplay = Integer.valueOf(settings[index++]);
             }catch(NumberFormatException ex){
                 numMatchingTextDisplay = getDefaultNumMatchingTextDisplay();
             }
@@ -182,26 +211,38 @@ public class UserPreference {
             } 
             try{
                 boxTransparency = Double.valueOf(settings[index++]);;
-            }catch(NumberFormatException ex){
+            }catch(NumberFormatException | NullPointerException ex){
                 boxTransparency = getDefaultBoxTransparency();
             }
             
             //Blocked List Pane
-            String[] s = settings[index++].split("\\s+");
-            blockedList = new ArrayList<BlockedPage>();
-            for (int i=0; i < s.length/2; i++){
-                BlockedPage page = new BlockedPage(s[2*i], Boolean.valueOf(s[(2*i)+1]));
-                blockedList.add(page);
+            try{
+            	String[] s = settings[index++].split("\\s+");
+            	blockedList = new ArrayList<BlockedPage>();
+            	for (int i=0; i < s.length/2; i++){
+            		BlockedPage page = new BlockedPage(s[2*i], Boolean.valueOf(s[(2*i)+1]));
+            		blockedList.add(page);
+            	}
+            }catch(NullPointerException ex){
+            	blockedList = new ArrayList<BlockedPage>();
             }
             
             //Path Pane
-            contentPath = settings[index++];
+            try{
+            	Paths.get(settings[index]);
+            	contentPath = settings[index++];
+            }catch(InvalidPathException | NullPointerException ex){
+            	contentPath = getDefaultContentPath();
+            }
             isShowPreviewText = Boolean.valueOf(settings[index++]);
             clearCachesTime = settings[index++];
+            //clearCachesTime = getDefaultClearCachesTime();
             
             //Storage Pane
             maxTextSizeStored = settings[index++];
+            //maxTextSizeStored = getDefaultMaxTextSizeStored();
             previewTextLength = settings[index++];
+            //previewTextLength = getDefaultPreviewTextLength();
 
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
