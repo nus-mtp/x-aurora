@@ -17,6 +17,7 @@ public class PreferenceIntegrityTest {
 	private static String EMPTY_FILE = "empty";
 	private static String INITIAL_FILE = "initial";
 	private static String RANDOM_FILE = "random";
+	private static String PREFERENCE_FILE = "preference";
 	private static String INPUT_FILE_EXTENSION = ".in";
 	private static final int numPreferences = 19;
 
@@ -25,6 +26,7 @@ public class PreferenceIntegrityTest {
 		//create an empty file
 		File emptyFile = new File(EMPTY_FILE + INPUT_FILE_EXTENSION);
 		emptyFile.createNewFile();
+		
 		//create preferences file with initial value
 		File initialFile = new File(INITIAL_FILE + INPUT_FILE_EXTENSION);
 		preferences.initPreferences();
@@ -66,13 +68,38 @@ public class PreferenceIntegrityTest {
         File initialFile = new File(INITIAL_FILE + INPUT_FILE_EXTENSION);
         preferences.initPreferences();
         preferences.writePreferences(INITIAL_FILE);
-        
+
         //check if random input is corrected
         boolean isEqual = FileUtils.contentEquals(randomFile, initialFile);
-		assertEquals(isEqual, true);	
+        assertEquals(isEqual, true);	
+
+        //delete after done testing
+        randomFile.delete();
+        initialFile.delete();
+	}
+
+	@Test
+	public void testReadInitialInput() throws IOException{
+		//create preferences file with initial value
+		File preferenceFile = new File(PREFERENCE_FILE + INPUT_FILE_EXTENSION);
+		preferences.initPreferences();
+		preferences.writePreferences(PREFERENCE_FILE);
+
+		//create preferences file with initial value
+		File initialFile = new File(INITIAL_FILE + INPUT_FILE_EXTENSION);
+		preferences.initPreferences();
+		preferences.writePreferences(INITIAL_FILE);
+
+		//read from input file and write
+		preferences.readPreferences(PREFERENCE_FILE);
+		preferences.writePreferences(PREFERENCE_FILE);
+
+		//check if input file maintains its value
+		boolean isEqual = FileUtils.contentEquals(preferenceFile, initialFile);
+		assertEquals(isEqual, true);
 		
 		//delete after done testing
-		randomFile.delete();
+		preferenceFile.delete();
 		initialFile.delete();
 	}
 
