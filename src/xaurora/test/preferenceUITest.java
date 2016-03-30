@@ -22,13 +22,13 @@ public class preferenceUITest extends GuiTest{
     
     @Test
     public void isCheckboxClicked(){
-        CheckBox checkbox1 = find("#checkbox1");
-        CheckBox checkbox2 = find("#checkbox2");
-        boolean checkbox1Value = checkbox1.isSelected();
-        boolean checkbox2Value = checkbox2.isSelected();
-        click(checkbox1);
-        click(checkbox2);
-        assertEquals(!checkbox1Value, checkbox1.isSelected());
-        assertEquals(!checkbox2Value, checkbox2.isSelected());
+        CheckBox checkboxRunOnStartUp = find("#checkboxRunOnStartUp");
+        CheckBox checkboxHideInToolbar = find("#checkboxHideInToolbar");
+        boolean checkboxRunOnStartUpValue = checkboxRunOnStartUp.isSelected();
+        boolean checkboxHideInToolbarValue = checkboxHideInToolbar.isSelected();
+        click(checkboxRunOnStartUp);
+        click(checkboxHideInToolbar);
+        assertEquals(!checkboxRunOnStartUpValue, checkboxRunOnStartUp.isSelected());
+        assertEquals(!checkboxHideInToolbarValue, checkboxHideInToolbar.isSelected());
     }
 }
