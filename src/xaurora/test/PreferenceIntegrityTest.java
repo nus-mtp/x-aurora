@@ -3,7 +3,6 @@ package xaurora.test;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
