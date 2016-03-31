@@ -417,6 +417,7 @@ public class PreferenceUI extends Application{
         labels[4] = new Label("Box Transparency");
         
         Spinner<Integer> spinner = new Spinner<Integer>();
+        spinner.setId("spinner");
         SpinnerValueFactory<Integer> svf = new SpinnerValueFactory.IntegerSpinnerValueFactory(minMatchingDisplayed, maxMatchingDisplayed);
         spinner.setValueFactory(svf);
         spinner.setEditable(true);
@@ -425,6 +426,7 @@ public class PreferenceUI extends Application{
         spinner.valueProperty().addListener((obs, oldValue, newValue) -> {preferences.setNumMatchingTextDisplay((int) newValue);});
 
         CheckBox cbShowTextSource = new CheckBox();
+        cbShowTextSource.setId("cbShowTextSource");
         cbShowTextSource.setSelected(preferences.isShowTextSource());
         cbShowTextSource.setOnAction(event -> {preferences.setIsShowTextSource(!preferences.isShowTextSource());});
         
@@ -439,6 +441,7 @@ public class PreferenceUI extends Application{
         textColorPicker.setOnAction(event -> {preferences.setTextColour(textColorPicker.getValue());});
         
         Slider transparency = new Slider();
+        transparency.setId("transparency");
         transparency.setMin(0);
         transparency.setMax(100);
         transparency.setShowTickLabels(true);

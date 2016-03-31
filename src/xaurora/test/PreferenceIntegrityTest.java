@@ -37,7 +37,7 @@ public class PreferenceIntegrityTest {
 		
 		//check if initialization is done correctly
 		boolean isEqual = FileUtils.contentEquals(emptyFile, initialFile);
-		assertEquals(isEqual, true);	
+		assertEquals(true, isEqual);	
 		
 		//delete after done testing
 		emptyFile.delete();
@@ -70,7 +70,7 @@ public class PreferenceIntegrityTest {
 
         //check if random input is corrected
         boolean isEqual = FileUtils.contentEquals(randomFile, initialFile);
-        assertEquals(isEqual, true);	
+        assertEquals(true, isEqual);	
 
         //delete after done testing
         randomFile.delete();
@@ -95,7 +95,7 @@ public class PreferenceIntegrityTest {
 
 		//check if input file maintains its value
 		boolean isEqual = FileUtils.contentEquals(preferenceFile, initialFile);
-		assertEquals(isEqual, true);
+		assertEquals(true, isEqual);
 		
 		//delete after done testing
 		preferenceFile.delete();

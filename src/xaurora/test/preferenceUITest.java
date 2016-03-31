@@ -2,13 +2,18 @@ package xaurora.test;
 
 import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Slider;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.io.File;
-import javafx.scene.control.Button;
 import org.loadui.testfx.GuiTest;
 import xaurora.ui.PreferenceUI;
 import xaurora.util.UserPreference;
+import javafx.scene.control.Button;
+import javafx.scene.control.Spinner;
+import javafx.scene.input.KeyCode;
+
+
 
 /**
  *
@@ -16,14 +21,15 @@ import xaurora.util.UserPreference;
  */
 public class preferenceUITest extends GuiTest{
     
+    private static final String TEST_FILE = "test";
+    private static final String INPUT_FILE_EXTENSION = ".in";
     PreferenceUI preferenceUI = new PreferenceUI();
     UserPreference preferences = UserPreference.getInstance();
-    private static final String TEST_FILE = "test";
-    private static String INPUT_FILE_EXTENSION = ".in";
     private File testFile;
 
     @Override
     protected Parent getRootNode() {
+    	preferenceUI.setUsername("test");
     	return preferenceUI.createPreferencePane();
     }
     
@@ -48,18 +54,16 @@ public class preferenceUITest extends GuiTest{
         click(checkboxRunOnStartUp);
         click(checkboxHideInToolbar);
         click(applyButton);
-        assertEquals(preferences.isRunOnStartUp(), false);
-        assertEquals(preferences.isHideInToolbar(), false);
+        assertEquals(false, preferences.isRunOnStartUp());
+        assertEquals(false, preferences.isHideInToolbar());
         click(checkboxRunOnStartUp);
         click(checkboxHideInToolbar);
         click(applyButton);
-        assertEquals(preferences.isRunOnStartUp(), true);
-        assertEquals(preferences.isHideInToolbar(), true);
-        deleteTestFile();
-        
+        assertEquals(true, preferences.isRunOnStartUp());
+        assertEquals(true, preferences.isHideInToolbar());
+        deleteTestFile();       
     }
     
-    /*
     @Test
     public void testHotkeysPane(){
     	click("#Setting");
@@ -70,6 +74,72 @@ public class preferenceUITest extends GuiTest{
     public void testTextEditorPane(){
     	click("#Setting");
     	click("#TextEditor");
+    	Spinner<Integer> spinner = find("#spinner");
+    	CheckBox cbShowTextSource = find("#cbShowTextSource");
+    	Slider slider = find("#transparency");
+    	Button applyButton = find("#Apply");
+    	createTestFile();
+    	
+    	//test spinner input range between 1 to 20
+    	click(spinner);
+    	push(KeyCode.BACK_SPACE);
+    	push(KeyCode.BACK_SPACE);
+    	push(KeyCode.DIGIT1);
+    	push(KeyCode.DIGIT0);
+    	push(KeyCode.ENTER);
+    	click(applyButton);
+    	assertEquals(10, preferences.getNumMatchingTextDisplay());
+    	
+    	//test spinner input range < 1
+    	click(spinner);
+    	push(KeyCode.BACK_SPACE);
+    	push(KeyCode.BACK_SPACE);
+    	push(KeyCode.DIGIT0);
+    	push(KeyCode.ENTER);
+    	click(applyButton);
+    	assertEquals(1, preferences.getNumMatchingTextDisplay());
+    	
+    	//test spinner input range > 20
+    	click(spinner);
+    	push(KeyCode.BACK_SPACE);
+    	push(KeyCode.BACK_SPACE);
+    	push(KeyCode.DIGIT3);
+    	push(KeyCode.DIGIT0);
+    	push(KeyCode.ENTER);
+    	click(applyButton);
+    	assertEquals(20, preferences.getNumMatchingTextDisplay());
+    	
+    	//test spinner decrement button
+    	for(int i=0; i<10; i++){
+    		click(spinner.lookup(".decrement-arrow-button"));
+    	}
+    	click(applyButton);
+    	assertEquals(10, preferences.getNumMatchingTextDisplay());
+    	
+    	//test spinner increment button
+    	for(int i=0; i<5; i++){
+    		click(spinner.lookup(".increment-arrow-button"));
+    	}
+    	click(applyButton);
+    	assertEquals(15, preferences.getNumMatchingTextDisplay());
+    	
+    	//test checkbox
+    	click(cbShowTextSource);
+    	click(applyButton);
+    	assertEquals(false, preferences.isShowTextSource());
+    	click(cbShowTextSource);
+    	click(applyButton);
+    	assertEquals(true, preferences.isShowTextSource());
+    	
+    	//test slider
+    	drag(slider.lookup(".thumb")).by(200, 0).drop();
+    	click(applyButton);
+    	assertEquals(100, preferences.getBoxTransparency(), 0);
+    	drag(slider.lookup(".thumb")).by(-200, 0).drop();
+    	click(applyButton);
+    	assertEquals(0, preferences.getBoxTransparency(), 0);
+
+    	deleteTestFile();  	
     }
     
     @Test
@@ -99,7 +169,7 @@ public class preferenceUITest extends GuiTest{
     public void testDataManagingPane(){
     	click("#DataManaging");
     }
-    */
+    
     
     private File createTestFile(){
     	testFile = new File(TEST_FILE + INPUT_FILE_EXTENSION);
