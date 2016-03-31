@@ -202,7 +202,7 @@ public class PreferenceUI extends Application{
         return hbox;
     }
     
-    private BorderPane createTutorialPane(){
+    public BorderPane createTutorialPane(){
         BorderPane border = new BorderPane();
         
         Image image = new Image("File:dropbox.png");
@@ -242,7 +242,7 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    private BorderPane createDataManagingPane(){
+    public BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
         TableView<DataFileMetaData> table = createDataTable();
         border.setCenter(table);
@@ -316,7 +316,7 @@ public class PreferenceUI extends Application{
     	return deleteCellFactory;
     }
 
-    private GridPane createSystemPane(){
+    public GridPane createSystemPane(){
         GridPane grid = createGridPane();
         
         Label labelRunOnStartUp = new Label("Run on start up");
@@ -338,7 +338,7 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    private BorderPane createHotkeysPane(){
+    public BorderPane createHotkeysPane(){
         BorderPane border = new BorderPane();
         border.setPadding(new Insets(10));
         VirtualKeyboard[] virtualKeyboards = new VirtualKeyboard[numHotkeys];      
@@ -396,7 +396,7 @@ public class PreferenceUI extends Application{
         }
     }
     
-    private GridPane createTextEditorPane(){
+    public GridPane createTextEditorPane(){
         GridPane grid = createGridPane();
         
         Label[] labels = new Label[5];
@@ -449,7 +449,7 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    private BorderPane createBlockedListPane(){
+    public BorderPane createBlockedListPane(){
         BorderPane border = new BorderPane();
         
         ObservableList<BlockedPage> blockedPages = FXCollections.observableArrayList();
@@ -580,7 +580,7 @@ public class PreferenceUI extends Application{
         return hbox;
     }
     
-    private GridPane createPathPane(){
+    public GridPane createPathPane(){
         GridPane grid = createGridPane();
         
         Label labelContentPath =  new Label("Store content at: ");
@@ -618,7 +618,7 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    private GridPane createStoragePane(){
+    public GridPane createStoragePane(){
         GridPane grid = createGridPane();
         
         Label labelMaxTextSize = new Label("Store single text size of at most");
