@@ -603,10 +603,12 @@ public class PreferenceUI extends Application{
         
         Label labelContentPath =  new Label("Store content at: ");
         TextField contentPathField = new TextField();
+        contentPathField.setId("contentPathField");
         contentPathField.setEditable(false);
         contentPathField.setMinWidth(300);
         contentPathField.setText(preferences.getContentPath());
         Button browseContentButton = new Button("Browse");
+        browseContentButton.setId("browseContentButton");
         browseContentButton.setOnAction(event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             File selectedDirectory = directoryChooser.showDialog(stage);
@@ -616,11 +618,13 @@ public class PreferenceUI extends Application{
                 
         Label labelShowPreviewText = new Label("Store preview text as caches to improve matching speed");
         CheckBox checkboxShowPreviewText = new CheckBox();
+        checkboxShowPreviewText.setId("checkboxShowPreviewText");
         checkboxShowPreviewText.setSelected(preferences.isShowPreviewText());
         checkboxShowPreviewText.setOnAction(event -> {preferences.setIsShowPreviewText(!preferences.isShowPreviewText());});
         
         Label labelClearCachesTime = new Label("Clear caches after ");
         ChoiceBox<String> cbClearCachesTime = new ChoiceBox<String>();
+        cbClearCachesTime.setId("cbClearCachesTime");
         cbClearCachesTime.setItems(FXCollections.observableArrayList("device is off", "one day", "one week", "never"));
         cbClearCachesTime.setValue(preferences.getClearCachesTime());
         cbClearCachesTime.setOnAction(event -> {preferences.setClearCachesTime(cbClearCachesTime.getSelectionModel().getSelectedItem());});     

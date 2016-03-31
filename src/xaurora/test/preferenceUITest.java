@@ -2,6 +2,7 @@ package xaurora.test;
 
 import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -185,6 +186,38 @@ public class preferenceUITest extends GuiTest{
     public void testPathPane(){
     	click("#Setting");
     	click("#Path");
+    	TextField contentPathField = find("#contentPathField");
+    	Button browseContentButton = find("#browseContentButton");
+    	CheckBox checkboxShowPreviewText = find("#checkboxShowPreviewText");
+    	ChoiceBox<String> cbClearCachesTime = find("#cbClearCachesTime");
+    	Button applyButton = find("#applyButton");
+    	createTestFile();
+    	
+    	//test unable to write to text field
+    	click(contentPathField);
+    	type("aaaaa");
+    	assertEquals(preferences.getContentPath(), contentPathField.getText());
+    	
+    	//test choosing directory
+    	click(browseContentButton);
+    	type("downloads");
+    	push(KeyCode.ENTER);
+    	push(KeyCode.ENTER);
+    	click(applyButton);
+    	assertEquals(preferences.getContentPath(), contentPathField.getText());
+    	
+    	//test checkbox
+    	click(checkboxShowPreviewText);
+    	click(applyButton);
+    	assertEquals(false, preferences.isShowPreviewText());
+    	
+    	//test choicebox
+    	click(cbClearCachesTime);
+    	moveBy(0, 30).click();
+    	click(applyButton);
+    	assertEquals(cbClearCachesTime.getItems().get(1), preferences.getClearCachesTime());
+    	
+    	deleteTestFile();
     }
     
     @Test
