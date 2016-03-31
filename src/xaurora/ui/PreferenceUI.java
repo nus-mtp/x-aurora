@@ -39,7 +39,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import xaurora.dropboxV2.User;
 import xaurora.io.DataFileIO;
 import xaurora.system.SystemManager;
 import xaurora.ui.VirtualKeyboard.Key;
@@ -89,11 +88,16 @@ public class PreferenceUI extends Application{
     public void start(Stage primaryStage){
         stage = primaryStage;
         stage.setTitle(stageTitle);      
-        Scene preferenceScene = new Scene(createPreferencePane(), sceneWidth, sceneHeight);
+        Scene preferenceScene = createPreferenceScene();
         stage.setScene(preferenceScene);
         String styleSheetsPath = new File(styleSheets).getAbsolutePath().replace("\\", "/");
         preferenceScene.getStylesheets().add("File:///" + styleSheetsPath);
         stage.show();
+    }
+    
+    public Scene createPreferenceScene(){
+    	Scene preferenceScene = new Scene(createPreferencePane(), sceneWidth, sceneHeight);
+    	return preferenceScene;
     }
 
     public BorderPane createPreferencePane(){
@@ -190,12 +194,15 @@ public class PreferenceUI extends Application{
     	HBox hbox = new HBox();
     	
         Button okButton = new Button("OK");
+        okButton.setId("OK");
         okButton.setPrefWidth(buttonWidth);
         okButton.setOnAction(event -> {preferences.writePreferences(username); exit(0);});
         Button cancelButton = new Button("Cancel");
+        cancelButton.setId("Cancel");
         cancelButton.setPrefWidth(buttonWidth);
         cancelButton.setOnAction(event -> {exit(1);});
         Button applyButton = new Button("Apply");
+        applyButton.setId("Apply");
         applyButton.setPrefWidth(buttonWidth);
         applyButton.setOnAction(event -> {preferences.writePreferences(username);});
         
