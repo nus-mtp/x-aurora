@@ -17,11 +17,13 @@ public class preferenceUITest extends GuiTest{
 
     @Override
     protected Parent getRootNode() {
-        return preferenceUI.createSettingPane();
+    	return preferenceUI.createPreferencePane();
     }
     
     @Test
-    public void isCheckboxClicked(){
+    public void testSystemPane(){
+    	click("#Setting");
+    	click("#System");
         CheckBox checkboxRunOnStartUp = find("#checkboxRunOnStartUp");
         CheckBox checkboxHideInToolbar = find("#checkboxHideInToolbar");
         boolean checkboxRunOnStartUpValue = checkboxRunOnStartUp.isSelected();
@@ -31,4 +33,46 @@ public class preferenceUITest extends GuiTest{
         assertEquals(!checkboxRunOnStartUpValue, checkboxRunOnStartUp.isSelected());
         assertEquals(!checkboxHideInToolbarValue, checkboxHideInToolbar.isSelected());
     }
+    
+    @Test
+    public void testHotkeysPane(){
+    	click("#Setting");
+    	click("#Hotkeys");
+    }
+    
+    @Test
+    public void testTextEditorPane(){
+    	click("#Setting");
+    	click("#TextEditor");
+    }
+    
+    @Test
+    public void testBlockedListPane(){
+    	click("#Setting");
+    	click("#BlockedList");
+    }
+    
+    @Test
+    public void testPathPane(){
+    	click("#Setting");
+    	click("#Path");
+    }
+    
+    @Test
+    public void testStoragePane(){
+    	click("#Setting");
+    	click("#Storage");
+    }
+    
+    @Test
+    public void testTutorialPane(){
+    	click("#Tutorial");
+    }
+    
+    @Test
+    public void testDataManagingPane(){
+    	click("#DataManaging");
+    }
+    
+    
 }

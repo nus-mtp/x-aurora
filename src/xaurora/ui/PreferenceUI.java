@@ -89,39 +89,42 @@ public class PreferenceUI extends Application{
     public void start(Stage primaryStage){
         stage = primaryStage;
         stage.setTitle(stageTitle);      
-        Scene preferenceScene = createPreferenceScene();
+        Scene preferenceScene = new Scene(createPreferencePane(), sceneWidth, sceneHeight);
         stage.setScene(preferenceScene);
         String styleSheetsPath = new File(styleSheets).getAbsolutePath().replace("\\", "/");
         preferenceScene.getStylesheets().add("File:///" + styleSheetsPath);
         stage.show();
     }
-    
-    public Scene createPreferenceScene(){
-        BorderPane border = new BorderPane();
-        
-        TabPane preferenceTabs = createPreferenceTabs();
-        Label labelEmail = createLabelEmail();
-        
-        AnchorPane anchor = new AnchorPane();
-        anchor.getChildren().addAll(preferenceTabs, labelEmail);
-        AnchorPane.setTopAnchor(labelEmail, 0.0);
-        AnchorPane.setRightAnchor(labelEmail, 0.0);
-        
-        border.setCenter(anchor);
-        Scene scene = new Scene(border, sceneWidth, sceneHeight);
-        
-        return scene;
+
+    public BorderPane createPreferencePane(){
+    	BorderPane border = new BorderPane();
+
+    	TabPane preferenceTabs = createPreferenceTabs();
+    	Label labelEmail = createLabelEmail();
+
+    	AnchorPane anchor = new AnchorPane();
+    	anchor.getChildren().addAll(preferenceTabs, labelEmail);
+    	AnchorPane.setTopAnchor(labelEmail, 0.0);
+    	AnchorPane.setRightAnchor(labelEmail, 0.0);
+
+    	border.setCenter(anchor);
+    	
+    	return border;
     }
-    
+
     private TabPane createPreferenceTabs(){
     	TabPane preferenceTabs = new TabPane();
-        Tab tabSetting = new Tab("Setting");
+    	Tab tabSetting = new Tab("Setting");
+    	tabSetting.setId("Setting");
         tabSetting.setContent(createSettingPane());
         Tab tabTutorial = new Tab("Tutorial");
+        tabTutorial.setId("Tutorial");
         tabTutorial.setContent(createTutorialPane());
         Tab tabAboutUs = new Tab("About Us");
+        tabAboutUs.setId("AboutUs");
         tabAboutUs.setContent(createAboutUsPane());
         Tab tabDataManaging = new Tab("Data Managing");
+        tabDataManaging.setId("DataManaging");
         tabDataManaging.setContent(createDataManagingPane());
         
         preferenceTabs.getTabs().addAll(tabSetting, tabTutorial, tabAboutUs, tabDataManaging);
@@ -143,7 +146,7 @@ public class PreferenceUI extends Application{
         return labelEmail;
     }
     
-    public BorderPane createSettingPane(){
+    private BorderPane createSettingPane(){
         preferences.readPreferences(username);
         BorderPane border = new BorderPane();
         
@@ -202,7 +205,7 @@ public class PreferenceUI extends Application{
         return hbox;
     }
     
-    public BorderPane createTutorialPane(){
+    private BorderPane createTutorialPane(){
         BorderPane border = new BorderPane();
         
         Image image = new Image("File:dropbox.png");
@@ -242,7 +245,7 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    public BorderPane createDataManagingPane(){
+    private BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
         TableView<DataFileMetaData> table = createDataTable();
         border.setCenter(table);
@@ -316,7 +319,7 @@ public class PreferenceUI extends Application{
     	return deleteCellFactory;
     }
 
-    public GridPane createSystemPane(){
+    private GridPane createSystemPane(){
         GridPane grid = createGridPane();
         
         Label labelRunOnStartUp = new Label("Run on start up");
@@ -334,23 +337,23 @@ public class PreferenceUI extends Application{
         grid.add(checkboxRunOnStartUp, 1, 0);
         grid.add(labelHideInToolbar, 0, 1);
         grid.add(checkboxHideInToolbar, 1, 1);
-        
+
         return grid;
     }
-    
-    public BorderPane createHotkeysPane(){
-        BorderPane border = new BorderPane();
-        border.setPadding(new Insets(10));
-        VirtualKeyboard[] virtualKeyboards = new VirtualKeyboard[numHotkeys];      
-        Node[] keyboardNodes = new Node[numHotkeys];
-        HBox[] keyboardBoxes = new HBox[numHotkeys];
-        
-        for (int i=0; i < numHotkeys; i++){
-            virtualKeyboards[i] = new VirtualKeyboard(i);
-            keyboardNodes[i] = virtualKeyboards[i].createNode();
-            setKeyboardHotkey(virtualKeyboards[i], i);
-            keyboardBoxes[i] = new HBox(6);
-            keyboardBoxes[i].getChildren().add(new Group(keyboardNodes[i]));
+
+    private BorderPane createHotkeysPane(){
+    	BorderPane border = new BorderPane();
+    	border.setPadding(new Insets(10));
+    	VirtualKeyboard[] virtualKeyboards = new VirtualKeyboard[numHotkeys];      
+    	Node[] keyboardNodes = new Node[numHotkeys];
+    	HBox[] keyboardBoxes = new HBox[numHotkeys];
+
+    	for (int i=0; i < numHotkeys; i++){
+    		virtualKeyboards[i] = new VirtualKeyboard(i);
+    		keyboardNodes[i] = virtualKeyboards[i].createNode();
+    		setKeyboardHotkey(virtualKeyboards[i], i);
+    		keyboardBoxes[i] = new HBox(6);
+    		keyboardBoxes[i].getChildren().add(new Group(keyboardNodes[i]));
             keyboardBoxes[i].setAlignment(Pos.CENTER);
         }
         
@@ -396,7 +399,7 @@ public class PreferenceUI extends Application{
         }
     }
     
-    public GridPane createTextEditorPane(){
+    private GridPane createTextEditorPane(){
         GridPane grid = createGridPane();
         
         Label[] labels = new Label[5];
@@ -449,7 +452,7 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    public BorderPane createBlockedListPane(){
+    private BorderPane createBlockedListPane(){
         BorderPane border = new BorderPane();
         
         ObservableList<BlockedPage> blockedPages = FXCollections.observableArrayList();
@@ -580,7 +583,7 @@ public class PreferenceUI extends Application{
         return hbox;
     }
     
-    public GridPane createPathPane(){
+    private GridPane createPathPane(){
         GridPane grid = createGridPane();
         
         Label labelContentPath =  new Label("Store content at: ");
@@ -618,7 +621,7 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
-    public GridPane createStoragePane(){
+    private GridPane createStoragePane(){
         GridPane grid = createGridPane();
         
         Label labelMaxTextSize = new Label("Store single text size of at most");
