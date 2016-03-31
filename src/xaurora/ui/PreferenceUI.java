@@ -194,15 +194,15 @@ public class PreferenceUI extends Application{
     	HBox hbox = new HBox();
     	
         Button okButton = new Button("OK");
-        okButton.setId("OK");
+        okButton.setId("okButton");
         okButton.setPrefWidth(buttonWidth);
         okButton.setOnAction(event -> {preferences.writePreferences(username); exit(0);});
         Button cancelButton = new Button("Cancel");
-        cancelButton.setId("Cancel");
+        cancelButton.setId("cancelButton");
         cancelButton.setPrefWidth(buttonWidth);
         cancelButton.setOnAction(event -> {exit(1);});
         Button applyButton = new Button("Apply");
-        applyButton.setId("Apply");
+        applyButton.setId("applyButton");
         applyButton.setPrefWidth(buttonWidth);
         applyButton.setOnAction(event -> {preferences.writePreferences(username);});
         
@@ -481,8 +481,9 @@ public class PreferenceUI extends Application{
     private TableView<BlockedPage> createBlockedPageTable(ObservableList<BlockedPage> blockedPages, ArrayList<BlockedPage> blockedList){
     	TableView<BlockedPage> table = new TableView<BlockedPage>();      
         TableColumn<BlockedPage, String> urlCol = new TableColumn<BlockedPage, String>("Website URL");
+        urlCol.setId("urlCol");
         urlCol.setCellValueFactory(new PropertyValueFactory<>("url"));
-        urlCol.setMinWidth(200);
+        urlCol.setMinWidth(300);
         TableColumn<BlockedPage, Boolean> toggleCol = new TableColumn<BlockedPage, Boolean>("Enable/Disable");
         toggleCol.setCellValueFactory(new PropertyValueFactory<>("isEnabled"));
         toggleCol.setMinWidth(100);
@@ -520,6 +521,7 @@ public class PreferenceUI extends Application{
                             setGraphic(null);
                             setText(null);
                         }else{
+                        	toggleButton.setId("toggleButton");
                             toggleButton.setText("Enabled");
                             toggleButton.setSelected(blockedList.get(getIndex()).getIsEnabled());
                             setGraphic(toggleButton);
@@ -555,6 +557,7 @@ public class PreferenceUI extends Application{
                             setGraphic(null);
                             setText(null);
                         }else{
+                        	deleteButton.setId("deleteButton");
                             setGraphic(deleteButton);
                             setText(null);
                             deleteButton.setOnAction(event -> {
@@ -575,9 +578,11 @@ public class PreferenceUI extends Application{
     
     private HBox createAddPageBox(ObservableList<BlockedPage> blockedPages, ArrayList<BlockedPage> blockedList){
     	TextField urlField = new TextField();
+    	urlField.setId("urlField");
         urlField.setPromptText("add url of websites to block");
         urlField.setMinWidth(400);
         Button addButton = new Button("Add to blocked list");
+        addButton.setId("addButton");
         addButton.setMinWidth(200);
         addButton.setOnAction(event -> {
             BlockedPage page = new BlockedPage(urlField.getText(), true);

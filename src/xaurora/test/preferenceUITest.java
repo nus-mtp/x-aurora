@@ -6,11 +6,15 @@ import javafx.scene.control.Slider;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.io.File;
+import java.util.ArrayList;
 import org.loadui.testfx.GuiTest;
 import xaurora.ui.PreferenceUI;
 import xaurora.util.UserPreference;
+import xaurora.util.BlockedPage;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 
 
@@ -41,7 +45,7 @@ public class preferenceUITest extends GuiTest{
     	//test if clicking toggle the boolean value 
         CheckBox checkboxRunOnStartUp = find("#checkboxRunOnStartUp");
         CheckBox checkboxHideInToolbar = find("#checkboxHideInToolbar");
-        Button applyButton = find("#Apply");
+        Button applyButton = find("#applyButton");
         boolean isCheckboxRunOnStartUpSelected = checkboxRunOnStartUp.isSelected();
         boolean isCheckboxHideInToolbarSelected = checkboxHideInToolbar.isSelected();
         click(checkboxRunOnStartUp);
@@ -77,7 +81,7 @@ public class preferenceUITest extends GuiTest{
     	Spinner<Integer> spinner = find("#spinner");
     	CheckBox cbShowTextSource = find("#cbShowTextSource");
     	Slider slider = find("#transparency");
-    	Button applyButton = find("#Apply");
+    	Button applyButton = find("#applyButton");
     	createTestFile();
     	
     	//test spinner input range between 1 to 20
@@ -146,6 +150,35 @@ public class preferenceUITest extends GuiTest{
     public void testBlockedListPane(){
     	click("#Setting");
     	click("#BlockedList");
+    	TextField urlField = find("#urlField");
+    	Button addButton = find("#addButton");
+    	Button applyButton = find("#applyButton");
+    	ArrayList<BlockedPage> blockedList;
+    	createTestFile();
+    	
+    	//test add to blocked list
+    	click(urlField);
+    	type("www.youtube.com");
+    	click(addButton);
+    	click(applyButton);
+    	blockedList = preferences.getBlockedList();
+    	assertEquals(1, blockedList.size());
+    	assertEquals("www.youtube.com", blockedList.get(0).getUrl());
+    	assertEquals(true, blockedList.get(0).getIsEnabled());
+    	
+    	//test toggle enable/disable
+    	ToggleButton toggleButton = find("#toggleButton");
+    	click(toggleButton);
+    	click(applyButton);
+    	assertEquals(false, blockedList.get(0).getIsEnabled());
+    	
+    	//test delete from blocked list
+    	Button deleteButton = find("#deleteButton");
+    	click(deleteButton);
+    	click(applyButton);
+    	assertEquals(0, blockedList.size());
+    	
+    	deleteTestFile();
     }
     
     @Test
