@@ -3,8 +3,7 @@ package xaurora.system;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import xaurora.io.SystemIO;
 import xaurora.security.Security;
 
@@ -16,9 +15,9 @@ import xaurora.security.Security;
  *
  */
 public final class SecurityManager {
-    private static final String MSG_USER_UPDATE = "Change in current user {}.";
+    private static final String MSG_USER_UPDATE = "Change in current user.";
     private static final String MSG_REINIT = "Reinitialization occurs in this Security Manager instance.";
-    private static final String MSG_USER_REQUEST = "A new User Existence Verification request with name {} and email {} is received.";
+    private static final String MSG_USER_REQUEST = "A new User Existence Verification request is received.";
     private static final String MSG_INIT_COMPLETE = "Loading Local keys complete. Initialization Complete.";
     private static final String MSG_START = "An instance of Security Manager is created. This message should appear only once at every software running flow.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
@@ -36,7 +35,7 @@ public final class SecurityManager {
      * @author Gao Risheng A0101891L
      */
     private SecurityManager(SystemIO io) {
-        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger = Logger.getLogger(this.getClass());
         this.logger.info(MSG_START);
         keySet = io.retrieveKeys();
         this.logger.info(MSG_INIT_COMPLETE);
@@ -70,7 +69,9 @@ public final class SecurityManager {
      * @author Gao Risheng A0101891L
      */
     public final boolean isNewUser(final String name, final String email) {
-        this.logger.info(MSG_USER_REQUEST,name,email);
+        this.logger.info(MSG_USER_REQUEST);
+        this.logger.debug(name);
+        this.logger.debug(email);
         return !this.keySet.containsKey(Security.hashUserName(name, email));
     }
 
@@ -96,7 +97,8 @@ public final class SecurityManager {
      * @author Gao Risheng A0101891L
      */
     public final void setCurrentHash(final String hashName) {
-        this.logger.info(MSG_USER_UPDATE,hashName);
+        this.logger.info(MSG_USER_UPDATE);
+        this.logger.debug(hashName);
         this.currentHashUserName = hashName;
     }
 
@@ -119,6 +121,7 @@ public final class SecurityManager {
      * @author GAO RISHENG
      */
     public final byte[] getSalt(final String hash) {
+        
         return this.keySet.get(hash);
     }
 

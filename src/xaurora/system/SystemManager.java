@@ -3,13 +3,11 @@ package xaurora.system;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import xaurora.io.DataFileIO;
 import xaurora.io.SystemIO;
 import xaurora.security.Security;
 import xaurora.text.TextIndexer;
-
 /**
  * Thie class is the main controller of the Logic component that controls all
  * the initialization of all the controller within Logic Component
@@ -18,6 +16,7 @@ import xaurora.text.TextIndexer;
  *
  */
 public final class SystemManager {
+
     private static final String ERR_MSG_INVALID_UPDATE_EMAIL = "Error, the system is trying to update a null email.";
     private static final String ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER = "Error, system is trying to update display number with a non-positive number {}.";
     private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS = "Error, system is trying to update a non-positive expiry time in hours {}";
@@ -53,8 +52,9 @@ public final class SystemManager {
     private TimeManager timeManager;
     private boolean isInitialized = false;
     private Logger logger;
-    private SystemManager() {
-        this.logger = LoggerFactory.getLogger(this.getClass());
+    private SystemManager() {       
+
+        this.logger = Logger.getLogger(this.getClass());
         this.logger.info(MSG_START);
         this.logger.info(MSG_FOUNDATION_INIT);
         this.io = DataFileIO.instanceOf();
@@ -99,10 +99,10 @@ public final class SystemManager {
 
                 pingProcess.destroy();
             } catch (InterruptedException e) {
-                this.logger.error(ERR_MSG_NET_ACCESS_INTERRUPT,e.getMessage());
+                this.logger.error(ERR_MSG_NET_ACCESS_INTERRUPT,e);
             }
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY,e.getMessage());
+            this.logger.error(ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY,e);
         }
         return result;
     }
@@ -206,7 +206,7 @@ public final class SystemManager {
         if(userName!=null&&userName.trim()!=EMPTY_STRING)
             this.currentUserName = userName;
         else
-            this.logger.error(ERR_MSG_INVALID_UPDATE_USERNAME,userName);
+            this.logger.error(ERR_MSG_INVALID_UPDATE_USERNAME+userName);
     }
 
     /**
@@ -235,7 +235,7 @@ public final class SystemManager {
         if(numOfHours>MINIMUM_NON_NEGATIVE){
             this.expiryHours = numOfHours;
         } else {
-            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS,numOfHours);
+            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS+numOfHours);
         }
     }
 
@@ -250,7 +250,7 @@ public final class SystemManager {
         if(displayNumber>MINIMUM_NON_NEGATIVE)
             this.displayNumber = displayNumber;
         else 
-            this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER,displayNumber);
+            this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER+displayNumber);
     }
 
     /**

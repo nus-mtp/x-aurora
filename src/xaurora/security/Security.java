@@ -8,8 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -25,11 +24,11 @@ import xaurora.system.SecurityManager;
  *
  */
 public final class Security {
-    private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: {}.";
+    private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: ";
     private static final String ERR_MSG_INVALID_GENERATED = "Invalid Key is generated due to errors.";
-    private static final String ERR_MSG_UNABLE_TO_GENERATE_KEY = "Error occurs in secret key generation with error message {}.";
-    private static final String ERR_MSG_DECRYPTION_FAIL = "Decryption fail. Error occurs at decrypting process with error Message {}.";
-    private static final String ERR_MSG_ENCRYPTION_FAIL = "Encryption fail. Error occurs at encrypting process with error Message {}.";
+    private static final String ERR_MSG_UNABLE_TO_GENERATE_KEY = "Error occurs in secret key generation with error message ";
+    private static final String ERR_MSG_DECRYPTION_FAIL = "Decryption fail. Error occurs at decrypting process with error Message ";
+    private static final String ERR_MSG_ENCRYPTION_FAIL = "Encryption fail. Error occurs at encrypting process with error Message ";
     private static final String HASH_TYPE_SHA_1 = "SHA-1";
     private static final int CASE_DIFFERENCE = 32;
     private static final int SUM_OF_DIGITS = 105;
@@ -47,7 +46,7 @@ public final class Security {
     private static final int IV_LENGTH = 16;
     private static final int SALT_LENGTH = 32;
     private static final int KEY_LENGTH_IN_BYTES = 16;
-    private static Logger logger = LoggerFactory.getLogger(Security.class);
+    private static Logger logger = Logger.getLogger(Security.class);
 
     /**
      * Description: encrypt the plain text content with given IV
@@ -73,7 +72,7 @@ public final class Security {
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, ivspec);
             return cipher.doFinal(content);
         } catch (Exception e) {
-            logger.error(ERR_MSG_ENCRYPTION_FAIL, e.getMessage());
+            logger.error(ERR_MSG_ENCRYPTION_FAIL, e);
         }
         return content;
     }
@@ -102,7 +101,7 @@ public final class Security {
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivspec);
             return cipher.doFinal(content);
         } catch (Exception e) {
-            logger.error(ERR_MSG_DECRYPTION_FAIL, e.getMessage());
+            logger.error(ERR_MSG_DECRYPTION_FAIL, e);
         }
         return content;
     }
@@ -170,7 +169,7 @@ public final class Security {
             return input;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(ERR_MSG_UNABLE_TO_GENERATE_KEY, e.getMessage());
+            logger.error(ERR_MSG_UNABLE_TO_GENERATE_KEY, e);
         }
         logger.info(ERR_MSG_INVALID_GENERATED);
         return new byte[KEY_LENGTH_IN_BYTES];
@@ -215,7 +214,7 @@ public final class Security {
             // return id;
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
-            logger.error(ERR_MSG_INVALID_HASH_ALGORITHM, e.getMessage());
+            logger.error(ERR_MSG_INVALID_HASH_ALGORITHM, e);
             return id.toString();
         }
     }

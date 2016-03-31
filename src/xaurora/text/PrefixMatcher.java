@@ -5,8 +5,7 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -19,11 +18,11 @@ import org.apache.lucene.search.Query;
  * @author GAO RISHENG A10101891L
  */
 public class PrefixMatcher {
-    
-    private static final String ERR_MSG_FAIL_TO_PARSE_QUERY = "Error occurs in parsing the search query, the error message is {}.";
-    private static final String MSG_NEW_NORMAL_QUERY = "New Normal Term/Prefix Query is created with query string {}.";
-    private static final String MSG_NEW_NUMBER_QUERY = "New Number Query is created with query string {}.";
-    private static final String MSG_NEW_EMAIL_QUERY = "New Email Query is created with query string {}.";
+
+    private static final String ERR_MSG_FAIL_TO_PARSE_QUERY = "Error occurs in parsing the search query, the error message is ";
+    private static final String MSG_NEW_NORMAL_QUERY = "New Normal Term/Prefix Query is created with query string ";
+    private static final String MSG_NEW_NUMBER_QUERY = "New Number Query is created with query string ";
+    private static final String MSG_NEW_EMAIL_QUERY = "New Email Query is created with query string ";
     private static final String MSG_NEW_SEARCH_REQUEST_RECEIVED = "New search request received, the user input is {}";
     private static final int CAPITAL_DIFFERENCE = 55;
     private static final int CAPTICAL_BOUNDARY = 36;
@@ -48,7 +47,8 @@ public class PrefixMatcher {
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String NEW_EMPTY_STRING = "";
     private static final String SPECIAL_CHARACTERS = "~[0-9,a-z]";
-    private static Logger logger = LoggerFactory.getLogger(PrefixMatcher.class);
+    private static Logger logger = Logger.getLogger(PrefixMatcher.class);
+
     /**
      * Description: The method that receive an user text input and returns the
      * search result.
@@ -62,7 +62,7 @@ public class PrefixMatcher {
     public static final ArrayList<String> getResult(String userInput,
             TextIndexer indexer) {
         ArrayList<String> suggestion = new ArrayList<String>();
-        logger.info(MSG_NEW_SEARCH_REQUEST_RECEIVED,userInput);
+        logger.info(MSG_NEW_SEARCH_REQUEST_RECEIVED + userInput);
         if (userInput.equals(PRESET_NUMBER_SEARCH_INPUT)) {
             suggestion = generateNumberQuery(suggestion, indexer);
         } else if (userInput.equals(PRESET_EMAIL_SEARCH_INPUT)) {
@@ -103,11 +103,11 @@ public class PrefixMatcher {
 
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
-            logger.info(MSG_NEW_EMAIL_QUERY,searchQuery.toString());
+            logger.debug(MSG_NEW_EMAIL_QUERY + searchQuery.toString());
             suggestion = indexer.searchDocument(searchQuery, TYPE_EMAIL);
         } catch (ParseException e) {
 
-            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY,e.getMessage());
+            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY, e);
         }
         return suggestion;
     }
@@ -134,11 +134,11 @@ public class PrefixMatcher {
 
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
-            logger.info(MSG_NEW_NUMBER_QUERY,searchQuery.toString());
+            logger.debug(MSG_NEW_NUMBER_QUERY + searchQuery.toString());
             suggestion = indexer.searchDocument(searchQuery, TYPE_NUMBER);
         } catch (ParseException e) {
 
-            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY,e.getMessage());
+            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY, e);
         }
         return suggestion;
     }
@@ -168,11 +168,11 @@ public class PrefixMatcher {
 
             Query searchQuery = MultiFieldQueryParser.parse(queries, fields,
                     new StandardAnalyzer());
-            logger.info(MSG_NEW_NORMAL_QUERY,searchQuery.toString());
+            logger.debug(MSG_NEW_NORMAL_QUERY + searchQuery.toString());
             suggestion = indexer.searchDocument(searchQuery, TYPE_DEFAULT);
         } catch (ParseException e) {
 
-            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY,e.getMessage());
+            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY, e);
         }
         return suggestion;
     }

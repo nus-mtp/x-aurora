@@ -23,22 +23,21 @@ import xaurora.text.TextIndexer;
 import xaurora.util.DataFileMetaData;
 
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Stack;
 
 public final class DataFileIO {
-    private static final String MSG_NEW_LUCENE_ENTRY_IS_CREATE = "A new lucene document is created, its source data file name is {}.";
-    private static final String MSG_NEW_FILE_IS_FOUND = "{} new file(s) is/are found after the last update.";
-    private static final String MSG_META_DATA_RETRIEVE = "A request of reading all meta data is raised. The number of files in the current system is {}.";
-    private static final String MSG_NEW_DATA_FILE_PATH_CREATE = "A new data file path {} is created.";
-    private static final String MSG_UPDATE_INDEX_DIRECTORY_SUCCESS = "Update local index directory successfully at location {}.";
-    private static final String MSG_UPDATE_SYNC_DIRECTORY_SUCCESS = "Update local sync directory successfully at location {}.";
+    private static final String MSG_NEW_LUCENE_ENTRY_IS_CREATE = "A new lucene document is created, its source data file name is %s.";
+    private static final String MSG_NEW_FILE_IS_FOUND = "%d new file(s) is/are found after the last update.";
+    private static final String MSG_META_DATA_RETRIEVE = "A request of reading all meta data is raised. The number of files in the current system is %d.";
+    private static final String MSG_NEW_DATA_FILE_PATH_CREATE = "A new data file path %s is created.";
+    private static final String MSG_UPDATE_INDEX_DIRECTORY_SUCCESS = "Update local index directory successfully at location %s.";
+    private static final String MSG_UPDATE_SYNC_DIRECTORY_SUCCESS = "Update local sync directory successfully at location %s.";
     private static final String MSG_START = "An instance of DataFileIO is created. This message should appear only once at every software running flow.";
-    private static final String ERR_MSG_UNABLE_TO_DELETE_DATA_FILE = "Error occurs at attempting to delete a local data file {}, the error message is {}.";
-    private static final String ERR_MSG_UNABLE_TO_READ_DATA_FILE = "Error occurs at reading data file {}, the error messag is {}.";
-    private static final String ERR_MSG_UNABLE_TO_WRITE_DATA_FILE = "Error occurs at writing data file {}, the error messag is {}.";
+    private static final String ERR_MSG_UNABLE_TO_DELETE_DATA_FILE = "Error occurs at attempting to delete a local data file %s, the error message is %s.";
+    private static final String ERR_MSG_UNABLE_TO_READ_DATA_FILE = "Error occurs at reading data file %s, the error messag is %s.";
+    private static final String ERR_MSG_UNABLE_TO_WRITE_DATA_FILE = "Error occurs at writing data file %s, the error messag is %s.";
     private static final String ERR_MSG_UNABLE_TO_SET_SYNC_FILE = "Error,unable to set the local sync directory because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
     private static final String ERR_MSG_UNABLE_TO_SET_INDEX_FILE = "Error,unable to set the local index directory because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
@@ -58,12 +57,12 @@ public final class DataFileIO {
     private String syncDirectory = DEFAULT_SYNC_DIRECTORY;
     private String indexDirectory = DEFAULT_INDEX_DIRECTORY;
     private static DataFileIO instance = null;
-    private Logger logger;
+    private final Logger logger;
 
     // Singleton Class constructor
     // This is to limits that only 1 instance of DataFileIO will be created
     private DataFileIO() {
-        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger = Logger.getLogger(this.getClass());
     }
 
     public static final DataFileIO instanceOf() {
@@ -91,8 +90,8 @@ public final class DataFileIO {
         } else {
 
             this.syncDirectory = path;
-            this.logger.info(MSG_UPDATE_SYNC_DIRECTORY_SUCCESS,
-                    this.syncDirectory);
+            this.logger.info(String.format(MSG_UPDATE_SYNC_DIRECTORY_SUCCESS,
+                    this.syncDirectory));
         }
     }
 
@@ -101,8 +100,8 @@ public final class DataFileIO {
             this.logger.error(ERR_MSG_UNABLE_TO_SET_INDEX_FILE);
         } else {
             this.indexDirectory = path;
-            this.logger.info(MSG_UPDATE_INDEX_DIRECTORY_SUCCESS,
-                    this.indexDirectory);
+            this.logger.info(String.format(MSG_UPDATE_INDEX_DIRECTORY_SUCCESS,
+                    this.indexDirectory));
         }
     }
 
@@ -138,7 +137,7 @@ public final class DataFileIO {
     private final String generateDataFilePath(final String id) {
         String dstpath = this.syncDirectory + PATH_SEPARATOR + new String(id)
                 + DEFAULT_FILE_EXTENSION;
-        this.logger.info(MSG_NEW_DATA_FILE_PATH_CREATE,dstpath);
+        this.logger.info(String.format(MSG_NEW_DATA_FILE_PATH_CREATE, dstpath));
         return dstpath;
     }
 
@@ -206,8 +205,9 @@ public final class DataFileIO {
                 dbManager.addMonitorToAFile(dstFile.getName()
                         .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING));
             } catch (IOException e) {
-                this.logger.error(ERR_MSG_UNABLE_TO_WRITE_DATA_FILE, dstFile,
-                        e.getMessage());
+                this.logger
+                        .error(String.format(ERR_MSG_UNABLE_TO_WRITE_DATA_FILE,
+                                dstFile, e.getMessage()));
             }
         }
     }
@@ -224,8 +224,9 @@ public final class DataFileIO {
      * @author GAO RISHENG A0101891L
      */
     private final String readFileContent(final File f, SystemManager system) {
-        assert (f.isFile() && f.exists() && !f.isDirectory() && !FilenameUtils.getExtension(f.getAbsolutePath())
-                .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
+        assert (f.isFile() && f.exists() && !f.isDirectory()
+                && !FilenameUtils.getExtension(f.getAbsolutePath())
+                        .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
         StringBuilder output = new StringBuilder(NEW_EMPTY_STRING);
         try {
             Path path = Paths.get(f.getAbsolutePath());
@@ -241,8 +242,8 @@ public final class DataFileIO {
             }
 
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_UNABLE_TO_READ_DATA_FILE,
-                    f.getAbsolutePath(), e.getMessage());
+            this.logger.error(String.format(ERR_MSG_UNABLE_TO_READ_DATA_FILE,
+                    f.getAbsolutePath(), e.getMessage()));
         }
         return output.toString();
     }
@@ -293,8 +294,8 @@ public final class DataFileIO {
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_UNABLE_TO_DELETE_DATA_FILE,
-                    filePath.toString(), e.getMessage());
+            this.logger.error(String.format(ERR_MSG_UNABLE_TO_DELETE_DATA_FILE,
+                    filePath.toString(), e.getMessage()));
         }
 
     }
@@ -310,9 +311,9 @@ public final class DataFileIO {
      */
     private final String getUrlFromFile(final File f, SystemManager manager) {
         // Assertion: thie method must read a txt file with valid file path
-        assert (f.isFile() && f.exists()
-                && !f.isDirectory()&&!FilenameUtils.getExtension(f.getAbsolutePath())
-                .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
+        assert (f.isFile() && f.exists() && !f.isDirectory()
+                && !FilenameUtils.getExtension(f.getAbsolutePath())
+                        .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
         String textContent = readFileContent(f, manager);
         String[] paragraphs = textContent.split(NEWLINE);
         String result = NEW_EMPTY_STRING;
@@ -355,7 +356,7 @@ public final class DataFileIO {
                         DataFileMetaData tempEntity = new DataFileMetaData(
                                 f.getName().substring(INDEX_ZERO,
                                         f.getName().lastIndexOf(
-                                                FILE_EXTENSION_DELIMITER)-1),
+                                                FILE_EXTENSION_DELIMITER)),
                                 getUrlFromFile(f, manager));
                         tempEntity.addFileMetaData(f.length(),
                                 f.lastModified());
@@ -364,8 +365,9 @@ public final class DataFileIO {
                 }
             }
         }
-        //this log is to keep track of the number of data files in the current system.
-        this.logger.info(MSG_META_DATA_RETRIEVE,result.size());
+        // this log is to keep track of the number of data files in the current
+        // system.
+        this.logger.info(String.format(MSG_META_DATA_RETRIEVE, result.size()));
         return result;
     }
 
@@ -384,7 +386,8 @@ public final class DataFileIO {
     public final synchronized void updateIndexingFromFiles(
             SystemManager manager,
             final ArrayList<DataFileMetaData> updateData) {
-        this.logger.info(MSG_NEW_FILE_IS_FOUND,updateData.size());
+        this.logger
+                .info(String.format(MSG_NEW_FILE_IS_FOUND, updateData.size()));
         ArrayList<String> content = new ArrayList<String>();
         File f = new File(this.syncDirectory);
         for (int index = INDEX_ZERO; index < updateData.size(); index++) {
@@ -402,7 +405,8 @@ public final class DataFileIO {
         }
 
         for (int index = INDEX_ZERO; index < updateData.size(); index++) {
-            this.logger.info(MSG_NEW_LUCENE_ENTRY_IS_CREATE,updateData.get(index).getFilename());
+            this.logger.info(String.format(MSG_NEW_LUCENE_ENTRY_IS_CREATE,
+                    updateData.get(index).getFilename()));
             manager.getIndexerInstance().createIndexDocumentFromWeb(
                     content.get(index), updateData.get(index).getUrl(),
                     updateData.get(index).getFilename(),

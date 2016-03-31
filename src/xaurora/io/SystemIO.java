@@ -9,8 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -25,19 +24,19 @@ import xaurora.security.Security;
  *
  */
 public final class SystemIO {
-    
+
     private static final String MSG_READ_KEYS_SUCCESS = "Successfully Loading the local key set.";
-    private static final String ERR_MSG_FAIL_TO_READ_KEY_FROM_KEY_FILE = "Fail to read the key for the following key file : {}. And the Error message is {}.";
+    private static final String ERR_MSG_FAIL_TO_READ_KEY_FROM_KEY_FILE = "Fail to read the key for the following key file : %s. And the Error message is %s.";
     private static final String MSG_START_RETRIEVING_KEYS = "A Local Device key set construction request is triggered. Start Reading all local keys.";
-    private static final String MSG_CREATE_KEY_SUCCESS = "The key for current user {} is created successfully.";
-    private static final String ERR_MSG_FAIL_TO_CREATE_KEY_FILE = "Error occurs in creating key set file for the current user {}, the error message is {}.";
+    private static final String MSG_CREATE_KEY_SUCCESS = "The key for current user %s is created successfully.";
+    private static final String ERR_MSG_FAIL_TO_CREATE_KEY_FILE = "Error occurs in creating key set file for the current user %s, the error message is %s.";
     private static final String MSG_GENERATE_LOCAL_KEY = "System starts to generate local key for default user/users who does not choose to login.";
     private static final String ERR_MSG_UNABLE_TO_CREATE_INDEX_DIRECTORY = "Error occurs in creating the indexing directory,it may be caused by invalid path name.";
-    private static final String ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY = "Error occurs at cleanning up the old data in the indexing directory of this user. The error message is {}.";
+    private static final String ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY = "Error occurs at cleanning up the old data in the indexing directory of this user. The error message is %s.";
     private static final String ERR_MSG_FAIL_TO_CREATE_USER_DIRECTORY = "User directory does not exist and fail to create system directory.";
     private static final String ERR_MSG_FAIL_TO_CREATE_SYSTEM_DIRECTORY = "System directory does not exist and fail to create system directory.";
-    private static final String MSG_UPDATE_INDEX_DIRECTORY_SUCCESS = "Successfully update the indexing directory for user {}.";
-    private static final String MSG_USER_REGISTRATION = "A new user with hashed user name {} is register to this local device.";
+    private static final String MSG_UPDATE_INDEX_DIRECTORY_SUCCESS = "Successfully update the indexing directory for user %s.";
+    private static final String MSG_USER_REGISTRATION = "A new user with hashed user name %s is register to this local device.";
     private static final String MSG_START = "An instance of SystemIO is created. This message should appear only once at every software running flow.";
     private static final String ERROR_OVERWRITING_LOCAL_KEY = "error! Overwriting local key";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
@@ -57,7 +56,7 @@ public final class SystemIO {
     private static SystemIO classInstance;
 
     private SystemIO() {
-        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger = Logger.getLogger(this.getClass());
         this.init();
     }
 
@@ -119,11 +118,11 @@ public final class SystemIO {
             final byte[] entry, DataFileIO instance) {
         assert userName != null && email != null
                 && !userName.trim().equals(NEW_EMPTY_STRING);
-        
+
         final String hashName = Security.hashUserName(userName, email);
         setUpUserIndexDirectory(hashName, instance);
         createKeyFile(hashName, entry);
-        this.logger.info(MSG_USER_REGISTRATION, hashName);
+        this.logger.debug(String.format(MSG_USER_REGISTRATION, hashName));
     }
 
     /**
@@ -155,9 +154,9 @@ public final class SystemIO {
                 try {
                     FileUtils.cleanDirectory(indexDirectory);
                 } catch (IOException e) {
-                    this.logger.error(
+                    this.logger.error(String.format(
                             ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY,
-                            e.getMessage());
+                            e.getMessage()));
                     // ASSUMPTION: Fail in cleaning the indexing directory of
                     // this user will not affect new DataBase construction
                 }
@@ -171,7 +170,8 @@ public final class SystemIO {
         assert indexDirectory.exists();
         // problem for future development: Need to have an error manager to
         // contact the logic with UI to let the user know what is getting wrong
-        this.logger.info(MSG_UPDATE_INDEX_DIRECTORY_SUCCESS,hashName);
+        this.logger.info(
+                String.format(MSG_UPDATE_INDEX_DIRECTORY_SUCCESS, hashName));
     }
 
     /**
@@ -225,7 +225,7 @@ public final class SystemIO {
      * @author GAO RISHENG A0101891L
      */
     public final void createKeyFile(final String hashName, final byte[] entry) {
-        
+
         String filename = Security.hashUserName(KEY_SET_FILE, NEW_EMPTY_STRING);
         File temp = new File(NEW_EMPTY_STRING);
         File systemDir = new File(
@@ -249,11 +249,12 @@ public final class SystemIO {
                 keySetFile.setReadOnly();
                 keySetFile.setReadable(true);
             } catch (IOException e) {
-                this.logger.error(ERR_MSG_FAIL_TO_CREATE_KEY_FILE,hashName,e.getMessage());
+                this.logger.error(String.format(ERR_MSG_FAIL_TO_CREATE_KEY_FILE,
+                        hashName, e.getMessage()));
             }
         }
         assert keySetFile.exists();
-        this.logger.info(MSG_CREATE_KEY_SUCCESS,hashName);
+        this.logger.info(String.format(MSG_CREATE_KEY_SUCCESS, hashName));
     }
 
     /**
@@ -298,7 +299,9 @@ public final class SystemIO {
                         }
                         keyset.put(new String(hashName), salt);
                     } catch (IOException e) {
-                        this.logger.error(ERR_MSG_FAIL_TO_READ_KEY_FROM_KEY_FILE,f.getName(),e.getMessage());
+                        this.logger.error(String.format(
+                                ERR_MSG_FAIL_TO_READ_KEY_FROM_KEY_FILE,
+                                f.getName(), e.getMessage()));
                     }
                 }
             }

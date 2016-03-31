@@ -59,29 +59,30 @@ import org.apache.lucene.store.FSDirectory;
 /*
  *  Log Library
  */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 /*
  * Software Internal Import
  */
 import xaurora.io.DataFileIO;
 
 public final class TextIndexer {
-    
+
+    private static final int INDEX_ONE = 1;
     /**
      * Constant used
      */
-    private static final String ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM = "Unable to access local indexing system. Error Message: {}";
-    private static final String ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER = "Error occurs at updating non-positive display number {}.";
-    private static final String ERR_MSG_UNABLE_PROCESS_DELETE = "Unable to process deletion at local file. Error Message : {}.";
+    private static final String ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM = "Unable to access local indexing system. Error Message: ";
+    private static final String ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER = "Error occurs at updating non-positive display number .";
+    private static final String ERR_MSG_UNABLE_PROCESS_DELETE = "Unable to process deletion at local file. Error Message : ";
     private static final String ERR_MSG_UNABLE_TO_PARSE_DELETE_QUERY = "Unable to process the deletion query with query string and error message {}.";
-    private static final String MSG_DELETE_QUERY_CREATED = "A Delete Query is triggered with selection field {} and input {}.";
-    private static final String ERR_MSG_FAIL_TO_EXTRACT_URL = "Unable to extract URL from input {},with error message.";
-    private static final String ERR_MSG_FAIL_TO_PARSE_INPUT = "Error occurs at parsing the raw Text Input with error message {}.";
-    private static final String ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS = "Error occurs at extracting terms within raw text input. Error Message : {}.";
-    private static final String ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT = "Error occurs at attempting to create a lucene document with error message {}.";
+    private static final String MSG_DELETE_QUERY_CREATED = "A Delete Query is triggered with selection field %s and input %s.";
+    private static final String ERR_MSG_FAIL_TO_EXTRACT_URL = "Unable to extract URL from input ";
+    private static final String ERR_MSG_FAIL_TO_PARSE_INPUT = "Error occurs at parsing the raw Text Input with error message ";
+    private static final String ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS = "Error occurs at extracting terms within raw text input. Error Message : ";
+    private static final String ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT = "Error occurs at attempting to create a lucene document with error message ";
     private static final String MSG_INIT_COMPLETE = "Initialization Complete.";
-    private static final String ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY = "Error raised at opening the local indexing directory {}, the error message is {}.";
+    private static final String ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY = "Error raised at opening the local indexing directory";
+    private static final String MSG_NEW_DOCUMENT_STATISTICS = "New Lucene document is created with %d paragraphs and %d sentences.";
     private static final String MSG_START = "An instance of Text Indexer is created. This message should appear only once at every software running flow.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
@@ -277,7 +278,7 @@ public final class TextIndexer {
      * Singleton constructor
      */
     private TextIndexer(DataFileIO io) {
-        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger = Logger.getLogger(this.getClass());
         this.logger.info(MSG_START);
         this.init(io);
     }
@@ -289,8 +290,8 @@ public final class TextIndexer {
                     .open(Paths.get(io.getIndexDirectory()));
 
         } catch (IOException e1) {
-            this.logger.error(ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY,
-                    io.getIndexDirectory(), e1.getMessage());
+            this.logger.error(ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY
+                    + io.getIndexDirectory(), e1);
         }
         this.displayNumber = DEFAULT_DISPLAY_NUMBER;
         this.logger.info(MSG_INIT_COMPLETE);
@@ -341,10 +342,11 @@ public final class TextIndexer {
         String[] paragraphs = rawData.split(NEWLINE);
         // retrieving host name from URL
         String sourceHost = getHostFromURL(url);
+
         try {
             this.writer = new IndexWriter(this.storeDirectory, this.config);
-
-            for (int i = 1; i < paragraphs.length; i++) {
+            int counter = INDEX_ZERO;
+            for (int i = INDEX_ONE; i < paragraphs.length; i++) {
                 // Not storing pure special characters lines
                 if (paragraphs[i]
                         .replaceAll(PATTERN_NON_ASCII_CHARACTERS, EMPTY_STRING)
@@ -368,17 +370,19 @@ public final class TextIndexer {
                     addLastModified(data, lastModified);
                     insertParagraphIntoDocument(paragraphs[i], data);
                     this.writer.addDocument(data);
+                    counter++;
                 }
             }
             // write the document into the indexing system
             // without this, searching will not be available
             this.writer.commit();
             this.writer.close();
+            this.logger.debug(String.format(MSG_NEW_DOCUMENT_STATISTICS,
+                    paragraphs.length - INDEX_ONE, counter));
             // printAll();
 
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT,
-                    e.getMessage());
+            this.logger.error(ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT, e);
         }
     }
 
@@ -411,8 +415,7 @@ public final class TextIndexer {
             stream.close();
         } catch (IOException e) {
 
-            this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS,
-                    e.getMessage());
+            this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS, e);
         }
         return result;
     }
@@ -480,7 +483,7 @@ public final class TextIndexer {
         try {
             XauroraParser.parseEmailInSentence(data);
         } catch (xaurora.text.ParseException e) {
-            this.logger.error(ERR_MSG_FAIL_TO_PARSE_INPUT, e.getMessage());
+            this.logger.error(ERR_MSG_FAIL_TO_PARSE_INPUT, e);
         }
     }
 
@@ -502,7 +505,7 @@ public final class TextIndexer {
             host = sourceURL.getHost();
         } catch (MalformedURLException e) {
 
-            this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_URL, url, e.getMessage());
+            this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_URL + url, e);
         }
         return host;
     }
@@ -729,7 +732,8 @@ public final class TextIndexer {
         assert inputQuery != null && !inputQuery.trim().equals(EMPTY_STRING);
         assert field != null && field.trim().equals(EMPTY_STRING);
         this.analyzer = new StandardAnalyzer();
-        this.logger.info(MSG_DELETE_QUERY_CREATED, field, inputQuery);
+        this.logger.debug(
+                String.format(MSG_DELETE_QUERY_CREATED, field, inputQuery));
         try {
             // open the current indexing directory
             this.reader = DirectoryReader.open(this.storeDirectory);
@@ -739,7 +743,8 @@ public final class TextIndexer {
             // the input data file name
             Query deleteQuery = new QueryParser(field, this.analyzer).parse(
                     inputQuery.replace(DATAFILE_EXTENSION, EMPTY_STRING));
-
+            this.logger.debug(String.format(MSG_DELETE_QUERY_CREATED, field,
+                    deleteQuery));
             // Estimate the count of entries to be deleted
             TopDocs docs = this.searcher.search(deleteQuery,
                     this.searcher.count(deleteQuery));
@@ -758,10 +763,9 @@ public final class TextIndexer {
             this.writer.close();
             // change to log
         } catch (ParseException e) {
-            this.logger.error(ERR_MSG_UNABLE_TO_PARSE_DELETE_QUERY,
-                    e.getMessage());
+            this.logger.error(ERR_MSG_UNABLE_TO_PARSE_DELETE_QUERY, e);
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_UNABLE_PROCESS_DELETE, e.getMessage());
+            this.logger.error(ERR_MSG_UNABLE_PROCESS_DELETE, e);
         }
     }
 
@@ -777,7 +781,7 @@ public final class TextIndexer {
      */
     public final void setDisplayNumber(final int number) {
         if (number <= MINIMUM_NON_NEGATIVE) {
-            this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER, number);
+            this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER + number);
         } else
             this.displayNumber = number;
     }
@@ -802,7 +806,8 @@ public final class TextIndexer {
             SortField[] filters = setSortingRules();
             Sort sort = new Sort(filters);
             TopDocs docs = this.searcher.search(q, this.displayNumber, sort);
-            int searchNumber = Math.min(docs.totalHits, DEFAULT_DISPLAY_NUMBER);
+            this.logger.debug(q.toString());
+            int searchNumber = Math.min(docs.totalHits, this.displayNumber);
             for (int i = INDEX_ZERO; i < searchNumber; i++) {
                 int id = docs.scoreDocs[i].doc;
                 String content;
@@ -824,8 +829,7 @@ public final class TextIndexer {
             }
 
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM,
-                    e.getMessage());
+            this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM, e);
         }
         return result;
     }
@@ -864,8 +868,7 @@ public final class TextIndexer {
                 // do something with docId here...
             }
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM,
-                    e.getMessage());
+            this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM, e);
         }
     }
 

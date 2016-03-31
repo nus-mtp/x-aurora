@@ -4,11 +4,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import xaurora.system.SystemManager;
-import xaurora.util.DataFileMetaData;;
-
+import xaurora.util.DataFileMetaData;
+import org.apache.log4j.Logger;
 /**
  * @author GAO RISHENG A0101891L Description: This class is mainly for
  *         periodically monitoring the files in the database, checking and
@@ -16,6 +14,7 @@ import xaurora.util.DataFileMetaData;;
  *         local folder
  */
 public final class DBManager implements Runnable {
+    private static final int FIVE_MINUTE = 300000;
     private static final String MSG_EXPIRY_CHECK_COMPLETE = "Auto File Expiry Check Complete. Start Deleting expired files.";
     private static final String MSG_EXPIRY_CHECK_START = "Auto File Expiry Check for current user start.";
     private static final String MSG_UPDATE_COMPLETE = "Database update complete.";
@@ -23,11 +22,8 @@ public final class DBManager implements Runnable {
     private static final String MSG_INIT_COMPLETE = "Finish loading data files for current user. Initialization complete. Tracking start.";
     private static final String MSG_INIT_START = "Start Retriving all data files for the current user. Start Tracking files in the local database.";
     private static final String MSG_START = "An instance of DBManager is created. This message should appear only once at every software running flow.";
-    private static final int FIFTH_MINUTE = 300000;
-    private static final int ZERO_MINUTE = 0;
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
-    private static final long DEFAULT_CHECK_INTERVAL = 600000;// 10 minute
     private boolean isToUpdate;
     private SystemManager instance;
     private HashSet<String> fileset;
@@ -43,17 +39,20 @@ public final class DBManager implements Runnable {
      */
     public void run() {
         while (true) {
-            if (isCorrectUpdateTiming()) {
-                ArrayList<DataFileMetaData> updateData = this.monitorFileSet();
-                if (this.isToUpdate) {
-                    this.logger.info(MSG_UPDATE_START);
-                    this.instance.getDataFileIOInstance()
-                            .updateIndexingFromFiles(this.instance, updateData);
-                    this.logger.info(MSG_UPDATE_COMPLETE);
-                    this.isToUpdate = false;
-                }
+            ArrayList<DataFileMetaData> updateData = this.monitorFileSet();
+            if (this.isToUpdate) {
+                this.logger.info(MSG_UPDATE_START);
+                this.instance.getDataFileIOInstance()
+                        .updateIndexingFromFiles(this.instance, updateData);
+                this.logger.info(MSG_UPDATE_COMPLETE);
+                this.isToUpdate = false;
             }
-            if (isCorrectCheckTiming() && !this.isToUpdate) {
+            try {
+                Thread.sleep(300000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (this.isToUpdate) {
                 this.logger.info(MSG_EXPIRY_CHECK_START);
                 ArrayList<DataFileMetaData> deleteData = this.instance
                         .getDataFileIOInstance()
@@ -64,12 +63,17 @@ public final class DBManager implements Runnable {
                 }
                 this.logger.info(MSG_UPDATE_COMPLETE);
             }
+            try {
+                Thread.sleep(FIVE_MINUTE);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
     private DBManager() {
-        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger = Logger.getLogger(this.getClass());
         this.logger.info(MSG_START);
         this.instance = SystemManager.getInstance();
         this.fileset = new HashSet<String>();
@@ -101,35 +105,6 @@ public final class DBManager implements Runnable {
         this.monitorFileSet();
     }
 
-    /**
-     * Description: method that is called periodically to check whether it is
-     * the correct time to run the checking for deletion of expired files
-     * 
-     * @return true if the current time is exactly the 0th minute out of the 10
-     *         minute interval, false otherwise
-     * 
-     * @author GAO RISHENG A0101891L
-     */
-    private static boolean isCorrectCheckTiming() {
-        long currentTime = System.currentTimeMillis();
-        // Every 10 minutes
-        return currentTime % DEFAULT_CHECK_INTERVAL == ZERO_MINUTE;
-    }
-
-    /**
-     * Description: method that is called periodically to check whether it is
-     * the correct time to run the auto-update for the database
-     * 
-     * @return true if the current time is exactly the 5th minute out of the 10
-     *         minute interval, false otherwise
-     * 
-     * @author GAO RISHENG A0101891L
-     */
-    private static boolean isCorrectUpdateTiming() {
-        long currentTime = System.currentTimeMillis();
-        // Every 5th minutes within a 10-minute-period
-        return currentTime % DEFAULT_CHECK_INTERVAL == FIFTH_MINUTE;
-    }
 
     /**
      * Description Adding monitor to data files which is generated locally

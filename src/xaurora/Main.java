@@ -1,7 +1,11 @@
 package xaurora;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.PropertyConfigurator;
 
 import xaurora.communication.*;
 import xaurora.system.DBManager;
@@ -10,11 +14,15 @@ import xaurora.system.SystemManager;
 import xaurora.ui.LoginUI;
 import xaurora.text.PrefixMatcher;
 
+
 public class Main {
     private static final int PORT_BROWSER = 6789;
     private static final int PORT_PLUGIN = 23333;
-
+    private static final String LOCAL_LOG_PROPERTIES = "/conf_data/system/log4j.properties";
+    private static final String EMPTY_STRING = "";
     public static void main(String[] args) {
+        BasicConfigurator.configure();
+        PropertyConfigurator.configure(getProperties());
         // Simulate the user Login process
         SystemManager sa = SystemManager.getInstance();
         sa.setCurrentUser("new user");
@@ -53,6 +61,11 @@ public class Main {
             System.out.println(actualResult.get(i));
         }
 
+    }
+    
+    private static String getProperties(){
+        File temp = new File(EMPTY_STRING);
+        return temp.getAbsolutePath()+ LOCAL_LOG_PROPERTIES;
     }
 
 }
