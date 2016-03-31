@@ -45,7 +45,7 @@ public class UserPreference {
     private static UserPreference instance = null;
     
     private UserPreference(){
-        
+    	initPreferences();
     }
     
     public static UserPreference getInstance(){
