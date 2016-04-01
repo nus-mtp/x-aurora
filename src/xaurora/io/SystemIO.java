@@ -175,6 +175,33 @@ public final class SystemIO {
     }
 
     /**
+     * Description: The method is to clear the index directory of the current
+     * user before switching the user
+     * 
+     * @param instance,
+     *            the instance of Datafile IO
+     * @param hashName,
+     *            the hash name of current user
+     * @author Gao Risheng A0101891L
+     */
+    public void cleanIndexData(DataFileIO instance, final String hashName) {
+        File indexDirectory = new File(instance.getIndexDirectory());
+        // The index directory to be cleared must be an existing directory
+        assert indexDirectory.exists() && indexDirectory.isDirectory();
+        // The index directory to be cleared must be the index directory from
+        // the current user
+        assert indexDirectory.getParentFile().getName().equals(hashName);
+        try {
+            FileUtils.cleanDirectory(indexDirectory);
+        } catch (IOException e) {
+            this.logger.error(String.format(
+                    ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY,
+                    e.getMessage()));
+        }
+
+    }
+
+    /**
      * Description: Verify whether the local key to this device is created by
      * checking the existence of the key set file
      * 

@@ -3,13 +3,19 @@ package xaurora.security;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 import org.apache.log4j.Logger;
+
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import xaurora.system.SecurityManager;
@@ -27,7 +33,6 @@ public final class Security {
     private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: ";
     private static final String ERR_MSG_INVALID_GENERATED = "Invalid Key is generated due to errors.";
     private static final String ERR_MSG_UNABLE_TO_GENERATE_KEY = "Error occurs in secret key generation with error message ";
-    private static final String ERR_MSG_DECRYPTION_FAIL = "Decryption fail. Error occurs at decrypting process with error Message ";
     private static final String ERR_MSG_ENCRYPTION_FAIL = "Encryption fail. Error occurs at encrypting process with error Message ";
     private static final String HASH_TYPE_SHA_1 = "SHA-1";
     private static final int CASE_DIFFERENCE = 32;
@@ -86,10 +91,16 @@ public final class Security {
      *            the String IV
      * @return Plain text data in bytes
      * @author GAO RISHENG A0101891L
+     * @throws InvalidAlgorithmParameterException 
+     * @throws InvalidKeyException 
+     * @throws NoSuchPaddingException 
+     * @throws NoSuchAlgorithmException 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
      */
     public static final byte[] decrypt(final byte[] content,
-            final String initVector, final SecurityManager secure) {
-        try {
+            final String initVector, final SecurityManager secure) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+
             String hash = secure.getCurrentHash();
             byte[] currentSalt = secure.getSalt(hash);
             byte[] secretKey = generateKey(hash, currentSalt);
@@ -100,10 +111,7 @@ public final class Security {
             IvParameterSpec ivspec = new IvParameterSpec(iv);
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivspec);
             return cipher.doFinal(content);
-        } catch (Exception e) {
-            logger.error(ERR_MSG_DECRYPTION_FAIL, e);
-        }
-        return content;
+
     }
 
     /**

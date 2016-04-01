@@ -6,8 +6,7 @@ import java.math.BigInteger;
 import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 /**
  * Description: this class is mainly in charge of generating MD5 hashed ID for
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public final class IDGenerator {
-    private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: {}.";
+    private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: %s.";
     private static final String MSG_START = "An instance of IDGenerator is created. This message should appear only once at every software running flow.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
@@ -30,7 +29,7 @@ public final class IDGenerator {
     private Logger logger;
 
     private IDGenerator() {
-        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.logger = Logger.getLogger(this.getClass());
         this.logger.info(MSG_START);
     }
 
@@ -38,7 +37,7 @@ public final class IDGenerator {
         if (instance == null) {
             instance = new IDGenerator();
         }
-        return new IDGenerator();
+        return instance;
     }
 
     /**
@@ -80,7 +79,7 @@ public final class IDGenerator {
             // return id;
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
-            this.logger.error(ERR_MSG_INVALID_HASH_ALGORITHM, e.getMessage());
+            this.logger.error(String.format(ERR_MSG_INVALID_HASH_ALGORITHM, e.getMessage()));
             return id.toString();
         }
 

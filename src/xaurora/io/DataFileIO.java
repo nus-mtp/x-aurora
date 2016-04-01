@@ -14,6 +14,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 import xaurora.security.*;
 import xaurora.system.SystemManager;
@@ -27,10 +30,18 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 public final class DataFileIO {
+    private static final String ERR_MSG_ILLEGAL_BLOCK = "Unable to decrypt due to Illegal block";
+    private static final String ERR_MSG_INVALID_PADDING = "Unable to decrypt due to invalid padding";
+    private static final String ERR_MSG_INVALID_ALGORITHM = "Unable to decrypt due to invalid algorithm";
+    private static final String ERR_MSG_INVALID_KEY = "Unable to decrypt due to invalid key";
     private static final String MSG_NEW_LUCENE_ENTRY_IS_CREATE = "A new lucene document is created, its source data file name is %s.";
     private static final String MSG_NEW_FILE_IS_FOUND = "%d new file(s) is/are found after the last update.";
-    private static final String MSG_META_DATA_RETRIEVE = "A request of reading all meta data is raised. The number of files in the current system is %d.";
+    private static final String MSG_META_DATA_RETRIEVE = "A request of reading all meta data is raised. The number of files in the current system is %d, with %d valid files and %d invalid files.";
     private static final String MSG_NEW_DATA_FILE_PATH_CREATE = "A new data file path %s is created.";
     private static final String MSG_UPDATE_INDEX_DIRECTORY_SUCCESS = "Update local index directory successfully at location %s.";
     private static final String MSG_UPDATE_SYNC_DIRECTORY_SUCCESS = "Update local sync directory successfully at location %s.";
@@ -38,10 +49,11 @@ public final class DataFileIO {
     private static final String ERR_MSG_UNABLE_TO_DELETE_DATA_FILE = "Error occurs at attempting to delete a local data file %s, the error message is %s.";
     private static final String ERR_MSG_UNABLE_TO_READ_DATA_FILE = "Error occurs at reading data file %s, the error messag is %s.";
     private static final String ERR_MSG_UNABLE_TO_WRITE_DATA_FILE = "Error occurs at writing data file %s, the error messag is %s.";
-    private static final String ERR_MSG_UNABLE_TO_SET_SYNC_FILE = "Error,unable to set the local sync directory because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
-    private static final String ERR_MSG_UNABLE_TO_SET_INDEX_FILE = "Error,unable to set the local index directory because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
+    private static final String ERR_MSG_UNABLE_TO_SET_SYNC_FILE = "Error,unable to set the local sync directory with directory %s because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
+    private static final String ERR_MSG_UNABLE_TO_SET_INDEX_FILE = "Error,unable to set the local index directory with directory %s because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
+    private static final String ERR_MSG_DECRYPTION_FAIL = "Decryption fail. Error occurs at decrypting process with error Message ";
     private static final String PATH_SEPARATOR = "\\";
     private static final String NEWLINE = "\n";
     private static final String DEFAULT_SYNC_DIRECTORY = "/local_data/";
@@ -86,7 +98,8 @@ public final class DataFileIO {
      */
     public final void setDirectory(final String path) {
         if (!new File(path).exists() || !new File(path).isDirectory()) {
-            this.logger.error(ERR_MSG_UNABLE_TO_SET_SYNC_FILE);
+            this.logger.error(
+                    String.format(ERR_MSG_UNABLE_TO_SET_SYNC_FILE, path));
         } else {
 
             this.syncDirectory = path;
@@ -97,12 +110,23 @@ public final class DataFileIO {
 
     public final void setIndexDirectory(final String path) {
         if (!new File(path).exists() || !new File(path).isDirectory()) {
-            this.logger.error(ERR_MSG_UNABLE_TO_SET_INDEX_FILE);
+            this.logger.error(
+                    String.format(ERR_MSG_UNABLE_TO_SET_INDEX_FILE, path));
         } else {
             this.indexDirectory = path;
             this.logger.info(String.format(MSG_UPDATE_INDEX_DIRECTORY_SUCCESS,
                     this.indexDirectory));
         }
+    }
+
+    /**
+     * reset method to reset current setting
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    public final void reset() {
+        this.syncDirectory = DEFAULT_SYNC_DIRECTORY;
+        this.indexDirectory = DEFAULT_INDEX_DIRECTORY;
     }
 
     /**
@@ -227,7 +251,7 @@ public final class DataFileIO {
         assert (f.isFile() && f.exists() && !f.isDirectory()
                 && !FilenameUtils.getExtension(f.getAbsolutePath())
                         .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
-        StringBuilder output = new StringBuilder(NEW_EMPTY_STRING);
+
         try {
             Path path = Paths.get(f.getAbsolutePath());
             byte[] data = Files.readAllBytes(path);
@@ -237,15 +261,32 @@ public final class DataFileIO {
                             NEW_EMPTY_STRING),
                     system.getSecurityManagerInstance());
 
-            for (int i = INDEX_ZERO; i < decrypted.length; i++) {
-                output.append(String.valueOf((char) decrypted[i]));
-            }
+            return new String(decrypted);
 
         } catch (IOException e) {
             this.logger.error(String.format(ERR_MSG_UNABLE_TO_READ_DATA_FILE,
                     f.getAbsolutePath(), e.getMessage()));
+            return NEW_EMPTY_STRING;
+        } catch (InvalidKeyException e) {
+            this.logger.error(ERR_MSG_INVALID_KEY, e);
+            return NEW_EMPTY_STRING;
+        } catch (InvalidAlgorithmParameterException e) {
+            this.logger.error(ERR_MSG_INVALID_ALGORITHM, e);
+            return NEW_EMPTY_STRING;
+        } catch (NoSuchAlgorithmException e) {
+            this.logger.error(ERR_MSG_INVALID_ALGORITHM, e);
+            return NEW_EMPTY_STRING;
+        } catch (NoSuchPaddingException e) {
+            this.logger.error(ERR_MSG_INVALID_PADDING, e);
+            return NEW_EMPTY_STRING;
+        } catch (IllegalBlockSizeException e) {
+            this.logger.error(ERR_MSG_ILLEGAL_BLOCK, e);
+            return NEW_EMPTY_STRING;
+        } catch (BadPaddingException e) {
+            this.logger.error(ERR_MSG_INVALID_PADDING, e);
+            return NEW_EMPTY_STRING;
         }
-        return output.toString();
+
     }
 
     /**
@@ -315,13 +356,13 @@ public final class DataFileIO {
                 && !FilenameUtils.getExtension(f.getAbsolutePath())
                         .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
         String textContent = readFileContent(f, manager);
-        String[] paragraphs = textContent.split(NEWLINE);
-        String result = NEW_EMPTY_STRING;
-        if (paragraphs.length > INDEX_ZERO) {
-            result = paragraphs[INDEX_ZERO];
+        if (textContent.equals(NEW_EMPTY_STRING)) {
+            return textContent;
         }
+        String[] paragraphs = textContent.split(NEWLINE);
 
-        return result;
+        return paragraphs.length > INDEX_ZERO ? paragraphs[INDEX_ZERO]
+                : NEW_EMPTY_STRING;
 
     }
 
@@ -340,6 +381,9 @@ public final class DataFileIO {
         File dir = new File(this.syncDirectory);
         Stack<File> s = new Stack<File>();
         s.push(dir);
+        int overall_counter = INDEX_ZERO;
+        int valid_counter = INDEX_ZERO;
+        int invalid_counter = INDEX_ZERO;
         // iterate through the directory tree
         while (!s.isEmpty()) {
             File f = s.pop();
@@ -353,21 +397,35 @@ public final class DataFileIO {
                 } else {
                     if (FilenameUtils.getExtension(f.getAbsolutePath())
                             .equals(TEXT_FILE_TYPE)) {
-                        DataFileMetaData tempEntity = new DataFileMetaData(
-                                f.getName().substring(INDEX_ZERO,
-                                        f.getName().lastIndexOf(
-                                                FILE_EXTENSION_DELIMITER)),
-                                getUrlFromFile(f, manager));
-                        tempEntity.addFileMetaData(f.length(),
-                                f.lastModified());
-                        result.add(tempEntity);
+                        String filename = f.getName().substring(INDEX_ZERO,
+                                f.getName()
+                                        .lastIndexOf(FILE_EXTENSION_DELIMITER));
+                        String url = getUrlFromFile(f, manager);
+                        this.logger.debug(url);
+                        // To handle the case when more than 1 user share the
+                        // same store directory
+                        // that one user may accidentally add the cipher text of
+                        // other user
+                        // (since he/she cannot decrypt this) to the monitor set
+                        if (!url.equals(NEW_EMPTY_STRING)) {
+                            DataFileMetaData tempEntity = new DataFileMetaData(
+                                    filename, url);
+                            tempEntity.addFileMetaData(f.length(),
+                                    f.lastModified());
+                            result.add(tempEntity);
+                            valid_counter++;
+                        } else {
+                            invalid_counter++;
+                        }
+                        overall_counter++;
                     }
                 }
             }
         }
         // this log is to keep track of the number of data files in the current
         // system.
-        this.logger.info(String.format(MSG_META_DATA_RETRIEVE, result.size()));
+        this.logger.info(String.format(MSG_META_DATA_RETRIEVE, overall_counter,
+                valid_counter, invalid_counter));
         return result;
     }
 

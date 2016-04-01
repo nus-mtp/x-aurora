@@ -95,10 +95,7 @@ public class ChromeServer implements Runnable {
             char[] content = new char[length - String.valueOf(comCode).length()
                     - ("\n").length()]; // cut the length of communication code
             in.read(content);
-            for (int i = 0; i < content.length; i++) {
-                contentData += String.valueOf(content[i]);
-            }
-
+            contentData = new String(content);
             // Generate Output
             out.print(genOutput(contentData, comCode));
             out.flush();

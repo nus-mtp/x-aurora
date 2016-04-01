@@ -1,5 +1,6 @@
 package xaurora.system;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,6 +9,7 @@ import xaurora.io.DataFileIO;
 import xaurora.io.SystemIO;
 import xaurora.security.Security;
 import xaurora.text.TextIndexer;
+
 /**
  * Thie class is the main controller of the Logic component that controls all
  * the initialization of all the controller within Logic Component
@@ -17,6 +19,7 @@ import xaurora.text.TextIndexer;
  */
 public final class SystemManager {
 
+    private static final String ERR_MSG_INVALID_USER_UPDATE = "Error, invalid update of user profile. Last update is unsuccessful.";
     private static final String ERR_MSG_INVALID_UPDATE_EMAIL = "Error, the system is trying to update a null email.";
     private static final String ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER = "Error, system is trying to update display number with a non-positive number {}.";
     private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS = "Error, system is trying to update a non-positive expiry time in hours {}";
@@ -34,6 +37,7 @@ public final class SystemManager {
     private static final String HOST_DROPBOX = "www.dropbox.com";
     private static final String COMMAND_PING = "ping ";
     private static final String DEFAULT_USERNAME = "default";
+    private static final String DEFAULT_SYNC_DIRECTORY = "/local_data/";
     private static final int MINIMUM_NON_NEGATIVE = 0;
     private static final int DEFAULT_DISPLAY_NUMBER = 5;
     private static final int DEFAULT_EXPIRY_HOURS = 72;
@@ -52,7 +56,8 @@ public final class SystemManager {
     private TimeManager timeManager;
     private boolean isInitialized = false;
     private Logger logger;
-    private SystemManager() {       
+
+    private SystemManager() {
 
         this.logger = Logger.getLogger(this.getClass());
         this.logger.info(MSG_START);
@@ -89,7 +94,7 @@ public final class SystemManager {
      *         return false
      * @author GAO RISHENG A0101891L
      */
-    public boolean isNetAccessible() {
+    public final boolean isNetAccessible() {
         boolean result = false;
         try {
             Process pingProcess = java.lang.Runtime.getRuntime()
@@ -99,10 +104,11 @@ public final class SystemManager {
 
                 pingProcess.destroy();
             } catch (InterruptedException e) {
-                this.logger.error(ERR_MSG_NET_ACCESS_INTERRUPT,e);
+                this.logger.error(ERR_MSG_NET_ACCESS_INTERRUPT, e);
             }
         } catch (IOException e) {
-            this.logger.error(ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY,e);
+            this.logger.error(ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY,
+                    e);
         }
         return result;
     }
@@ -115,9 +121,10 @@ public final class SystemManager {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public synchronized void triggerInitialization() {
-        //3 assertions that must be fulfilled
-        assert this.currentUserName != null&&!this.currentUserName.trim().equals(EMPTY_STRING);
+    private synchronized final void triggerInitialization() {
+        // 3 assertions that must be fulfilled
+        assert this.currentUserName != null
+                && !this.currentUserName.trim().equals(EMPTY_STRING);
         assert this.userEmail != null;
         assert this.storeDirectory != null;
         this.logger.info(MSG_USER_INIT);
@@ -139,6 +146,52 @@ public final class SystemManager {
         this.timeManager.setExpiredInterval(this.expiryHours);
         this.isInitialized = true;
         this.logger.info(MSG_USER_INIT_COMPLETE);
+    }
+
+    /**
+     * Description: This method is to switch user profile for different user
+     * 
+     * @param userName,
+     *            the new user Name
+     * @param email,
+     *            the new user email
+     * @param directory,
+     *            the new user sync directory
+     * @param displayNumber,the
+     *            display number of the new user
+     * @param expiry,
+     *            the expiry time of new user
+     * @author GAO RISHENG A0101891L
+     */
+    public synchronized final void changeUser(String userName, String email,
+            String directory, int displayNumber, int expiry) {
+        String currentUserName = this.currentUserName;
+        String currentEmail = this.userEmail;
+        boolean isUpdateValid = true;
+        isUpdateValid &= this.setCurrentUser(userName);
+        isUpdateValid &= this.setUserEmail(email);
+        isUpdateValid &= this.setSyncDirectory(directory);
+        isUpdateValid &= this.setDisplayNumber(displayNumber);
+        isUpdateValid &= this.setExpireTime(expiry);
+        if (isUpdateValid) {
+            if(currentUserName!=null)
+            this.systemIo.cleanIndexData(this.io,
+                    Security.hashUserName(currentUserName, currentEmail));
+            triggerInitialization();
+        } else {
+            this.logger.error(ERR_MSG_INVALID_USER_UPDATE);
+        }
+    }
+
+    /**
+     * Description: reset all user info stored in the system to default value
+     * which is equivalent to change the current user to the default user which
+     * is equivalent to logout which is equivalent to re-initialize the system
+     */
+    public synchronized final void reset() {
+        this.changeUser(DEFAULT_USERNAME, EMPTY_STRING,
+                getDefaultStoreDirectory(), DEFAULT_DISPLAY_NUMBER,
+                DEFAULT_EXPIRY_HOURS);
     }
 
     /**
@@ -202,11 +255,14 @@ public final class SystemManager {
      *            the user name of the current user
      * @author GAO RISHENG A0101891L
      */
-    public final void setCurrentUser(final String userName) {
-        if(userName!=null&&userName.trim()!=EMPTY_STRING)
+    private final boolean setCurrentUser(final String userName) {
+        if (userName != null && userName.trim() != EMPTY_STRING) {
             this.currentUserName = userName;
-        else
-            this.logger.error(ERR_MSG_INVALID_UPDATE_USERNAME+userName);
+            return true;
+        } else {
+            this.logger.error(ERR_MSG_INVALID_UPDATE_USERNAME + userName);
+            return false;
+        }
     }
 
     /**
@@ -216,11 +272,13 @@ public final class SystemManager {
      *            the path name of the directory
      * @author GAO RISHENG A0101891L
      */
-    public final void setSyncDirectory(final String directory) {
-        if(directory!=null){
+    private final boolean setSyncDirectory(final String directory) {
+        if (directory != null) {
             this.storeDirectory = directory;
+            return true;
         } else {
             this.logger.error(ERR_MSG_INVALID_UPDATE_STORE_DIRECTORY);
+            return false;
         }
     }
 
@@ -231,11 +289,13 @@ public final class SystemManager {
      *            of hours for extracted file to be deleted
      * @author GAO RISHENG A0101891L
      */
-    public final void setExpireTime(final int numOfHours) {
-        if(numOfHours>MINIMUM_NON_NEGATIVE){
+    private final boolean setExpireTime(final int numOfHours) {
+        if (numOfHours > MINIMUM_NON_NEGATIVE) {
             this.expiryHours = numOfHours;
+            return true;
         } else {
-            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS+numOfHours);
+            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS + numOfHours);
+            return false;
         }
     }
 
@@ -246,11 +306,15 @@ public final class SystemManager {
      * @param displayNumber
      * @author GAO RISHENG A0101891L
      */
-    public final void setDisplayNumber(final int displayNumber) {
-        if(displayNumber>MINIMUM_NON_NEGATIVE)
+    private final boolean setDisplayNumber(final int displayNumber) {
+        if (displayNumber > MINIMUM_NON_NEGATIVE) {
             this.displayNumber = displayNumber;
-        else 
-            this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER+displayNumber);
+            return true;
+        } else {
+            this.logger.error(
+                    ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER + displayNumber);
+            return false;
+        }
     }
 
     /**
@@ -260,11 +324,23 @@ public final class SystemManager {
      *            user Email
      * @author Gao Risheng A0101891L
      */
-    public final void setUserEmail(final String email) {
-        if(email!=null)
+    private final boolean setUserEmail(final String email) {
+        if (email != null) {
             this.userEmail = email;
-        else
+            return true;
+        } else {
             this.logger.error(ERR_MSG_INVALID_UPDATE_EMAIL);
+            return false;
+        }
+    }
+
+    /**
+     * @return the sync directory of default user
+     * @author GAO RISHENG
+     */
+    private final String getDefaultStoreDirectory() {
+        File temp = new File(EMPTY_STRING);
+        return temp.getAbsolutePath() + DEFAULT_SYNC_DIRECTORY;
     }
 
     /**
