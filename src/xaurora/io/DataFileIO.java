@@ -35,6 +35,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 public final class DataFileIO {
+    private static final String MSG_EXPIRED_FILE_DELETED = "Expired data file %s is deleted.";
     private static final String ERR_MSG_ILLEGAL_BLOCK = "Unable to decrypt due to Illegal block";
     private static final String ERR_MSG_INVALID_PADDING = "Unable to decrypt due to invalid padding";
     private static final String ERR_MSG_INVALID_ALGORITHM = "Unable to decrypt due to invalid algorithm";
@@ -192,8 +193,6 @@ public final class DataFileIO {
                 .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING), secure));
 
         fos.close();
-        dstFile.setReadOnly();
-        dstFile.setReadable(true);
 
     }
 
@@ -309,9 +308,14 @@ public final class DataFileIO {
                 manager.getIndexerInstance().deleteByField(
                         TextIndexer.FIELD_SEARCH_FILENAME,
                         allMetaData.get(index).getFilename());
+                manager.getDataFileIOInstance()
+                        .removeDataFile(allMetaData.get(index).getFilename());
+                this.logger.info(String.format(MSG_EXPIRED_FILE_DELETED,
+                        allMetaData.get(index).getFilename()));
                 deleteMetaData.add(allMetaData.get(index));
             }
         }
+        
         return deleteMetaData;
     }
 
@@ -328,7 +332,6 @@ public final class DataFileIO {
     public final void removeDataFile(final String filename) {
         // This should never be triggered. => use Assert
         assert filename != null && !filename.trim().equals(NEW_EMPTY_STRING);
-
         Path filePath = Paths.get(this.syncDirectory + PATH_SEPARATOR + filename
                 + DEFAULT_FILE_EXTENSION);
         try {

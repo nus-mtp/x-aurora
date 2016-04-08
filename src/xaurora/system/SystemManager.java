@@ -290,7 +290,7 @@ public final class SystemManager {
      * @author GAO RISHENG A0101891L
      */
     private final boolean setExpireTime(final int numOfHours) {
-        if (numOfHours > MINIMUM_NON_NEGATIVE) {
+        if (numOfHours >= MINIMUM_NON_NEGATIVE) {
             this.expiryHours = numOfHours;
             return true;
         } else {

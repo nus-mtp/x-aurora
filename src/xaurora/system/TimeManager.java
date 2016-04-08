@@ -101,7 +101,7 @@ public final class TimeManager {
     }
     
     public final void setExpiredInterval(int hours){
-        if(hours<=MINIMUM_NON_NEGATIVE){
+        if(hours<MINIMUM_NON_NEGATIVE){
             this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR+hours);
         }
         else

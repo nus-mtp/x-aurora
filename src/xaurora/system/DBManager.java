@@ -7,6 +7,7 @@ import java.util.HashSet;
 import xaurora.system.SystemManager;
 import xaurora.util.DataFileMetaData;
 import org.apache.log4j.Logger;
+
 /**
  * @author GAO RISHENG A0101891L Description: This class is mainly for
  *         periodically monitoring the files in the database, checking and
@@ -17,7 +18,7 @@ public final class DBManager implements Runnable {
     private static final int FIVE_MINUTE = 300000;
     private static final String MSG_EXPIRY_CHECK_COMPLETE = "Auto File Expiry Check Complete. Start Deleting expired files.";
     private static final String MSG_EXPIRY_CHECK_START = "Auto File Expiry Check for current user start.";
-    private static final String MSG_UPDATE_COMPLETE = "Database update complete.";
+    private static final String MSG_UPDATE_COMPLETE = "Database update complete. %d expired file deleted.";
     private static final String MSG_UPDATE_START = "New Data File is found. Start Updating the local Database.";
     private static final String MSG_INIT_COMPLETE = "Finish loading data files for current user. Initialization complete. Tracking start.";
     private static final String MSG_INIT_START = "Start Retriving all data files for the current user. Start Tracking files in the local database.";
@@ -29,6 +30,7 @@ public final class DBManager implements Runnable {
     private HashSet<String> fileset;
     private static DBManager db;
     private Logger logger;
+
     /*
      * (non-Javadoc)
      * 
@@ -52,7 +54,7 @@ public final class DBManager implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (this.isToUpdate) {
+            if (!this.isToUpdate) {
                 this.logger.info(MSG_EXPIRY_CHECK_START);
                 ArrayList<DataFileMetaData> deleteData = this.instance
                         .getDataFileIOInstance()
@@ -61,7 +63,9 @@ public final class DBManager implements Runnable {
                 for (DataFileMetaData m : deleteData) {
                     this.fileset.remove(m.getFilename());
                 }
-                this.logger.info(MSG_UPDATE_COMPLETE);
+                System.out.println(deleteData.size());
+                this.logger.info(
+                        String.format(MSG_UPDATE_COMPLETE, deleteData.size()));
             }
             try {
                 Thread.sleep(FIVE_MINUTE);
@@ -104,7 +108,6 @@ public final class DBManager implements Runnable {
     private synchronized void init() {
         this.monitorFileSet();
     }
-
 
     /**
      * Description Adding monitor to data files which is generated locally

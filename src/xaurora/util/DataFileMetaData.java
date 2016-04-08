@@ -7,8 +7,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import xaurora.system.TimeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This class is a helper class that mainly stores the needed meta data of a
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DataFileMetaData {
 
-    private static final String UNABLE_TO_DECODE_HOST_IN_URL = "Unable to decode host in URL {}.";
+    private static final String UNABLE_TO_DECODE_HOST_IN_URL = "Unable to decode host in URL %s.";
     private static final String FILE_LENGTH_UNIT = " KB";
     private static final String DEFAULT_FILE_SIZE_FORMAT = "#.##";
     private static final double BYTES_PER_KB = 1024.0;
@@ -32,8 +31,7 @@ public final class DataFileMetaData {
     private static final String SOURCE_UNKNOWN = "unknown";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
-    private static Logger logger = LoggerFactory
-            .getLogger(DataFileMetaData.class);
+    private static Logger logger = Logger.getLogger(DataFileMetaData.class);
 
     public DataFileMetaData(String filename, String url) {
         this.filename = filename;
@@ -47,7 +45,7 @@ public final class DataFileMetaData {
             URL sourceURL = new URL(this.url);
             this.source = sourceURL.getHost();
         } catch (MalformedURLException e) {
-            logger.warn(UNABLE_TO_DECODE_HOST_IN_URL, this.url);
+            logger.warn(String.format(UNABLE_TO_DECODE_HOST_IN_URL, this.url));
         }
     }
 

@@ -755,8 +755,8 @@ public final class TextIndexer {
                 String.format(MSG_DELETE_QUERY_CREATED, field, inputQuery));
         try {
             // open the current indexing directory
-            this.reader = DirectoryReader.open(this.storeDirectory);
-            this.searcher = new IndexSearcher(this.reader);
+            //this.reader = DirectoryReader.open(this.storeDirectory);
+            //this.searcher = new IndexSearcher(this.reader);
 
             // Generate the delete query from removing the file extension from
             // the input data file name
@@ -765,18 +765,8 @@ public final class TextIndexer {
 
             this.logger.debug(String.format(MSG_DELETE_QUERY_CREATED, field,
                     deleteQuery));
-            // Estimate the count of entries to be deleted
-
-            TopDocs docs = this.searcher.search(deleteQuery,
-                    this.searcher.count(deleteQuery));
-            // Remove the text file
-            for (int i = INDEX_ZERO; i < docs.totalHits; i++) {
-                int id = docs.scoreDocs[i].doc;
-                String filename = this.searcher.doc(id).get(FIELD_FILENAME);
-                DataFileIO.instanceOf().removeDataFile(filename);
-            }
             // Remove the respective entities from the indexing system
-            this.reader.close();
+            //this.reader.close();
             this.analyzer = new StandardAnalyzer();
             this.config = new IndexWriterConfig(this.analyzer);
             this.writer = new IndexWriter(this.storeDirectory, this.config);
