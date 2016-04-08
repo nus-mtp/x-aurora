@@ -89,11 +89,12 @@ public final class TextIndexer {
     /**
      * Field Constant
      */
+    public static final String FIELD_SEARCH_FILENAME = "s_filename";
     public static final String FIELD_FILENAME = "filename";
     private static final String SOURCE_UNKNOWN = "unknown";
     private static final String FIELD_SOURCE = "source";
-    private static final String FIELD_URL = "url";
-    private static final String FIELD_CONTENT = "content";
+    public static final String FIELD_URL = "url";
+    public static final String FIELD_CONTENT = "content";
     private static final String FIELD_NUMBER = "number";
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_TERMS = "term";
@@ -325,7 +326,8 @@ public final class TextIndexer {
      * @param url,
      *            the URL of the respective webpage
      * @param filename,
-     *            the file name of the data file
+     *            the file name of the data file (ALL CHARACTERS IN FILE NAME
+     *            MUST BE IN LOWER CASE)
      * @param lastModified,
      *            the time when the file is created.
      * 
@@ -365,6 +367,8 @@ public final class TextIndexer {
                     addSource(data, sourceHost);
                     addFilename(data,
                             filename.replace(DATAFILE_EXTENSION, EMPTY_STRING));
+                    addSearchFilename(data,
+                            filename.replace(DATAFILE_EXTENSION, EMPTY_STRING));
                     insertSentencesIntoDocument(sentences, j, data);
                     extractNumbersAndEmails(sentences, j, data);
                     addLastModified(data, lastModified);
@@ -379,7 +383,6 @@ public final class TextIndexer {
             this.writer.close();
             this.logger.debug(String.format(MSG_NEW_DOCUMENT_STATISTICS,
                     paragraphs.length - INDEX_ONE, counter));
-            // printAll();
 
         } catch (IOException e) {
             this.logger.error(ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT, e);
@@ -558,7 +561,21 @@ public final class TextIndexer {
         assert filename != null && !filename.trim().equals(EMPTY_STRING);
         addStringField(doc, FIELD_FILENAME, filename);
     }
-
+    /**
+     * Description: add the tokenized filename of the datafile to a lucene document
+     * object.
+     * 
+     * @param doc,A
+     *            lucene Document object
+     * @param filename,
+     *            A string storing the filename of the text datafile
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    public final static void addSearchFilename(Document doc, final String filename) {
+        assert filename != null && !filename.trim().equals(EMPTY_STRING);
+        addTextField(doc, FIELD_SEARCH_FILENAME, filename);
+    }
     /**
      * Description: add the text content of a sentence to a lucene document
      * object.
@@ -743,9 +760,11 @@ public final class TextIndexer {
             // the input data file name
             Query deleteQuery = new QueryParser(field, this.analyzer).parse(
                     inputQuery.replace(DATAFILE_EXTENSION, EMPTY_STRING));
+
             this.logger.debug(String.format(MSG_DELETE_QUERY_CREATED, field,
                     deleteQuery));
             // Estimate the count of entries to be deleted
+
             TopDocs docs = this.searcher.search(deleteQuery,
                     this.searcher.count(deleteQuery));
             // Remove the text file
@@ -870,6 +889,22 @@ public final class TextIndexer {
         } catch (IOException e) {
             this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM, e);
         }
+    }
+
+    /**
+     * Description: normal getter function to allow access to the index reader
+     * instance
+     * 
+     * @return the index reader instance that is stored locally
+     */
+    public IndexReader getReader() {
+        try {
+            this.reader = DirectoryReader.open(this.storeDirectory);
+        } catch (IOException e) {
+            // Testing method may not require log
+            e.printStackTrace();
+        }
+        return this.reader;
     }
 
     /**

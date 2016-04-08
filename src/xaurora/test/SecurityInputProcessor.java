@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.Stack;
 
 import xaurora.security.Security;
+import xaurora.system.SystemManager;
 
 /**
  * 
@@ -24,11 +25,13 @@ public final class SecurityInputProcessor {
 
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
-
+    private static SystemManager testInstance;
     public static void main(String[] args) {
         // Performance Analysis
+        testInstance = SystemManager.getInstance();
+        testInstance.reset();
         long startTime = System.currentTimeMillis();
-        produceExpectedOutput();
+        produceExpectedOutput(testInstance);
         long endTime = System.currentTimeMillis();
         System.out.println("Finished in "
                 + (double) (endTime - startTime) / 1000.0 + " seconds.");
@@ -42,7 +45,7 @@ public final class SecurityInputProcessor {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private static void produceExpectedOutput() {
+    private static void produceExpectedOutput(SystemManager testInstance) {
         File temp = new File(SecurityTestInputGenerator.NEW_EMPTY_STRING);
         File storeDir = new File(temp.getAbsolutePath()
                 + SecurityTestInputGenerator.RANDOM_INPUT_DIRECTORY);
@@ -82,7 +85,7 @@ public final class SecurityInputProcessor {
                     // write the output file
                     fos.write(Security.encrypt(content, f.getName().replace(
                             SecurityTestInputGenerator.DEFAULT_FILE_EXTENSION,
-                            SecurityTestInputGenerator.NEW_EMPTY_STRING)));
+                            SecurityTestInputGenerator.NEW_EMPTY_STRING),testInstance.getSecurityManagerInstance()));
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {

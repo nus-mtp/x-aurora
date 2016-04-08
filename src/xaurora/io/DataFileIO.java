@@ -53,7 +53,6 @@ public final class DataFileIO {
     private static final String ERR_MSG_UNABLE_TO_SET_INDEX_FILE = "Error,unable to set the local index directory with directory %s because one of the following reason: 1. Invalid Path, 2. Input Path is not a directory.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
-    private static final String ERR_MSG_DECRYPTION_FAIL = "Decryption fail. Error occurs at decrypting process with error Message ";
     private static final String PATH_SEPARATOR = "\\";
     private static final String NEWLINE = "\n";
     private static final String DEFAULT_SYNC_DIRECTORY = "/local_data/";
@@ -308,7 +307,7 @@ public final class DataFileIO {
                     .isExpired(allMetaData.get(index).getLastModified())) {
 
                 manager.getIndexerInstance().deleteByField(
-                        TextIndexer.FIELD_FILENAME,
+                        TextIndexer.FIELD_SEARCH_FILENAME,
                         allMetaData.get(index).getFilename());
                 deleteMetaData.add(allMetaData.get(index));
             }

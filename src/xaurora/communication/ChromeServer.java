@@ -55,7 +55,7 @@ public class ChromeServer implements Runnable {
         String id = IDGenerator.instanceOf().GenerateID(getURL(text),
                 TYPE_FULL_TEXT);
         manager.getDataFileIOInstance().createDataFile(getURL(text), id,
-                String.valueOf(text).getBytes(),manager,databaseManager);
+                text.getBytes(),manager,databaseManager);
     }
 
     /*

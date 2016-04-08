@@ -48,7 +48,7 @@ public final class DBManager implements Runnable {
                 this.isToUpdate = false;
             }
             try {
-                Thread.sleep(300000);
+                Thread.sleep(FIVE_MINUTE);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

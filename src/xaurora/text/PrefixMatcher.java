@@ -218,7 +218,7 @@ public class PrefixMatcher {
 
         for (int i = INDEX_ZERO; i < keywords.size(); i++) {
             queries[i + currentIndex] = keywords.get(i)
-                    .replace(SPECIAL_CHARACTERS, NEW_EMPTY_STRING);
+                    .replace(SPECIAL_CHARACTERS, NEW_EMPTY_STRING)+WILDCARD;
         }
         return queries;
     }

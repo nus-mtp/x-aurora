@@ -59,7 +59,7 @@ public final class IDGenerator {
      * @param url,
      *            the URL of the extracted data source
      * @param type
-     * @return the MD5 hashed ID for the input
+     * @return the MD5 hashed ID (in lower case) for the input
      * @author GAO RISHENG A0101891L
      */
     public final String GenerateID(final String url, final int type) {
@@ -80,7 +80,7 @@ public final class IDGenerator {
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
             this.logger.error(String.format(ERR_MSG_INVALID_HASH_ALGORITHM, e.getMessage()));
-            return id.toString();
+            return new String(id);
         }
 
     }

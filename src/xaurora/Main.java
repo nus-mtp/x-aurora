@@ -39,7 +39,7 @@ public class Main {
 
         // Establish connection between browser/editor and logic
         wordSvrThread.start();
-        sa.changeUser("new user", "example@gmail.com",
+        /*sa.changeUser("new user", "example@gmail.com",
                 "E:\\study\\study2015sem1\\CS3283\\x-aurora\\local_data\\",
                 10, 36);
         
@@ -57,7 +57,7 @@ public class Main {
         sa.changeUser("new user2", "abcde@gmail.com",
                 "E:\\study\\study2015sem1\\CS3283\\x-aurora\\local_data\\",
                 7, 24);
-        
+        */
 
         
 

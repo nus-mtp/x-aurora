@@ -16,6 +16,7 @@ import java.util.Stack;
 import org.junit.Test;
 
 import xaurora.security.Security;
+import xaurora.system.SystemManager;
 
 /**
  * Description: This is a Junit test programming for testing the ability of the
@@ -41,13 +42,16 @@ import xaurora.security.Security;
  *
  */
 public final class SecurityTest {
+    private static final String ERR_MSG_DECRYPT = "Error raised during decryption. ";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
     private static final int INDEX_ZERO = 0;
-
+    private static SystemManager testInstance;
     @Test
     public void test() {
-        produceActualOutput();
+        testInstance = SystemManager.getInstance();
+        testInstance.reset();
+        produceActualOutput(testInstance);
         ArrayList<SecurityTestTextUnit> expectedOutputs = getDirectoryContent(
                 SecurityTestInputGenerator.EXPECTED_OUTPUT_DIRECTORY);
         ArrayList<SecurityTestTextUnit> actualOutputs = getDirectoryContent(
@@ -58,20 +62,23 @@ public final class SecurityTest {
                     actualOutputs.get(index).getText().length);
             assertEquals(actualOutputs.get(index).getName(),
                     actualOutputs.get(index).getName());
-
+            try{
             byte[] expectedOutput = Security.decrypt(
                     expectedOutputs.get(index).getText(),
                     expectedOutputs.get(index).getName().replace(
                             SecurityTestInputGenerator.DEFAULT_FILE_EXTENSION,
-                            SecurityTestInputGenerator.NEW_EMPTY_STRING));
+                            SecurityTestInputGenerator.NEW_EMPTY_STRING),testInstance.getSecurityManagerInstance());
             byte[] actualOutput = Security.decrypt(
                     actualOutputs.get(index).getText(),
                     actualOutputs.get(index).getName().replace(
                             SecurityTestInputGenerator.DEFAULT_FILE_EXTENSION,
-                            SecurityTestInputGenerator.NEW_EMPTY_STRING));
+                            SecurityTestInputGenerator.NEW_EMPTY_STRING),testInstance.getSecurityManagerInstance());
             assertEquals(expectedOutput.length, actualOutput.length);
             for (int offset = INDEX_ZERO; offset < expectedOutput.length; offset++) {
                 assertEquals(actualOutput[offset], expectedOutput[offset]);
+            }
+            } catch (Exception e){
+                System.err.println(ERR_MSG_DECRYPT+e.getMessage());
             }
         }
     }
@@ -82,7 +89,7 @@ public final class SecurityTest {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private static void produceActualOutput() {
+    private static void produceActualOutput(SystemManager testInstance) {
 
         File temp = new File(SecurityTestInputGenerator.NEW_EMPTY_STRING);
         File storeDir = new File(temp.getAbsolutePath()
@@ -115,7 +122,7 @@ public final class SecurityTest {
                             outputFile.getAbsoluteFile());
                     fos.write(Security.encrypt(content, f.getName().replace(
                             SecurityTestInputGenerator.DEFAULT_FILE_EXTENSION,
-                            SecurityTestInputGenerator.NEW_EMPTY_STRING)));
+                            SecurityTestInputGenerator.NEW_EMPTY_STRING),testInstance.getSecurityManagerInstance()));
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {
