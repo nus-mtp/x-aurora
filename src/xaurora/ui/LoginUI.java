@@ -167,21 +167,13 @@ public class LoginUI extends Application{
     	UserPreference preferences = UserPreference.getInstance();
     	preferences.readPreferences(user.username);
     	preferenceUI.setUsername(user.username);
-    	systemManager.setCurrentUser(user.username);
-    	systemManager.setUserEmail(user.email);
-    	systemManager.setDisplayNumber(preferences.getNumMatchingTextDisplay());
-    	systemManager.setExpireTime(preferences.getClearCachesTimeInHours());
-    	systemManager.setSyncDirectory(preferences.getContentPath());
+    	systemManager.changeUser(user.username, user.email, preferences.getContentPath(), preferences.getNumMatchingTextDisplay(), preferences.getClearCachesTimeInHours());
     }
     
     private void buildDefaultUser(){
     	UserPreference preferences = UserPreference.getInstance();
     	preferences.readPreferences(defaultUser);
     	preferenceUI.setUsername(defaultUser);
-    	systemManager.setCurrentUser(defaultUser);
-    	systemManager.setUserEmail(noEmail);
-    	systemManager.setDisplayNumber(preferences.getNumMatchingTextDisplay());
-    	systemManager.setExpireTime(preferences.getClearCachesTimeInHours());
-    	systemManager.setSyncDirectory(preferences.getContentPath());
+    	systemManager.reset();
     }
 }
