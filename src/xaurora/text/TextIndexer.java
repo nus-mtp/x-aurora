@@ -674,11 +674,11 @@ public final class TextIndexer {
     /**
      * Description: add a text field to a lucene document object.
      * 
-     * @param doc£¬A
+     * @param doc,A
      *            lucene Document object
      * @param field,
      *            A String storing the name of the field
-     * @param value£¬A
+     * @param value,A
      *            string storing the text content
      * 
      * @author GAO RISHENG A0101891L
@@ -692,11 +692,11 @@ public final class TextIndexer {
     /**
      * Description: add a String field to a lucene document object.
      * 
-     * @param doc£¬A
+     * @param doc,A
      *            lucene Document object
      * @param field,
      *            A String storing the name of the field
-     * @param value£¬A
+     * @param value,A
      *            string storing the text content
      * 
      * @author GAO RISHENG A0101891L
@@ -710,8 +710,10 @@ public final class TextIndexer {
 
     /**
      * Description: Add a long field to a lucene document object with
-     * overwritten field setting ¡Á This is mainly for storing the time when the
-     * data was retrieved and use that for ¡Á sorting (more received result will
+     * overwritten field setting  
+     * This is mainly for storing the time when the
+     * data was retrieved and use that for 
+     * sorting (more received result will
      * rank higher)
      * 
      * @param doc,
@@ -733,13 +735,13 @@ public final class TextIndexer {
 
     /**
      * Description: delete an entity in the lucene indexing system and removing
-     * its ¡Á actual data file
+     * its actual data file
      * 
      * @param The
      *            field needs to search
      * @param Tthe
      *            input query in String Post-condition: The entity and its
-     *            corresponding data file will be deleted ¡Á if found in the
+     *            corresponding data file will be deleted if found in the
      *            index system.
      * 
      * @author GAO RISHENG A0101891L
