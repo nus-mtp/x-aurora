@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import xaurora.security.Security;
+import xaurora.system.SecurityManager;
 
 /**
  * Description: This class is mainly in charge of file IO that related to system
@@ -111,17 +112,20 @@ public final class SystemIO {
      *            the secure salt generated to this user
      * @param instance,
      *            the DataFileIO instance to be updated
+     * @param secureInstance,
+     *            the SecureManager instance to encrypt
      * 
      * @author Gao Risheng A0101891L
      */
     public final void registerNewUser(final String userName, final String email,
-            final byte[] entry, DataFileIO instance) {
+            final byte[] entry, DataFileIO instance,
+            SecurityManager secureInstance) {
         assert userName != null && email != null
                 && !userName.trim().equals(NEW_EMPTY_STRING);
 
         final String hashName = Security.hashUserName(userName, email);
         setUpUserIndexDirectory(hashName, instance);
-        createKeyFile(hashName, entry);
+        createKeyFile(hashName, entry, secureInstance);
         this.logger.debug(String.format(MSG_USER_REGISTRATION, hashName));
     }
 
@@ -231,14 +235,16 @@ public final class SystemIO {
      * 
      * @param entry,
      *            the random salt that belongs to default user in this device
-     * 
+     * @param instance,
+     *            the security manager instance to encrypt
      * @author Gao Risheng A0101891L
      */
-    public final void createLocalKey(final byte[] entry) {
+    public final void createLocalKey(final byte[] entry,
+            SecurityManager instance) {
         String filename = Security.hashUserName(DEFAULT_USERNAME,
                 NEW_EMPTY_STRING);
         this.logger.info(MSG_GENERATE_LOCAL_KEY);
-        createKeyFile(filename, entry);
+        createKeyFile(filename, entry, instance);
     }
 
     /**
@@ -248,10 +254,13 @@ public final class SystemIO {
      *            the Hashed user Name
      * @param entry,
      *            The random salt belongs to this user
+     * @param instance,
+     *            The Security Manager instance to encrypt the user key
      * 
      * @author GAO RISHENG A0101891L
      */
-    public final void createKeyFile(final String hashName, final byte[] entry) {
+    public final void createKeyFile(final String hashName, final byte[] entry,
+            SecurityManager instance) {
 
         String filename = Security.hashUserName(KEY_SET_FILE, NEW_EMPTY_STRING);
         File temp = new File(NEW_EMPTY_STRING);
@@ -270,7 +279,7 @@ public final class SystemIO {
                 keySetFile.createNewFile();
                 FileOutputStream fos = new FileOutputStream(
                         keySetFile.getAbsolutePath());
-                fos.write(entry);
+                fos.write(instance.encryptUserkeys(entry));
                 fos.flush();
                 fos.close();
                 keySetFile.setReadOnly();
@@ -288,12 +297,15 @@ public final class SystemIO {
      * Description: this is reading all the keys store locally to construct a
      * Hash map that stores all the salt string and hashed user name
      * 
+     * @param instance,
+     *            the security manager instance to decrypt the user keys
      * @return a HashMap consist of all the Hashed user name and their random
      *         salt String
      * 
      * @author GAO RISHENG
      */
-    public final HashMap<String, byte[]> retrieveKeys() {
+    public final HashMap<String, byte[]> retrieveKeys(
+            SecurityManager instance) {
         // Salt is the value, hash name is the key
         HashMap<String, byte[]> keyset = new HashMap<String, byte[]>();
         this.logger.info(MSG_START_RETRIEVING_KEYS);
@@ -316,13 +328,15 @@ public final class SystemIO {
                 if (FilenameUtils.getExtension(f.getAbsolutePath())
                         .equals(KEY_SET_FILE_EXTENSION)) {
                     try {
-                        byte[] entry = Files
+                        byte[] cipherEntry = Files
                                 .readAllBytes(Paths.get(f.getAbsolutePath()));
+                        byte[] plainEntry = instance
+                                .decryptUserkeys(cipherEntry);
                         byte[] hashName = new byte[HASH_LENGTH];
                         byte[] salt = new byte[HASH_LENGTH];
                         for (int index = INDEX_ZERO; index < HASH_LENGTH; index++) {
-                            hashName[index] = entry[index];
-                            salt[index] = entry[HASH_LENGTH + index];
+                            hashName[index] = plainEntry[index];
+                            salt[index] = plainEntry[HASH_LENGTH + index];
                         }
                         keyset.put(new String(hashName), salt);
                     } catch (IOException e) {

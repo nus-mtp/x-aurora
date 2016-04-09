@@ -63,7 +63,6 @@ public final class DBManager implements Runnable {
                 for (DataFileMetaData m : deleteData) {
                     this.fileset.remove(m.getFilename());
                 }
-                System.out.println(deleteData.size());
                 this.logger.info(
                         String.format(MSG_UPDATE_COMPLETE, deleteData.size()));
             }

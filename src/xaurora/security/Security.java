@@ -91,26 +91,30 @@ public final class Security {
      *            the String IV
      * @return Plain text data in bytes
      * @author GAO RISHENG A0101891L
-     * @throws InvalidAlgorithmParameterException 
-     * @throws InvalidKeyException 
-     * @throws NoSuchPaddingException 
-     * @throws NoSuchAlgorithmException 
-     * @throws BadPaddingException 
-     * @throws IllegalBlockSizeException 
+     * @throws InvalidAlgorithmParameterException
+     * @throws InvalidKeyException
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      */
     public static final byte[] decrypt(final byte[] content,
-            final String initVector, final SecurityManager secure) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+            final String initVector, final SecurityManager secure)
+                    throws InvalidKeyException,
+                    InvalidAlgorithmParameterException,
+                    NoSuchAlgorithmException, NoSuchPaddingException,
+                    IllegalBlockSizeException, BadPaddingException {
 
-            String hash = secure.getCurrentHash();
-            byte[] currentSalt = secure.getSalt(hash);
-            byte[] secretKey = generateKey(hash, currentSalt);
-            SecretKeySpec skeySpec = new SecretKeySpec(secretKey,
-                    ENCRYPT_ALGORITHM);
-            Cipher cipher = Cipher.getInstance(ENCRYPT_METHOD);
-            byte[] iv = createIV(initVector);
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
-            cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivspec);
-            return cipher.doFinal(content);
+        String hash = secure.getCurrentHash();
+        byte[] currentSalt = secure.getSalt(hash);
+        byte[] secretKey = generateKey(hash, currentSalt);
+        SecretKeySpec skeySpec = new SecretKeySpec(secretKey,
+                ENCRYPT_ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ENCRYPT_METHOD);
+        byte[] iv = createIV(initVector);
+        IvParameterSpec ivspec = new IvParameterSpec(iv);
+        cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivspec);
+        return cipher.doFinal(content);
 
     }
 
@@ -121,6 +125,7 @@ public final class Security {
      * @param initVector,
      *            is usually the file name of a text file
      * @return the IV of AES Encryption in byte array
+     * @author GAO RISHENG A0101891L
      */
     private static final byte[] createIV(final String initVector) {
         char[] characters = initVector.toCharArray();
@@ -151,6 +156,7 @@ public final class Security {
      * Description: generate a secure random 32 byte salt value
      * 
      * @return a 32 byte secure random salt
+     * @author GAO RISHENG A0101891L
      */
     private static final byte[] generateSalt() {
         final Random r = new SecureRandom();
@@ -159,35 +165,68 @@ public final class Security {
         return salt;
     }
 
+    /**
+     * Description: generate an encryption key for given user hash ID and salt
+     * 
+     * @param hashName,
+     *            the MD5 hashed user ID
+     * @param salt,
+     *            the 32 bytes secure random salt @return, the unique encryption
+     *            key for this user
+     * @author GAO RISHENG A0101891L
+     */
     private static final byte[] generateKey(final String hashName,
             final byte[] salt) {
         try {
             byte[] temp = hashName.getBytes(DEFAULT_CHARSET);
             // input contains hashed userName + salt
+            // 64 byte temporary key
             byte[] input = new byte[temp.length + salt.length];
             for (int index = INDEX_ZERO; index < salt.length; index++) {
                 input[index] = salt[index];
             }
             for (int index = INDEX_ZERO; index < temp.length; index++) {
-                input[index] = temp[index];
+                input[index + salt.length] = temp[index];
             }
+            // generate the 16 byte actual key by applying SHA_1 hash at
+            // the 64 byte temporary key
             MessageDigest sha = MessageDigest.getInstance(HASH_TYPE_SHA_1);
             input = sha.digest(input);
             input = Arrays.copyOf(input, KEY_LENGTH_IN_BYTES);
             return input;
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(ERR_MSG_UNABLE_TO_GENERATE_KEY, e);
         }
         logger.info(ERR_MSG_INVALID_GENERATED);
         return new byte[KEY_LENGTH_IN_BYTES];
     }
 
+    /**
+     * Description: create the unique encryption key for the un-sync local user
+     * in the local device (characteristic of local key, default user name + no
+     * email)
+     * 
+     * @param userName,
+     *            the default user name in the local device
+     * @return the local encryption key
+     * @author GAO RISHENG A0101891L
+     */
     public static final byte[] generateLocalKey(final String userName) {
         assert userName != null;
         return generateUserKey(userName, EMPTY_STRING);
     }
 
+    /**
+     * Description: generate the user encryption key from given user name and
+     * user email
+     * 
+     * @param userName,
+     *            the user name, a non-empty and not null string
+     * @param userEmail,
+     *            the user email, a not null string
+     * @return the unique encryption key for this user
+     * @author Gao Risheng A0101891L
+     */
     public static final byte[] generateUserKey(final String userName,
             final String userEmail) {
         assert userName != null && !userName.trim().equals(EMPTY_STRING);
@@ -205,6 +244,16 @@ public final class Security {
         return entry;
     }
 
+    /**
+     * Description: this is to generate a MD5 hashed user ID from given user
+     * name and user email
+     * 
+     * @param userName,
+     *            the userName of the user
+     * @param email,
+     *            the user email of the user @return, the MD5 hashed user ID
+     * @author GAO RISHENG A0101891L
+     */
     public static final String hashUserName(final String userName,
             final String email) {
         byte[] id = (userName + email).getBytes();

@@ -62,14 +62,16 @@ public final class SystemManager {
         this.logger = Logger.getLogger(this.getClass());
         this.logger.info(MSG_START);
         this.logger.info(MSG_FOUNDATION_INIT);
+        
         this.io = DataFileIO.instanceOf();
         this.systemIo = SystemIO.getClassInstance();
+        this.secure = SecurityManager.getClassInstance(this.systemIo);
         if (!systemIo.isLocalKeyCreated()) {
             byte[] entry = Security.generateLocalKey(DEFAULT_USERNAME);
             this.systemIo.registerNewUser(DEFAULT_USERNAME, EMPTY_STRING, entry,
-                    io);
+                    this.io, this.secure);
         }
-        this.secure = SecurityManager.getClassInstance(this.systemIo);
+
         this.timeManager = TimeManager.getInstance();
         this.logger.info(MSG_FOUNDATION_COMPLETE);
     }
@@ -133,7 +135,7 @@ public final class SystemManager {
             byte[] entry = Security.generateUserKey(this.currentUserName,
                     this.userEmail);
             this.systemIo.registerNewUser(this.currentUserName, this.userEmail,
-                    entry, io);
+                    entry, this.io, this.secure);
             this.secure.reInit(this.systemIo);
         }
         this.secure.setCurrentHash(
@@ -174,9 +176,9 @@ public final class SystemManager {
         isUpdateValid &= this.setDisplayNumber(displayNumber);
         isUpdateValid &= this.setExpireTime(expiry);
         if (isUpdateValid) {
-            if(currentUserName!=null)
-            this.systemIo.cleanIndexData(this.io,
-                    Security.hashUserName(currentUserName, currentEmail));
+            if (currentUserName != null)
+                this.systemIo.cleanIndexData(this.io,
+                        Security.hashUserName(currentUserName, currentEmail));
             triggerInitialization();
         } else {
             this.logger.error(ERR_MSG_INVALID_USER_UPDATE);
