@@ -8,6 +8,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import org.apache.log4j.Logger;
 
+import xaurora.ui.Message;
+
 /**
  * Description: This class is in charge of converting the time format, recording
  * the time setting of the current user, and verifying whether a file is expired
@@ -17,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 public final class TimeManager {
     private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR = "Error, system is trying to update a non-positive expiry time in hours";
-    private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND = "Error, system is trying to update a non-positive expiry time in seonds";
+    private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND = "Error, system is trying to update a non-positive expiry time in seconds";
     private static final int MINIMUM_NON_NEGATIVE = 0;
     private static final String MSG_START = "An instance of Time Manager is created. This message should appear only once at every software running flow.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
@@ -29,6 +31,7 @@ public final class TimeManager {
     private long expireInterval;
     private static TimeManager classInstance;
     private Logger logger;
+    private Message message = new Message();
     private TimeManager() {
         this.logger = Logger.getLogger(this.getClass());
         this.expireInterval = DEFAULT_EXPIRE_INTERVAL;
@@ -95,14 +98,16 @@ public final class TimeManager {
      */
     public final void setExpiredInterval(long seconds) {
         if(seconds<=MINIMUM_NON_NEGATIVE){
-            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND+seconds);
+            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND + seconds);
+            message.showError(ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND);
         } else 
             this.expireInterval = seconds * MILLISECONDS_PER_SECOND;
     }
     
     public final void setExpiredInterval(int hours){
         if(hours<MINIMUM_NON_NEGATIVE){
-            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR+hours);
+            this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR + hours);
+            message.showError(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR);
         }
         else
             this.expireInterval = hours*SECONDS_PER_HOURS*MILLISECONDS_PER_SECOND;

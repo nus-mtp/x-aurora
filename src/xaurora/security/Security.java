@@ -19,6 +19,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import xaurora.system.SecurityManager;
+import xaurora.ui.Message;
 
 /**
  * Description: This Class is mainly in charge of maintaining the
@@ -52,6 +53,7 @@ public final class Security {
     private static final int SALT_LENGTH = 32;
     private static final int KEY_LENGTH_IN_BYTES = 16;
     private static Logger logger = Logger.getLogger(Security.class);
+    private static Message message = new Message();
 
     /**
      * Description: encrypt the plain text content with given IV
@@ -78,6 +80,7 @@ public final class Security {
             return cipher.doFinal(content);
         } catch (Exception e) {
             logger.error(ERR_MSG_ENCRYPTION_FAIL, e);
+            message.showError(ERR_MSG_ENCRYPTION_FAIL);
         }
         return content;
     }
@@ -198,6 +201,7 @@ public final class Security {
             logger.error(ERR_MSG_UNABLE_TO_GENERATE_KEY, e);
         }
         logger.info(ERR_MSG_INVALID_GENERATED);
+        message.showError(ERR_MSG_INVALID_GENERATED);
         return new byte[KEY_LENGTH_IN_BYTES];
     }
 
@@ -272,6 +276,7 @@ public final class Security {
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
             logger.error(ERR_MSG_INVALID_HASH_ALGORITHM, e);
+            message.showError(ERR_MSG_INVALID_HASH_ALGORITHM);
             return id.toString();
         }
     }

@@ -9,6 +9,7 @@ import xaurora.io.DataFileIO;
 import xaurora.io.SystemIO;
 import xaurora.security.Security;
 import xaurora.text.TextIndexer;
+import xaurora.ui.Message;
 
 /**
  * Thie class is the main controller of the Logic component that controls all
@@ -56,6 +57,7 @@ public final class SystemManager {
     private TimeManager timeManager;
     private boolean isInitialized = false;
     private Logger logger;
+    private Message message = new Message();
 
     private SystemManager() {
 
@@ -107,10 +109,12 @@ public final class SystemManager {
                 pingProcess.destroy();
             } catch (InterruptedException e) {
                 this.logger.error(ERR_MSG_NET_ACCESS_INTERRUPT, e);
+                message.showError(ERR_MSG_NET_ACCESS_INTERRUPT);
             }
         } catch (IOException e) {
             this.logger.error(ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY,
                     e);
+            message.showError(ERR_MSG_UNABLE_TO_CHECK_FOR_NETWORK_ACCESSIBILITY);
         }
         return result;
     }
@@ -182,6 +186,7 @@ public final class SystemManager {
             triggerInitialization();
         } else {
             this.logger.error(ERR_MSG_INVALID_USER_UPDATE);
+            message.showError(ERR_MSG_INVALID_USER_UPDATE);
         }
     }
 
@@ -263,6 +268,7 @@ public final class SystemManager {
             return true;
         } else {
             this.logger.error(ERR_MSG_INVALID_UPDATE_USERNAME + userName);
+            message.showError(ERR_MSG_INVALID_UPDATE_USERNAME);
             return false;
         }
     }
@@ -280,6 +286,7 @@ public final class SystemManager {
             return true;
         } else {
             this.logger.error(ERR_MSG_INVALID_UPDATE_STORE_DIRECTORY);
+            message.showError(ERR_MSG_INVALID_UPDATE_STORE_DIRECTORY);
             return false;
         }
     }
@@ -297,6 +304,7 @@ public final class SystemManager {
             return true;
         } else {
             this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS + numOfHours);
+            message.showError(ERR_MSG_INVALID_UPDATE_EXPIRY_HOURS);
             return false;
         }
     }
@@ -315,6 +323,7 @@ public final class SystemManager {
         } else {
             this.logger.error(
                     ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER + displayNumber);
+            message.showError(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER);
             return false;
         }
     }
@@ -332,6 +341,7 @@ public final class SystemManager {
             return true;
         } else {
             this.logger.error(ERR_MSG_INVALID_UPDATE_EMAIL);
+            message.showError(ERR_MSG_INVALID_UPDATE_EMAIL);
             return false;
         }
     }
