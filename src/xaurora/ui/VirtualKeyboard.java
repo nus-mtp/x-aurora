@@ -23,9 +23,6 @@ import xaurora.util.UserPreference;
 @SuppressWarnings("deprecation")
 public class VirtualKeyboard {
 
-    private final Key[][] keys;
-    int hotkeyIndex;
-    UserPreference preferences = UserPreference.getInstance();
     final String[][] keyTexts = new String[][]{
         {"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="},
         {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"},
@@ -48,6 +45,9 @@ public class VirtualKeyboard {
         {KeyCode.CONTROL, KeyCode.META, KeyCode.ALT, KeyCode.SPACE, KeyCode.LEFT,
             KeyCode.UP, KeyCode.DOWN, KeyCode.RIGHT}
     };
+    private final Key[][] keys;
+    int hotkeyIndex;
+    UserPreference preferences = UserPreference.getInstance();
 
     public VirtualKeyboard() {
         keys = new Key[5][];
@@ -166,29 +166,11 @@ public class VirtualKeyboard {
     }
     
     private KeyCode[] getHotkey(int index){
-        KeyCode[] hotkey = null;
-        switch(index){
-            case 0: hotkey = preferences.getExtendWordHotkey(); break;
-            case 1: hotkey = preferences.getReduceWordHotkey(); break;
-            case 2: hotkey = preferences.getExtendSentenceHotkey(); break;
-            case 3: hotkey = preferences.getReduceSentenceHotkey(); break; 
-            case 4: hotkey = preferences.getExtendParagraphHotkey(); break;
-            case 5: hotkey = preferences.getReduceParagraphHotkey(); break;
-            default:    
-        }
-        return hotkey;
+        return preferences.getHotkeyCodes(index);
     }
     
-    private void setHotkey(int index, KeyCode[] hotkey){
-        switch(index){
-            case 0: preferences.setExtendWordHotkey(hotkey); break;
-            case 1: preferences.setReduceWordHotkey(hotkey); break;
-            case 2: preferences.setExtendSentenceHotkey(hotkey); break;
-            case 3: preferences.setReduceSentenceHotkey(hotkey); break; 
-            case 4: preferences.setExtendParagraphHotkey(hotkey); break;
-            case 5: preferences.setReduceParagraphHotkey(hotkey); break;
-            default:    
-        }
+    private void setHotkey(int index, KeyCode[] codes){
+        preferences.setHotkeyCodes(index, codes);
     }
 
     public class Key {

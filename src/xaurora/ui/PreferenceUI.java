@@ -389,19 +389,10 @@ public class PreferenceUI extends Application{
     }
     
     private void setKeyboardHotkey(VirtualKeyboard keyboard, int index){
-        KeyCode[] hotkey = null;
-        switch(index){
-            case 0: hotkey = preferences.getExtendWordHotkey(); break;
-            case 1: hotkey = preferences.getReduceWordHotkey(); break;
-            case 2: hotkey = preferences.getExtendSentenceHotkey(); break;
-            case 3: hotkey = preferences.getReduceSentenceHotkey(); break; 
-            case 4: hotkey = preferences.getExtendParagraphHotkey(); break;
-            case 5: hotkey = preferences.getReduceParagraphHotkey(); break;
-            default:    
-        }
-        
-        for (int i = 0; i < hotkey.length; i++){
-            Key key = keyboard.getKey(hotkey[i]);
+        KeyCode[] codes = preferences.getHotkeyCodes(index);
+
+        for (int i = 0; i < codes.length; i++){
+            Key key = keyboard.getKey(codes[i]);
             key.setPressed(true);
         }
     }

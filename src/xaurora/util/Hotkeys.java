@@ -32,8 +32,24 @@ public class Hotkeys {
 		return hotkeys[index];
 	}
 	
+	public String getHotkeyName(int index){
+		return hotkeys[index].getName();
+	}
+	
+	public KeyCode[] getHotkeyCodes(int index){
+		return hotkeys[index].getCodes();
+	}
+	
+	public KeyCode[] getDefaultHotkeyCodes(int index){
+		return codes[index];
+	}
+	
 	public void setHotkey(int index, Hotkey hotkey){
 		hotkeys[index] = hotkey;
+	}
+	
+	public void setHotkeyCodes(int index, KeyCode[] codes){
+		hotkeys[index].setCodes(codes);
 	}
 }
 
