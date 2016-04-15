@@ -1,5 +1,6 @@
 package xaurora.test;
 
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -26,10 +27,10 @@ public class PreferenceUITest extends GuiTest{
     
     private static final String TEST_FILE = "test";
     private static final String INPUT_FILE_EXTENSION = ".in";
+    private File testFile;
     PreferenceUI preferenceUI = new PreferenceUI();
     UserPreference preferences = UserPreference.getInstance();
-    private File testFile;
-
+    
     @Override
     protected Parent getRootNode() {
     	preferenceUI.setUsername("test");
@@ -40,11 +41,11 @@ public class PreferenceUITest extends GuiTest{
     public void testSystemPane(){
     	click("#Setting");
     	click("#System");
-    	
-    	//test if clicking toggle the boolean value 
-        CheckBox checkboxRunOnStartUp = find("#checkboxRunOnStartUp");
+    	CheckBox checkboxRunOnStartUp = find("#checkboxRunOnStartUp");
         CheckBox checkboxHideInToolbar = find("#checkboxHideInToolbar");
         Button applyButton = find("#applyButton");
+        
+    	//test if clicking toggle the boolean value 
         boolean isCheckboxRunOnStartUpSelected = checkboxRunOnStartUp.isSelected();
         boolean isCheckboxHideInToolbarSelected = checkboxHideInToolbar.isSelected();
         click(checkboxRunOnStartUp);
@@ -113,15 +114,17 @@ public class PreferenceUITest extends GuiTest{
     	assertEquals(20, preferences.getNumMatchingTextDisplay());
     	
     	//test spinner decrement button
+    	Node decrementArrowButton = spinner.lookup(".decrement-arrow-button");
     	for(int i=0; i<10; i++){
-    		click(spinner.lookup(".decrement-arrow-button"));
+    		click(decrementArrowButton);
     	}
     	click(applyButton);
     	assertEquals(10, preferences.getNumMatchingTextDisplay());
     	
     	//test spinner increment button
+    	Node incrementArrowButton = spinner.lookup(".increment-arrow-button");
     	for(int i=0; i<5; i++){
-    		click(spinner.lookup(".increment-arrow-button"));
+    		click(incrementArrowButton);
     	}
     	click(applyButton);
     	assertEquals(15, preferences.getNumMatchingTextDisplay());
@@ -135,10 +138,11 @@ public class PreferenceUITest extends GuiTest{
     	assertEquals(true, preferences.isShowTextSource());
     	
     	//test slider
-    	drag(slider.lookup(".thumb")).by(200, 0).drop();
+    	Node sliderThumb = slider.lookup(".thumb");
+    	drag(sliderThumb).by(200, 0).drop();
     	click(applyButton);
     	assertEquals(100, preferences.getBoxTransparency(), 0);
-    	drag(slider.lookup(".thumb")).by(-200, 0).drop();
+    	drag(sliderThumb).by(-200, 0).drop();
     	click(applyButton);
     	assertEquals(0, preferences.getBoxTransparency(), 0);
 
@@ -151,6 +155,8 @@ public class PreferenceUITest extends GuiTest{
     	click("#BlockedList");
     	TextField urlField = find("#urlField");
     	Button addButton = find("#addButton");
+    	ToggleButton toggleButton = find("#toggleButton");
+    	Button deleteButton = find("#deleteButton");
     	Button applyButton = find("#applyButton");
     	ArrayList<BlockedPage> blockedList;
     	createTestFile();
@@ -166,15 +172,13 @@ public class PreferenceUITest extends GuiTest{
     	assertEquals(true, blockedList.get(0).getIsEnabled());
     	
     	//test toggle enable/disable
-    	ToggleButton toggleButton = find("#toggleButton");
     	click(toggleButton);
-    	click(applyButton);
     	assertEquals(false, blockedList.get(0).getIsEnabled());
+    	click(toggleButton);
+    	assertEquals(true, blockedList.get(0).getIsEnabled());
     	
     	//test delete from blocked list
-    	Button deleteButton = find("#deleteButton");
     	click(deleteButton);
-    	click(applyButton);
     	assertEquals(0, blockedList.size());
     	
     	deleteTestFile();
