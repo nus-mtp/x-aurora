@@ -13,25 +13,31 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import xaurora.util.Hotkeys;
 
+
+/**
+ * 
+ * @author Lee
+ *
+ */
 public class UserPreference {
-    //System Pane
+    //System Pane preferences
     private boolean isRunOnStartUp;
     private boolean isHideInToolbar;
-    //Hotkeys Pane
+    //Hotkeys Pane preferences
     Hotkeys hotkeys;
-    //Text Editor Pane
+    //Text Editor Pane preferences
     private int numMatchingTextDisplay;
     private boolean isShowTextSource;
     private Color boxColour;
     private Color textColour;
     private double boxTransparency;
-    //Blocked List Pane
+    //Blocked List Pane preferences
     private ArrayList<BlockedPage> blockedList;
-    //Path Pane
+    //Path Pane preferences
     private String contentPath;
     private boolean isShowPreviewText;
     private String clearCachesTime;
-    //Storage Pane
+    //Storage Pane preferences
     private String maxTextSizeStored;
     private String previewTextLength;
     
@@ -43,6 +49,10 @@ public class UserPreference {
     	initPreferences();
     }
     
+    /**
+     * makes UserPreference a Singleton class
+     * @return an instance of UserPreference
+     */
     public static UserPreference getInstance(){
         if (instance == null){
             instance = new UserPreference();
@@ -50,33 +60,42 @@ public class UserPreference {
         return instance;
     }
 
+    /**
+     * initialize preferences with initial value
+     */
     public void initPreferences(){
-        //System Pane
+        //System Pane preferences
         isRunOnStartUp = true;
         isHideInToolbar = true;
-        //Hotkeys Pane
+        //Hotkeys Pane preferences
         hotkeys = new Hotkeys();
-        //Text Editor Pane
+        //Text Editor Pane preferences
         numMatchingTextDisplay = 5;
         isShowTextSource = true;
         boxColour = Color.WHITE;
         textColour = Color.BLACK;
         boxTransparency = 0;
-        //Blocked List Pane
+        //Blocked List Pane preferences
         blockedList = new ArrayList<BlockedPage>();
-        //Path Pane
+        //Path Pane preferences
         contentPath = "C:/User/Desktop";
         isShowPreviewText = true;
         clearCachesTime = "device is off";
-        //Storage Pane
+        //Storage Pane preferences
         maxTextSizeStored = "100MB";
         previewTextLength = "one sentence";
     }
     
+    /**
+     * read preferences from file, run integrity check for each preference
+     * and load the correct value to UI 
+     * @param username
+     */
     public void readPreferences(String username) {
         String filename = username + ".in";
 
         try {
+        	//read preferences from file
             FileReader fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String[] settings = new String[numPreferences];
@@ -85,11 +104,12 @@ public class UserPreference {
             }
             
             int index = 0;
-            //System Pane
+            
+            //System Pane preferences
             isRunOnStartUp = toBoolean(settings[index++]);
             isHideInToolbar = toBoolean(settings[index++]);
 
-            //Hotkeys Pane
+            //Hotkeys Pane preferences
             String[] codes;
             for (int i=0; i < numHotkeys; i++){
             	try{
@@ -113,7 +133,7 @@ public class UserPreference {
             	}
             }
 
-            //Text Editor Pane
+            //Text Editor Pane preferences
             try{
             	numMatchingTextDisplay = Integer.valueOf(settings[index++]);
             }catch(NumberFormatException ex){
@@ -136,7 +156,7 @@ public class UserPreference {
                 boxTransparency = getDefaultBoxTransparency();
             }
             
-            //Blocked List Pane
+            //Blocked List Pane preferences
             try{
             	String[] s = settings[index++].split("\\s+");
             	blockedList = new ArrayList<BlockedPage>();
@@ -148,7 +168,7 @@ public class UserPreference {
             	blockedList = new ArrayList<BlockedPage>();
             }
 
-            //Path Pane
+            //Path Pane preferences
             try{
             	String filepath = settings[index++];
             	File file = new File(filepath);
@@ -164,7 +184,7 @@ public class UserPreference {
             clearCachesTime = settings[index++];
             checkClearCachesTime();
             
-            //Storage Pane
+            //Storage Pane preferences
             maxTextSizeStored = settings[index++];
             checkMaxTextSizeStored();
             previewTextLength = settings[index++];
@@ -178,6 +198,11 @@ public class UserPreference {
         }
     }
     
+    /**
+     * convert a String to Boolean
+     * @param str
+     * @return a boolean value
+     */
     private boolean toBoolean(String str){
     	if (str != null && str.equalsIgnoreCase("FALSE")){
     		return false;
@@ -215,22 +240,28 @@ public class UserPreference {
 		previewTextLength = getDefaultPreviewTextLength();
 	}
 
+    /**
+     * write preferences to file
+     * @param username
+     */
     public void writePreferences(String username) {
         String filename = username + ".in";
 
         try {
             FileWriter fileWriter = new FileWriter(filename);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            
+            //System Pane preferences
             bufferedWriter.write(String.valueOf(isRunOnStartUp));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isHideInToolbar));
             bufferedWriter.newLine();
-            
+            //Hotkey Pane preferences
             for (int i=0; i < numHotkeys; i++){
             	bufferedWriter.write(Arrays.toString(hotkeys.getHotkeyCodes(i)));
                 bufferedWriter.newLine();
             }
-
+            //Text Editor Pane preferences
             bufferedWriter.write(String.valueOf(numMatchingTextDisplay));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isShowTextSource));
@@ -241,25 +272,31 @@ public class UserPreference {
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(boxTransparency));
             bufferedWriter.newLine();
+            //Blocked List Pane preferences 
             for (int i=0; i < blockedList.size(); i++){
                 BlockedPage page = blockedList.get(i);
                 bufferedWriter.write(page.getUrl() + " " + String.valueOf(page.getIsEnabled()) + " ");
             }
-            bufferedWriter.newLine();         
+            bufferedWriter.newLine();       
+            //Path Pane preferences
             bufferedWriter.write(String.valueOf(contentPath));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isShowPreviewText));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(clearCachesTime));
             bufferedWriter.newLine();
+            //Storage Pane preferences
             bufferedWriter.write(String.valueOf(maxTextSizeStored));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(previewTextLength));
+            
             bufferedWriter.close();
         } catch (IOException ex) {
             System.out.println("Error writing file " + filename);
         }
     }
+ 
+    /** getters **/
     
     public boolean isRunOnStartUp() {
         return isRunOnStartUp;
@@ -335,6 +372,8 @@ public class UserPreference {
         return numPreferences;
     }
     
+    /** default value getters **/
+    
     public KeyCode[] getDefaultHotkeyCodes(int index){
     	return hotkeys.getDefaultHotkeyCodes(index);
     }
@@ -371,6 +410,8 @@ public class UserPreference {
         return previewTextLength = "one sentence";
     }
 
+    /** setters **/
+    
     public void setIsRunOnStartUp(boolean isRunOnStartUp) {
         this.isRunOnStartUp = isRunOnStartUp;
     }

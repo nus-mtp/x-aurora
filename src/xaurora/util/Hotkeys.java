@@ -2,6 +2,11 @@ package xaurora.util;
 
 import javafx.scene.input.KeyCode;
 
+/**
+ * 
+ * @author Lee
+ *
+ */
 public class Hotkeys {
 
 	String[] names = new String[]{
