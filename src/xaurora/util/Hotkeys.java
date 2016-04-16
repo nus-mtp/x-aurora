@@ -48,6 +48,9 @@ public class Hotkeys {
 	public KeyCode[] getDefaultHotkeyCodes(int index){
 		return codes[index];
 	}
+	public KeyCode[][] getCodes(){
+	    return this.codes;
+	}
 	
 	public void setHotkey(int index, Hotkey hotkey){
 		hotkeys[index] = hotkey;

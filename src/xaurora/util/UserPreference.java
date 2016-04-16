@@ -409,7 +409,9 @@ public class UserPreference {
     public String getDefaultPreviewTextLength() {
         return previewTextLength = "one sentence";
     }
-
+    public Hotkeys getHotKey(){
+        return this.hotkeys;
+    }
     /** setters **/
     
     public void setIsRunOnStartUp(boolean isRunOnStartUp) {
