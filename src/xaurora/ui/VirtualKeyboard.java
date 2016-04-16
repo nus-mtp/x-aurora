@@ -20,12 +20,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import xaurora.util.UserPreference;
 
+/**
+ * 
+ * @author Lee
+ *
+ */
 @SuppressWarnings("deprecation")
 public class VirtualKeyboard {
 
-    private final Key[][] keys;
-    int hotkeyIndex;
-    UserPreference preferences = UserPreference.getInstance();
     final String[][] keyTexts = new String[][]{
         {"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="},
         {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"},
@@ -48,11 +50,25 @@ public class VirtualKeyboard {
         {KeyCode.CONTROL, KeyCode.META, KeyCode.ALT, KeyCode.SPACE, KeyCode.LEFT,
             KeyCode.UP, KeyCode.DOWN, KeyCode.RIGHT}
     };
+    private final Key[][] keys;
+    private int hotkeyIndex;
+    private static final int nullIndex = -1;
+    private static final int numRows = 5;
+    private static final int insets = 10;
+    private static final int keyWidth = 30;
+    private static final int keyHeight = 30;
+    private static final int arrowWidth = 20;
+    private static final int arrowHeight = 20;
+    private static final int strokeWidth = 2;
+    private static final int arcWidth = 12;
+    private static final int arcHeight = 12;
+    private static final int spacebarWidth = 200;
+    UserPreference preferences = UserPreference.getInstance();
 
     public VirtualKeyboard() {
-        keys = new Key[5][];
-        this.hotkeyIndex = -1;
-        for (int row = 0; row < keyCodes.length; row++) {
+        keys = new Key[numRows][];
+        this.hotkeyIndex = nullIndex;
+        for (int row = 0; row < numRows; row++) {
             keys[row] = new Key[keyCodes[row].length];
             for (int col = 0; col < keyCodes[row].length; col++) {
                 keys[row][col] = new Key(keyTexts[row][col], keyCodes[row][col]);
@@ -61,9 +77,9 @@ public class VirtualKeyboard {
     }
     
     public VirtualKeyboard(int hotkeyIndex) {
-        keys = new Key[5][];
+        keys = new Key[numRows][];
         this.hotkeyIndex = hotkeyIndex;
-        for (int row = 0; row < keyCodes.length; row++) {
+        for (int row = 0; row < numRows; row++) {
             keys[row] = new Key[keyCodes[row].length];
             for (int col = 0; col < keyCodes[row].length; col++) {
                 keys[row][col] = new Key(keyTexts[row][col], keyCodes[row][col]);
@@ -71,6 +87,11 @@ public class VirtualKeyboard {
         }
     }
     
+    /**
+     * get the Key with the given KeyCode value
+     * @param keyCode
+     * @return Key
+     */
     public Key getKey(KeyCode keyCode){
         for (int i = 0; i < keys.length; i++){
             for (int j = 0; j < keys[i].length; j++){
@@ -82,14 +103,18 @@ public class VirtualKeyboard {
         return null;
     }
 
+    /**
+     * create a VirtualKeyboard Node
+     * @return Node
+     */
     public Node createNode() {
-        final VBox keyboardNode = new VBox(5);
-        keyboardNode.setPadding(new Insets(10));
+        final VBox keyboardNode = new VBox(numRows);
+        keyboardNode.setPadding(new Insets(insets));
         keyboardNode.getStyleClass().add("virtual-keyboard");
 
         final List<Node> keyboardNodeChildren = keyboardNode.getChildren();
         for (int row = 0; row < keys.length; row++) {
-            HBox hbox = new HBox(5);
+            HBox hbox = new HBox(numRows);
             hbox.setAlignment(Pos.CENTER);
             keyboardNodeChildren.add(hbox);
 
@@ -103,10 +128,14 @@ public class VirtualKeyboard {
         return keyboardNode;
     }
 
+    /**
+     * install KeyEvent Handler to keyboardNode
+     * @param keyboardNode
+     */
     private void installEventHandler(final Parent keyboardNode) {
         final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
-                final Key key = lookupKey(keyEvent.getCode());
+                final Key key = getKey(keyEvent.getCode());
                 if (key != null) {
                     key.setPressed(!key.isPressed() && keyEvent.getEventType() == KeyEvent.KEY_PRESSED);
                     if (key.isPressed() == true){
@@ -121,20 +150,11 @@ public class VirtualKeyboard {
 
         keyboardNode.setOnKeyPressed(keyEventHandler);
     }
-
-    private Key lookupKey(final KeyCode keyCode) {
-        for (int row = 0; row < keys.length; row++) {
-            for (int col = 0; col < keys[row].length; col++) {
-                Key key = keys[row][col];
-                if (key.getKeyCode() == keyCode) {
-                    return key;
-                }
-            }
-        }
-
-        return null;
-    }
     
+    /**
+     * add the Key to the hotkey
+     * @param key
+     */
     private void addKey(Key key) {
         KeyCode[] hotkey = getHotkey(hotkeyIndex);
         KeyCode[] newHotkey = new KeyCode[hotkey.length + 1];
@@ -147,6 +167,10 @@ public class VirtualKeyboard {
         setHotkey(hotkeyIndex, newHotkey);       
     }
     
+    /**
+     * remove the Key from the hotkey
+     * @param key
+     */
     private void removeKey(Key key){
         KeyCode[] hotkey = getHotkey(hotkeyIndex);
         KeyCode[] newHotkey = new KeyCode[hotkey.length - 1];
@@ -165,32 +189,29 @@ public class VirtualKeyboard {
         setHotkey(hotkeyIndex, newHotkey);       
     }
     
+    /**
+     * get the hotkey of the given index
+     * @param index
+     * @return KeyCode[]
+     */
     private KeyCode[] getHotkey(int index){
-        KeyCode[] hotkey = null;
-        switch(index){
-            case 0: hotkey = preferences.getExtendWordHotkey(); break;
-            case 1: hotkey = preferences.getReduceWordHotkey(); break;
-            case 2: hotkey = preferences.getExtendSentenceHotkey(); break;
-            case 3: hotkey = preferences.getReduceSentenceHotkey(); break; 
-            case 4: hotkey = preferences.getExtendParagraphHotkey(); break;
-            case 5: hotkey = preferences.getReduceParagraphHotkey(); break;
-            default:    
-        }
-        return hotkey;
+        return preferences.getHotkeyCodes(index);
     }
     
-    private void setHotkey(int index, KeyCode[] hotkey){
-        switch(index){
-            case 0: preferences.setExtendWordHotkey(hotkey); break;
-            case 1: preferences.setReduceWordHotkey(hotkey); break;
-            case 2: preferences.setExtendSentenceHotkey(hotkey); break;
-            case 3: preferences.setReduceSentenceHotkey(hotkey); break; 
-            case 4: preferences.setExtendParagraphHotkey(hotkey); break;
-            case 5: preferences.setReduceParagraphHotkey(hotkey); break;
-            default:    
-        }
+    /**
+     * set the hotkey of the given index
+     * @param index
+     * @param codes
+     */
+    private void setHotkey(int index, KeyCode[] codes){
+        preferences.setHotkeyCodes(index, codes);
     }
 
+    /**
+     * 
+     * @author Lee
+     *
+     */
     public class Key {
 
         private final String text;
@@ -219,24 +240,28 @@ public class VirtualKeyboard {
             pressedProperty.set(value);
         }
 
+        /**
+         * create a keyNode
+         * @return keyNode
+         */
         private Node createNode() {
             final StackPane keyNode = new StackPane();
             keyNode.setFocusTraversable(true);
             installEventHandler(keyNode);
 
-            final Rectangle keyBackground = new Rectangle(30, 30);
+            final Rectangle keyBackground = new Rectangle(keyWidth, keyHeight);
             keyBackground.fillProperty().bind(Bindings.when(pressedProperty).then(Color.RED).otherwise(Color.WHITE));
             keyBackground.setStroke(Color.BLACK);
-            keyBackground.setStrokeWidth(2);
-            keyBackground.setArcWidth(12);
-            keyBackground.setArcHeight(12);
+            keyBackground.setStrokeWidth(strokeWidth);
+            keyBackground.setArcWidth(arcWidth);
+            keyBackground.setArcHeight(arcHeight);
             if (keyCode == KeyCode.SPACE) {
-                keyBackground.setWidth(200);
+                keyBackground.setWidth(spacebarWidth);
             }
 
             final Text keyText = new Text(text);
             if (text.equals("arrow")) {
-                final Rectangle arrow = new Rectangle(20, 20);
+                final Rectangle arrow = new Rectangle(arrowWidth, arrowHeight);
                 Node graphic = null;
                 if (keyCode == KeyCode.LEFT) {
                     graphic = createGraphic(15.0, 5.0, 15.0, 15.0, 5.0, 10.0);
@@ -255,12 +280,21 @@ public class VirtualKeyboard {
             return keyNode;
         }
 
+        /**
+         * draw graphic with the given points
+         * @param points
+         * @return Node
+         */
         private Node createGraphic(Double... points) {
             final Node graphic = PolygonBuilder.create().points(points).build();
             graphic.setStyle("-fx-fill: -fx-mark-color;");
             return graphic;
         }
 
+        /**
+         * install KeyEvent Handler to keyNode
+         * @param keyNode
+         */
         private void installEventHandler(final Node keyNode) {
             final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
                 public void handle(final KeyEvent keyEvent) {

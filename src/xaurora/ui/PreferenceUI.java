@@ -95,11 +95,19 @@ public class PreferenceUI extends Application{
         stage.show();
     }
     
+    /**
+     * create the main scene
+     * @return Scene
+     */
     public Scene createPreferenceScene(){
     	Scene preferenceScene = new Scene(createPreferencePane(), sceneWidth, sceneHeight);
     	return preferenceScene;
     }
 
+    /**
+     * create the main Pane
+     * @return PreferencePane
+     */
     public BorderPane createPreferencePane(){
     	BorderPane border = new BorderPane();
 
@@ -116,6 +124,10 @@ public class PreferenceUI extends Application{
     	return border;
     }
 
+    /**
+     * create four tabs: Setting, Tutorial, About Us, Data Managing
+     * @return PreferenceTabs
+     */
     private TabPane createPreferenceTabs(){
     	TabPane preferenceTabs = new TabPane();
     	Tab tabSetting = new Tab("Setting");
@@ -139,6 +151,10 @@ public class PreferenceUI extends Application{
         return preferenceTabs;
     }
 
+    /**
+     * show current user's email
+     * @return LabelEmail
+     */
     private Label createLabelEmail(){
     	Image image = new Image("File:dropbox.png"); //dummy value
         ImageView imageView = new ImageView(image);
@@ -150,6 +166,10 @@ public class PreferenceUI extends Application{
         return labelEmail;
     }
     
+    /**
+     * Pane to set preferences
+     * @return SettingPane
+     */
     private BorderPane createSettingPane(){
         preferences.readPreferences(username);
         BorderPane border = new BorderPane();
@@ -163,6 +183,10 @@ public class PreferenceUI extends Application{
         return border;
     }
     
+    /**
+     * create six tabs: System, Hotkeys, Text Editor, Blocked List, Path, Storage
+     * @return settingTabs
+     */
     private TabPane createSettingTabs(){
     	TabPane settingTabs = new TabPane();
         Tab tabSystem = new Tab("System");
@@ -190,6 +214,10 @@ public class PreferenceUI extends Application{
         return settingTabs;
     }
     
+    /**
+     * create a HBox with three buttons: OK, Cancel, Apply
+     * @return HBox
+     */
     private HBox createOkCancelApplyBox(){
     	HBox hbox = new HBox();
     	
@@ -212,6 +240,10 @@ public class PreferenceUI extends Application{
         return hbox;
     }
     
+    /**
+     * Pane to view tutorials
+     * @return tutorialPane
+     */
     private BorderPane createTutorialPane(){
         BorderPane border = new BorderPane();
         
@@ -225,6 +257,10 @@ public class PreferenceUI extends Application{
         return border;
     }
     
+    /**
+     * create a HBox with two buttons: Next, Previous
+     * @return HBox
+     */
     private HBox createPrevNextBox(){
     	HBox hbox = new HBox();
     	setMargin(hbox, new Insets(0, 10, 20, 10));
@@ -241,6 +277,10 @@ public class PreferenceUI extends Application{
         return hbox;
     }
     
+    /**
+     * Pane for developers and software information
+     * @return AboutUsPane
+     */
     private GridPane createAboutUsPane(){
         GridPane grid = createGridPane();
         
@@ -252,6 +292,10 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
+    /**
+     * Pane for data managing
+     * @return DataManagingPane
+     */
     private BorderPane createDataManagingPane(){
         BorderPane border = new BorderPane();
         TableView<DataFileMetaData> table = createDataTable();
@@ -260,6 +304,10 @@ public class PreferenceUI extends Application{
         return border;
     }
     
+    /**
+     * create Table structure for DataManagingPane
+     * @return DataTable
+     */
     private TableView<DataFileMetaData> createDataTable(){
     	TableView<DataFileMetaData> table = new TableView<DataFileMetaData>();
         TableColumn<DataFileMetaData, String> urlCol = new TableColumn<DataFileMetaData, String>("Url");
@@ -292,6 +340,11 @@ public class PreferenceUI extends Application{
         return table;
     }
 
+    /**
+     * create cell factory for delete cell in DataManaging Table
+     * @param browsedPages
+     * @return deleteCellFactory
+     */
     private Callback<TableColumn<DataFileMetaData, Boolean>, TableCell<DataFileMetaData, Boolean>> 
     createDeleteCellFactory(ObservableList<DataFileMetaData> browsedPages){
     	Callback<TableColumn<DataFileMetaData, Boolean>, TableCell<DataFileMetaData, Boolean>> deleteCellFactory = 
@@ -326,6 +379,10 @@ public class PreferenceUI extends Application{
     	return deleteCellFactory;
     }
 
+    /**
+     * Pane for system preferences
+     * @return SystemPane
+     */
     private GridPane createSystemPane(){
         GridPane grid = createGridPane();
         
@@ -348,6 +405,10 @@ public class PreferenceUI extends Application{
         return grid;
     }
 
+    /**
+     * Pane for hotkeys preferences
+     * @return HotkeysPane
+     */
     private BorderPane createHotkeysPane(){
     	BorderPane border = new BorderPane();
     	border.setPadding(new Insets(10));
@@ -388,24 +449,24 @@ public class PreferenceUI extends Application{
         return border;
     }
     
+    /**
+     * set hotkeys
+     * @param keyboard
+     * @param index
+     */
     private void setKeyboardHotkey(VirtualKeyboard keyboard, int index){
-        KeyCode[] hotkey = null;
-        switch(index){
-            case 0: hotkey = preferences.getExtendWordHotkey(); break;
-            case 1: hotkey = preferences.getReduceWordHotkey(); break;
-            case 2: hotkey = preferences.getExtendSentenceHotkey(); break;
-            case 3: hotkey = preferences.getReduceSentenceHotkey(); break; 
-            case 4: hotkey = preferences.getExtendParagraphHotkey(); break;
-            case 5: hotkey = preferences.getReduceParagraphHotkey(); break;
-            default:    
-        }
-        
-        for (int i = 0; i < hotkey.length; i++){
-            Key key = keyboard.getKey(hotkey[i]);
+        KeyCode[] codes = preferences.getHotkeyCodes(index);
+
+        for (int i = 0; i < codes.length; i++){
+            Key key = keyboard.getKey(codes[i]);
             key.setPressed(true);
         }
     }
     
+    /**
+     * Pane for Text Editor preferences
+     * @return TextEditorPane
+     */
     private GridPane createTextEditorPane(){
         GridPane grid = createGridPane();
         
@@ -462,6 +523,10 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
+    /**
+     * Pane for adding web pages to Blocked List
+     * @return BlockedListPane
+     */
     private BorderPane createBlockedListPane(){
         BorderPane border = new BorderPane();
         
@@ -478,6 +543,12 @@ public class PreferenceUI extends Application{
         return border;
     }
     
+    /**
+     * Table structure for BlockedList Pane
+     * @param blockedPages
+     * @param blockedList
+     * @return BlockedPageTable
+     */
     private TableView<BlockedPage> createBlockedPageTable(ObservableList<BlockedPage> blockedPages, ArrayList<BlockedPage> blockedList){
     	TableView<BlockedPage> table = new TableView<BlockedPage>();      
         TableColumn<BlockedPage, String> urlCol = new TableColumn<BlockedPage, String>("Website URL");
@@ -506,6 +577,11 @@ public class PreferenceUI extends Application{
         return table;
     }
     
+    /**
+     * create cell factory for toggle cell in BlockedList Table
+     * @param blockedList
+     * @return toggleCellFactory
+     */
     private Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> createToggleCellFactory(ArrayList<BlockedPage> blockedList){
     	Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> toggleCellFactory = 
                 new Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>>(){
@@ -542,6 +618,12 @@ public class PreferenceUI extends Application{
         return toggleCellFactory;
     }
     
+    /**
+     * create cell factory for delete cell in BlockedList Table
+     * @param blockedPages
+     * @param blockedList
+     * @return deleteCellFactory
+     */
     private Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> createDeleteCellFactory(ObservableList<BlockedPage> blockedPages, ArrayList<BlockedPage> blockedList){
     	Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>> deleteCellFactory = 
                 new Callback<TableColumn<BlockedPage, Boolean>, TableCell<BlockedPage, Boolean>>(){
@@ -576,6 +658,12 @@ public class PreferenceUI extends Application{
         return deleteCellFactory;
     }
     
+    /**
+     * create a HBox with a text field and an add button
+     * @param blockedPages
+     * @param blockedList
+     * @return HBox
+     */
     private HBox createAddPageBox(ObservableList<BlockedPage> blockedPages, ArrayList<BlockedPage> blockedList){
     	TextField urlField = new TextField();
     	urlField.setId("urlField");
@@ -598,6 +686,10 @@ public class PreferenceUI extends Application{
         return hbox;
     }
     
+    /**
+     * Pane for Path preferences
+     * @return PathPane
+     */
     private GridPane createPathPane(){
         GridPane grid = createGridPane();
         
@@ -640,6 +732,10 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
+    /**
+     * Pane for Storage preferences
+     * @return StoragePane
+     */
     private GridPane createStoragePane(){
         GridPane grid = createGridPane();
         
@@ -677,6 +773,10 @@ public class PreferenceUI extends Application{
         return grid;
     }
     
+    /**
+     * create a standardize GridPane
+     * @return GridPane
+     */
     private GridPane createGridPane(){
     	GridPane grid = new GridPane();
         grid.setHgap(hGap);

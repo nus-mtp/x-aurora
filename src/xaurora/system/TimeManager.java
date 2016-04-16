@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import org.apache.log4j.Logger;
 
+import xaurora.ui.Message;
+
 /**
  * Description: This class is in charge of converting the time format, recording
  * the time setting of the current user, and verifying whether a file is expired
@@ -33,7 +35,7 @@ public final class TimeManager {
     private static final int SECOND_BYTE_OFFSET = 16;
     private static final int FIRST_BYTE_OFFSET = 24;
     private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR = "Error, system is trying to update a non-positive expiry time in hours";
-    private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND = "Error, system is trying to update a non-positive expiry time in seonds";
+    private static final String ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND = "Error, system is trying to update a non-positive expiry time in seconds";
     private static final int MINIMUM_NON_NEGATIVE = 0;
     private static final String MSG_START = "An instance of Time Manager is created. This message should appear only once at every software running flow.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
@@ -42,24 +44,27 @@ public final class TimeManager {
     private static final int MILLISECONDS_PER_SECOND = 1000;
     private static final int SECONDS_PER_HOURS = 3600;
     private static final long DEFAULT_EXPIRE_INTERVAL = 259200000;// 3 days
-    //private static final long EPOCH_OFFSET_MILLIS;
+    // private static final long EPOCH_OFFSET_MILLIS;
     // time server list
     private static final String[] hostName = { "time-c.nist.gov",
             "time-nw.nist.gov", "time.nist.gov", "0.sg.pool.ntp.org",
             "1.sg.pool.ntp.org", "2.sg.pool.ntp.org", "3.sg.pool.ntp.org" };
 
     // Calculate the offset time offset
-    /*static {
-
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        calendar.set(1900, Calendar.JANUARY, 1, 0, 0, 0);
-        EPOCH_OFFSET_MILLIS = Math.abs(calendar.getTime().getTime());
-
-    }*/
+    /*
+     * static {
+     * 
+     * Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+     * calendar.set(1900, Calendar.JANUARY, 1, 0, 0, 0); EPOCH_OFFSET_MILLIS =
+     * Math.abs(calendar.getTime().getTime());
+     * 
+     * }
+     */
 
     private long expireInterval;
     private static TimeManager classInstance;
     private Logger logger;
+    private Message message = new Message();
 
     private TimeManager() {
         this.logger = Logger.getLogger(this.getClass());
@@ -125,9 +130,11 @@ public final class TimeManager {
      *            number of seconds in long type.
      * @author GAO RISHENG A0101891L
      */
+
     public final void setExpiredIntervalSecond(long seconds) {
         if (seconds <= MINIMUM_NON_NEGATIVE) {
             this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND + seconds);
+            message.showError(ERR_MSG_INVALID_UPDATE_EXPIRY_SECOND);
         } else
             this.expireInterval = seconds * MILLISECONDS_PER_SECOND;
     }
@@ -135,16 +142,16 @@ public final class TimeManager {
     public final void setExpiredIntervalHour(int hours) {
         if (hours < MINIMUM_NON_NEGATIVE) {
             this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR + hours);
-        } else
-            this.expireInterval = hours * SECONDS_PER_HOURS
-                    * MILLISECONDS_PER_SECOND;
+            message.showError(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR);
+        }
     }
 
     /**
      * Description: calibrating the system time with the remote time server time
+     * 
      * @author GAO RISHENG A0101891L
-     * @deprecated 
-     * Reason: From windows 7 onwards time will be synchronized automatically
+     * @deprecated Reason: From windows 7 onwards time will be synchronized
+     *             automatically
      */
     public void calibrateTime() {
         for (String s : hostName) {
@@ -154,10 +161,12 @@ public final class TimeManager {
 
     /**
      * Description: retrieve the current time from a Time server
-     * @param hostname, the host name of a time server
+     * 
+     * @param hostname,
+     *            the host name of a time server
      * @author Gao Risheng A0101891L
-     * @deprecated
-     * Reason: From windows 7 onwards time will be synchronized automatically
+     * @deprecated Reason: From windows 7 onwards time will be synchronized
+     *             automatically
      */
     private void retrieveTime(String hostname) {
         long currentMillisecond = MINIMUM_NON_NEGATIVE;
@@ -183,16 +192,18 @@ public final class TimeManager {
                         + (byte3 << THIRD_BYTE_OFFSET) + byte4;
 
                 socket.close();
-                //changeTime(currentMillisecond*MILLISECONDS_PER_SECOND-EPOCH_OFFSET_MILLIS);
+                // changeTime(currentMillisecond*MILLISECONDS_PER_SECOND-EPOCH_OFFSET_MILLIS);
             }
 
         } catch (UnknownHostException ex) {
 
-            this.logger.error(ERR_MSG_UNABLE_TO_CONNECT_TIME_SERVER+ex.getMessage());
+            this.logger.error(
+                    ERR_MSG_UNABLE_TO_CONNECT_TIME_SERVER + ex.getMessage());
 
         } catch (IOException ex) {
 
-            this.logger.error(ERR_MSG_UNABLE_TO_READ_NTP_REPLY+ex.getMessage());
+            this.logger
+                    .error(ERR_MSG_UNABLE_TO_READ_NTP_REPLY + ex.getMessage());
 
         }
 
@@ -200,10 +211,12 @@ public final class TimeManager {
 
     /**
      * Description: Changing the current system time with the network time
-     * @param currentMillisecond, the current time in milliseconds
+     * 
+     * @param currentMillisecond,
+     *            the current time in milliseconds
      * @author GAO RISHENG A0101891L
-     * @deprecated
-     * Reason: From windows 7 onwards time will be synchronized automatically
+     * @deprecated Reason: From windows 7 onwards time will be synchronized
+     *             automatically
      */
     private void changeTime(long currentMillisecond) {
         Calendar c = Calendar.getInstance();
@@ -229,24 +242,28 @@ public final class TimeManager {
 
                 String cmd = CMD_CHANGE_DATE + date;
                 Process process = Runtime.getRuntime().exec(cmd);
-                //process.waitFor();
+                // process.waitFor();
             }
 
             if (hour != system_hour || minute != system_minute) {
                 String cmd = CMD_CHANGE_TIME + time;
                 Process process = Runtime.getRuntime().exec(cmd);
-                //process.waitFor();
+                // process.waitFor();
             }
 
         } catch (IOException ex) {
 
-            this.logger.error(ERR_MSG_UNABLE_TO_CHANGE_SYSTEM_TIME+ex.getMessage());
+            this.logger.error(
+                    ERR_MSG_UNABLE_TO_CHANGE_SYSTEM_TIME + ex.getMessage());
 
-        }/* catch (InterruptedException ex) {
-
-            this.logger.error(ERR_MSG_UNABLE_TO_CHANGE_TIME_INTERRUPTED+ex.getMessage());
-
-        }*/
+        } /*
+           * catch (InterruptedException ex) {
+           * 
+           * this.logger.error(ERR_MSG_UNABLE_TO_CHANGE_TIME_INTERRUPTED+ex.
+           * getMessage());
+           * 
+           * }
+           */
 
     }
 

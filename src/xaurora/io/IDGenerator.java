@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import org.apache.log4j.Logger;
 
+import xaurora.ui.Message;
+
 /**
  * Description: this class is mainly in charge of generating MD5 hashed ID for
  * data file from their source URL and the current System time
@@ -29,6 +31,7 @@ public final class IDGenerator {
     private static final String HASH_TYPE = "MD5";
     private static int numOfIDs = 0;
     private Logger logger;
+    private Message message = new Message();
 
     private IDGenerator() {
         this.logger = Logger.getLogger(this.getClass());
@@ -84,6 +87,8 @@ public final class IDGenerator {
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
             this.logger.error(String.format(ERR_MSG_INVALID_HASH_ALGORITHM,
+                    e.getMessage()));
+            message.showError(String.format(ERR_MSG_INVALID_HASH_ALGORITHM,
                     e.getMessage()));
             return new String(id);
         }

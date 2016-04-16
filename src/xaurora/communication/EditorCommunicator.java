@@ -126,7 +126,7 @@ public final class EditorCommunicator implements Runnable {
             // requesting for hot keys
         case CommunicationCode.CONNECTION_REQUEST_WITH_HOT_KEY: {
             output.add(CommunicationCode.HOT_KEY + EMPTY_STRING);
-            KeyCode[][] hotkeys = UserPreference.getInstance().getAllHotkeys();
+            KeyCode[][] hotkeys = UserPreference.getInstance().getHotKey().getCodes();
             for (KeyCode[] temp : hotkeys) {
                 output.add(Arrays.toString(temp));
             }
