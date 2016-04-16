@@ -159,7 +159,8 @@ public final class DataFileIO {
      * @author GAO RISHENG A0101891L
      */
     private final String generateDataFilePath(final String id) {
-        String dstpath = this.syncDirectory + PATH_SEPARATOR + new String(id)
+        assert id != null && !id.trim().equals(NEW_EMPTY_STRING);
+        String dstpath = this.syncDirectory + PATH_SEPARATOR + id
                 + DEFAULT_FILE_EXTENSION;
         this.logger.info(String.format(MSG_NEW_DATA_FILE_PATH_CREATE, dstpath));
         return dstpath;
@@ -210,26 +211,29 @@ public final class DataFileIO {
      */
     public final void createDataFile(final String url, final String id,
             final byte[] content, SystemManager manager, DBManager dbManager) {
+        assert url != null && id != null && !id.equals(NEW_EMPTY_STRING)
+                && content != null;
         String dstpath = generateDataFilePath(id);
         // Store the data in the lucene indexing system.
         long currentTime = System.currentTimeMillis();
-        manager.getIndexerInstance().createIndexDocumentFromWeb(
-                new String(content), url, dstpath, currentTime);
-        File dstFile = new File(dstpath);
-        if (dstFile.exists()) {
-            this.logger.error(ERR_MSG_MD5_COLLISION);
+        if (manager.getIndexerInstance().createIndexDocumentFromWeb(
+                new String(content), url, dstpath, currentTime)) {
+            File dstFile = new File(dstpath);
+            if (dstFile.exists()) {
+                this.logger.error(ERR_MSG_MD5_COLLISION);
 
-        } else {
-            try {
-                writeDataFileWithEncryption(url, content, dstFile,
-                        manager.getSecurityManagerInstance());
-                // register this file into DBSystem
-                dbManager.addMonitorToAFile(dstFile.getName()
-                        .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING));
-            } catch (IOException e) {
-                this.logger
-                        .error(String.format(ERR_MSG_UNABLE_TO_WRITE_DATA_FILE,
-                                dstFile, e.getMessage()));
+            } else {
+                try {
+                    writeDataFileWithEncryption(url, content, dstFile,
+                            manager.getSecurityManagerInstance());
+                    // register this file into DBSystem
+                    dbManager.addMonitorToAFile(dstFile.getName()
+                            .replace(DEFAULT_FILE_EXTENSION, NEW_EMPTY_STRING));
+                } catch (IOException e) {
+                    this.logger.error(
+                            String.format(ERR_MSG_UNABLE_TO_WRITE_DATA_FILE,
+                                    dstFile, e.getMessage()));
+                }
             }
         }
     }
@@ -247,7 +251,7 @@ public final class DataFileIO {
      */
     private final String readFileContent(final File f, SystemManager system) {
         assert (f.isFile() && f.exists() && !f.isDirectory()
-                && !FilenameUtils.getExtension(f.getAbsolutePath())
+                && FilenameUtils.getExtension(f.getAbsolutePath())
                         .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
 
         try {
@@ -315,7 +319,7 @@ public final class DataFileIO {
                 deleteMetaData.add(allMetaData.get(index));
             }
         }
-        
+
         return deleteMetaData;
     }
 
@@ -355,7 +359,7 @@ public final class DataFileIO {
     private final String getUrlFromFile(final File f, SystemManager manager) {
         // Assertion: thie method must read a txt file with valid file path
         assert (f.isFile() && f.exists() && !f.isDirectory()
-                && !FilenameUtils.getExtension(f.getAbsolutePath())
+                && FilenameUtils.getExtension(f.getAbsolutePath())
                         .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
         String textContent = readFileContent(f, manager);
         if (textContent.equals(NEW_EMPTY_STRING)) {

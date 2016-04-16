@@ -145,9 +145,10 @@ public final class SystemManager {
         this.io.setDirectory(this.storeDirectory);
         this.indexer = TextIndexer.getInstance(this.io);
         this.indexer.setDisplayNumber(this.displayNumber);
-        this.timeManager.setExpiredInterval(this.expiryHours);
+        this.timeManager.setExpiredIntervalHour(this.expiryHours);
         this.isInitialized = true;
         this.logger.info(MSG_USER_INIT_COMPLETE);
+        DBManager.getClassInstance().reInit();
     }
 
     /**
@@ -180,6 +181,7 @@ public final class SystemManager {
                 this.systemIo.cleanIndexData(this.io,
                         Security.hashUserName(currentUserName, currentEmail));
             triggerInitialization();
+            DBManager.getClassInstance().reInit();
         } else {
             this.logger.error(ERR_MSG_INVALID_USER_UPDATE);
         }
@@ -239,7 +241,46 @@ public final class SystemManager {
         assert this.isInitialized;
         return this.timeManager;
     }
-
+    /**
+     * Description: test get method
+     * @return the user name of the current user
+     * @author GAO RISHENG A0101891L
+     */
+    public final String getUserName(){
+        assert this.isInitialized;
+        assert this.currentUserName!=null;
+        return this.currentUserName;
+    }
+    /**
+     * Description: test get method
+     * @return the email of the current user
+     * @author GAO RISHENG A0101891L
+     */
+    public final String getEmail(){
+        assert this.isInitialized;
+        assert this.currentUserName!=null;
+        return this.userEmail;
+    }
+    /**
+     * Description: test get method
+     * @return the expiry interval of the current user
+     * @author GAO RISHENG A0101891L
+     */
+    public final int getExpireInterval(){
+        assert this.isInitialized;
+        assert this.expiryHours>=MINIMUM_NON_NEGATIVE;
+        return this.expiryHours;
+    }
+    /**
+     * Description: test get method
+     * @return the display number of the current user
+     * @author GAO RISHENG A0101891L
+     */
+    public final int getDisplayNumber(){
+        assert this.isInitialized;
+        assert this.displayNumber>=MINIMUM_NON_NEGATIVE;
+        return this.displayNumber;
+    }
     /**
      * Description: Check whether this instance is initialized
      * 

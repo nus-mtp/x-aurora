@@ -30,11 +30,12 @@ public class Main {
         Thread autoUpdatingThread = new Thread(dbManager);
         autoUpdatingThread.start();
         if (sa.isNetAccessible()) {
-            ChromeServer chromeSvr = new ChromeServer(PORT_BROWSER);
+            sa.getTimeManagerInstance().calibrateTime();
+            BrowserCoimmunicator chromeSvr = new BrowserCoimmunicator(PORT_BROWSER);
             Thread chromeSvrThread = new Thread(chromeSvr);
             chromeSvrThread.start();
         }
-        WordServer wordSvr = new WordServer(PORT_PLUGIN);
+        EditorCommunicator wordSvr = new EditorCommunicator(PORT_PLUGIN);
         Thread wordSvrThread = new Thread(wordSvr);
 
         // Establish connection between browser/editor and logic

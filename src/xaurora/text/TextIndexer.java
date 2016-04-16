@@ -37,6 +37,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
@@ -100,7 +101,7 @@ public final class TextIndexer {
     private static final String FIELD_TERMS = "term";
     private static final String FIELD_EXTENDED_DATA = "data";
     private static final String FIELD_LAST_MODIFIED = "last_modified";
-
+    private static final String FIELD_INDEX = "index";
     /**
      * DATA file extension
      */
@@ -124,7 +125,8 @@ public final class TextIndexer {
     private static final String EMPTY_STRING = "";
     private static final String PATTERN_NON_ASCII_CHARACTERS = "[^\\x00-\\x7F]";
     private static final String PATTERN_SENTENCE_TERMINATOR = "[.|!|?]+ ";
-
+    private static final String FILENAME_DELIMITER = "\n*filename*\n";
+    private static final String INDEX_DELIMITER = "\n*index*\n";
     // Overwriting the FieldType for lucene indexing system
     // This will be significant to the sorting rule
     private static final FieldType LONG_FIELD_TYPE_STORED_SORTED = new FieldType();
@@ -302,6 +304,7 @@ public final class TextIndexer {
         if (instance == null) {
             instance = new TextIndexer(io);
         }
+        instance.init(io);
         return instance;
     }
 
@@ -333,13 +336,15 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public synchronized final void createIndexDocumentFromWeb(
+    public synchronized final boolean createIndexDocumentFromWeb(
             final String rawData, final String url, final String filename,
             final long lastModified) {
         // Create analyzer for indexing system
-
+        assert rawData != null && filename != null && url != null
+                && lastModified > INDEX_ZERO;
         this.analyzer = new StandardAnalyzer();
         this.config = new IndexWriterConfig(this.analyzer);
+        boolean isSuccessful = false;
         // split paragraphs
         String[] paragraphs = rawData.split(NEWLINE);
         // retrieving host name from URL
@@ -348,6 +353,7 @@ public final class TextIndexer {
         try {
             this.writer = new IndexWriter(this.storeDirectory, this.config);
             int counter = INDEX_ZERO;
+            int paragraphID = INDEX_ONE;
             for (int i = INDEX_ONE; i < paragraphs.length; i++) {
                 // Not storing pure special characters lines
                 if (paragraphs[i]
@@ -373,9 +379,13 @@ public final class TextIndexer {
                     extractNumbersAndEmails(sentences, j, data);
                     addLastModified(data, lastModified);
                     insertParagraphIntoDocument(paragraphs[i], data);
+                    addIndex(data, paragraphID);
                     this.writer.addDocument(data);
+                    
                     counter++;
+                    isSuccessful = true;
                 }
+                paragraphID++;
             }
             // write the document into the indexing system
             // without this, searching will not be available
@@ -387,6 +397,7 @@ public final class TextIndexer {
         } catch (IOException e) {
             this.logger.error(ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT, e);
         }
+        return isSuccessful;
     }
 
     /**
@@ -561,9 +572,10 @@ public final class TextIndexer {
         assert filename != null && !filename.trim().equals(EMPTY_STRING);
         addStringField(doc, FIELD_FILENAME, filename);
     }
+
     /**
-     * Description: add the tokenized filename of the datafile to a lucene document
-     * object.
+     * Description: add the tokenized filename of the datafile to a lucene
+     * document object.
      * 
      * @param doc,A
      *            lucene Document object
@@ -572,10 +584,12 @@ public final class TextIndexer {
      * 
      * @author GAO RISHENG A0101891L
      */
-    public final static void addSearchFilename(Document doc, final String filename) {
+    public final static void addSearchFilename(Document doc,
+            final String filename) {
         assert filename != null && !filename.trim().equals(EMPTY_STRING);
         addTextField(doc, FIELD_SEARCH_FILENAME, filename);
     }
+
     /**
      * Description: add the text content of a sentence to a lucene document
      * object.
@@ -622,6 +636,18 @@ public final class TextIndexer {
      */
     public final static void addNumber(Document doc, final String number) {
         addStringField(doc, FIELD_NUMBER, number);
+    }
+
+    /**
+     * Description: add the index of paragraph to a lucene document object
+     * 
+     * @param doc,
+     *            A lucene Document object
+     * @param index,
+     *            the paragraph index of a sentence
+     */
+    public final static void addIndex(Document doc, final int index) {
+        addIntField(doc, FIELD_INDEX, index);
     }
 
     /**
@@ -710,10 +736,8 @@ public final class TextIndexer {
 
     /**
      * Description: Add a long field to a lucene document object with
-     * overwritten field setting  
-     * This is mainly for storing the time when the
-     * data was retrieved and use that for 
-     * sorting (more received result will
+     * overwritten field setting This is mainly for storing the time when the
+     * data was retrieved and use that for sorting (more received result will
      * rank higher)
      * 
      * @param doc,
@@ -734,6 +758,21 @@ public final class TextIndexer {
     }
 
     /**
+     * @param doc,
+     *            A lucene Document object
+     * @param field,
+     *            A String storing the name of the field
+     * @param value,
+     *            The value of the respective field
+     * 
+     */
+    private final static void addIntField(Document doc, final String field,
+            final int value) {
+        assert value >= MINIMUM_NON_NEGATIVE;
+        doc.add(new IntField(field, value, Field.Store.YES));
+    }
+
+    /**
      * Description: delete an entity in the lucene indexing system and removing
      * its actual data file
      * 
@@ -741,22 +780,22 @@ public final class TextIndexer {
      *            field needs to search
      * @param Tthe
      *            input query in String Post-condition: The entity and its
-     *            corresponding data file will be deleted if found in the
-     *            index system.
+     *            corresponding data file will be deleted if found in the index
+     *            system.
      * 
      * @author GAO RISHENG A0101891L
      */
     public final synchronized void deleteByField(final String field,
             final String inputQuery) {
         assert inputQuery != null && !inputQuery.trim().equals(EMPTY_STRING);
-        assert field != null && field.trim().equals(EMPTY_STRING);
+        assert field != null && !field.trim().equals(EMPTY_STRING);
         this.analyzer = new StandardAnalyzer();
         this.logger.debug(
                 String.format(MSG_DELETE_QUERY_CREATED, field, inputQuery));
         try {
             // open the current indexing directory
-            //this.reader = DirectoryReader.open(this.storeDirectory);
-            //this.searcher = new IndexSearcher(this.reader);
+            // this.reader = DirectoryReader.open(this.storeDirectory);
+            // this.searcher = new IndexSearcher(this.reader);
 
             // Generate the delete query from removing the file extension from
             // the input data file name
@@ -766,7 +805,7 @@ public final class TextIndexer {
             this.logger.debug(String.format(MSG_DELETE_QUERY_CREATED, field,
                     deleteQuery));
             // Remove the respective entities from the indexing system
-            //this.reader.close();
+            // this.reader.close();
             this.analyzer = new StandardAnalyzer();
             this.config = new IndexWriterConfig(this.analyzer);
             this.writer = new IndexWriter(this.storeDirectory, this.config);
@@ -836,7 +875,10 @@ public final class TextIndexer {
                     break;
                 }
                 }
-                result.add(content);
+                result.add(content + FILENAME_DELIMITER
+                        + this.searcher.doc(id).get(FIELD_FILENAME)
+                        + INDEX_DELIMITER
+                        + this.searcher.doc(id).get(FIELD_INDEX));
             }
 
         } catch (IOException e) {

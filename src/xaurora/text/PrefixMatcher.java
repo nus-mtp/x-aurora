@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 
 /**
@@ -18,7 +19,8 @@ import org.apache.lucene.search.Query;
  * @author GAO RISHENG A10101891L
  */
 public class PrefixMatcher {
-
+    private static final String DEFAULT_INVALID_OUTPUT = "INVALID";
+    private static final String FIELD_FILENAME = "s_filename";
     private static final String ERR_MSG_FAIL_TO_PARSE_QUERY = "Error occurs in parsing the search query, the error message is ";
     private static final String MSG_NEW_NORMAL_QUERY = "New Normal Term/Prefix Query is created with query string ";
     private static final String MSG_NEW_NUMBER_QUERY = "New Number Query is created with query string ";
@@ -71,6 +73,28 @@ public class PrefixMatcher {
             suggestion = generatreNormalQuery(userInput, suggestion, indexer);
         }
         return suggestion;
+    }
+
+    /**
+     * Description: retrieve the next paragraph content
+     * 
+     * @param filename,
+     *            the filename of a document
+     * @param index,
+     *            the index of next paragraph
+     * @param indexer,
+     *            the text indexer instance
+     * @return the content of the next paragraph
+     * @author GAO RISHENG A0101891L
+     */
+    public static final String getResult(String filename, int index,
+            TextIndexer indexer) {
+        ArrayList<String> suggestion = new ArrayList<String>();
+        suggestion = generateNextQuery(filename, index, suggestion, indexer);
+        if(index>suggestion.size())
+        return DEFAULT_INVALID_OUTPUT;
+        else
+            return suggestion.get(index-1);
     }
 
     /**
@@ -177,10 +201,52 @@ public class PrefixMatcher {
         return suggestion;
     }
 
+    /**
+     * Description: search for next paragraph
+     * 
+     * @param filename,
+     *            the filename of a document
+     * @param index,
+     *            the index of the next paragraph
+     * @param suggestions,
+     *            the search result
+     * @param indexer,
+     *            the text indexer instance
+     * @return the content of the next paragraph
+     * @author GAO RISHENG A0101891L
+     */
+    private static final ArrayList<String> generateNextQuery(String filename,
+            int index, ArrayList<String> suggestions, TextIndexer indexer) {
+        Query searchQuery;
+        try {
+            searchQuery = new QueryParser(FIELD_FILENAME,
+                    new StandardAnalyzer()).parse(filename);
+            logger.debug(MSG_NEW_NORMAL_QUERY + searchQuery.toString());
+            suggestions = indexer.searchDocument(searchQuery, TYPE_DEFAULT);
+        } catch (ParseException e) {
+            logger.error(ERR_MSG_FAIL_TO_PARSE_QUERY, e);
+        }
+
+        return suggestions;
+    }
+
+    /**
+     * @param userInput,
+     *            the user query
+     * @return true only if the user input contains searching keywords for
+     *         numbers, false otherwise
+     * @author GAO RISHENG A0101891L
+     */
     private static final boolean isContainNumberKeyWords(String userInput) {
         return userInput.contains(NUMBER_SEARCH_KEYWORD);
     }
 
+    /**
+     * @param userInput,
+     *            the user query
+     * @return true only if it contains email keywords, false otherwise
+     * @author GAO RISHENG A0101891L
+     */
     private static final boolean isContainEmailKeyWords(String userInput) {
         Pattern p = Pattern.compile(E_MAIL_ADDRESS_KEYWORD_EXPRESSION);
         Matcher m = p.matcher(userInput);
@@ -218,7 +284,7 @@ public class PrefixMatcher {
 
         for (int i = INDEX_ZERO; i < keywords.size(); i++) {
             queries[i + currentIndex] = keywords.get(i)
-                    .replace(SPECIAL_CHARACTERS, NEW_EMPTY_STRING)+WILDCARD;
+                    .replace(SPECIAL_CHARACTERS, NEW_EMPTY_STRING) + WILDCARD;
         }
         return queries;
     }

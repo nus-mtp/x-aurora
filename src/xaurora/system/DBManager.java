@@ -99,12 +99,23 @@ public final class DBManager implements Runnable {
     }
 
     /**
+     * Description: This is the re-initialization of DBManager which occurs at
+     * switching user
+     * @author GAO RISHENG A0101891L
+     */
+    public final synchronized void reInit() {
+        this.fileset = new HashSet<String>();
+        this.instance = SystemManager.getInstance();
+        init();
+    }
+
+    /**
      * Description: Initializing the DBManager instance by loading all the files
      * in the current store directory
      * 
      * @author GAO RISHENG A0101891L
      */
-    private synchronized void init() {
+    private final synchronized void init() {
         this.monitorFileSet();
     }
 
@@ -145,7 +156,13 @@ public final class DBManager implements Runnable {
         }
         return updateData;
     }
-
+    /**
+     * @return the number of tracking files
+     * @author GAO RISHENG A0101891L
+     */
+    public final int getEntries(){
+        return this.fileset.size();
+    }
     /**
      * Secure Programming. Making this Object not-clonable. Object.clone()
      * allows cloning the data of an object without initialize it which may leak
