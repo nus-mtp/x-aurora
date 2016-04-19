@@ -59,6 +59,7 @@ public class LoginUI extends Application{
         String styleSheetsPath = new File(styleSheets).getAbsolutePath().replace("\\", "/");
         loginScene.getStylesheets().add("File:///" + styleSheetsPath);
         stage.show();
+        buildDefaultUser();
     }
     
     public Scene createLoginScene(){
