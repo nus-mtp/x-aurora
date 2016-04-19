@@ -65,6 +65,7 @@ import org.apache.log4j.Logger;
  * Software Internal Import
  */
 import xaurora.io.DataFileIO;
+import xaurora.ui.Message;
 
 public final class TextIndexer {
 
@@ -130,7 +131,7 @@ public final class TextIndexer {
     // Overwriting the FieldType for lucene indexing system
     // This will be significant to the sorting rule
     private static final FieldType LONG_FIELD_TYPE_STORED_SORTED = new FieldType();
-
+    private Message message = new Message();
     static {
         LONG_FIELD_TYPE_STORED_SORTED.setTokenized(true);
         LONG_FIELD_TYPE_STORED_SORTED.setOmitNorms(true);
@@ -293,6 +294,7 @@ public final class TextIndexer {
                     .open(Paths.get(io.getIndexDirectory()));
 
         } catch (IOException e1) {
+        	message.showError(ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY);
             this.logger.error(ERR_MSG_FAIL_TO_OPEN_INDEXING_DIRECTORY
                     + io.getIndexDirectory(), e1);
         }
@@ -395,6 +397,7 @@ public final class TextIndexer {
                     paragraphs.length - INDEX_ONE, counter));
 
         } catch (IOException e) {
+        	message.showError(ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT);
             this.logger.error(ERR_MSG_FAIL_TO_CREATE_LUCENE_DOCUMENT, e);
         }
         return isSuccessful;
@@ -428,7 +431,7 @@ public final class TextIndexer {
             }
             stream.close();
         } catch (IOException e) {
-
+        	message.showError(ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS);
             this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_KEY_TERMS, e);
         }
         return result;
@@ -497,6 +500,7 @@ public final class TextIndexer {
         try {
             XauroraParser.parseEmailInSentence(data);
         } catch (xaurora.text.ParseException e) {
+        	message.showError(ERR_MSG_FAIL_TO_PARSE_INPUT);
             this.logger.error(ERR_MSG_FAIL_TO_PARSE_INPUT, e);
         }
     }
@@ -518,7 +522,7 @@ public final class TextIndexer {
             URL sourceURL = new URL(url);
             host = sourceURL.getHost();
         } catch (MalformedURLException e) {
-
+        	message.showError(ERR_MSG_FAIL_TO_EXTRACT_URL);
             this.logger.error(ERR_MSG_FAIL_TO_EXTRACT_URL + url, e);
         }
         return host;
@@ -813,8 +817,10 @@ public final class TextIndexer {
             this.writer.close();
             // change to log
         } catch (ParseException e) {
+        	message.showError(ERR_MSG_UNABLE_TO_PARSE_DELETE_QUERY);
             this.logger.error(ERR_MSG_UNABLE_TO_PARSE_DELETE_QUERY, e);
         } catch (IOException e) {
+        	message.showError(ERR_MSG_UNABLE_PROCESS_DELETE);
             this.logger.error(ERR_MSG_UNABLE_PROCESS_DELETE, e);
         }
     }
@@ -831,6 +837,7 @@ public final class TextIndexer {
      */
     public final void setDisplayNumber(final int number) {
         if (number <= MINIMUM_NON_NEGATIVE) {
+        	message.showError(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER);
             this.logger.error(ERR_MSG_INVALID_UPDATE_DISPLAY_NUMBER + number);
         } else
             this.displayNumber = number;
@@ -882,6 +889,7 @@ public final class TextIndexer {
             }
 
         } catch (IOException e) {
+        	message.showError(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM);
             this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM, e);
         }
         return result;
@@ -921,6 +929,7 @@ public final class TextIndexer {
                 // do something with docId here...
             }
         } catch (IOException e) {
+        	message.showError(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM);
             this.logger.error(ERR_MSG_UNABLE_TO_ACCESS_INDEXING_SYSTEM, e);
         }
     }
