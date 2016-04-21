@@ -197,7 +197,7 @@ public final class BrowserCoimmunicator implements Runnable {
             contentData = new String(content);
             // Generate Output
             for (String s : genOutput(contentData, comCode)) {
-                out.println(s);
+                out.print(s);
             }
             out.flush();
 
@@ -227,16 +227,16 @@ public final class BrowserCoimmunicator implements Runnable {
         // According to Communication code, generate response.
         switch (commCode) {
         case CommunicationCode.CONNECTION_REQUEST: {
-            output.add(CommunicationCode.ALL_OK + EMPTY_STRING);
+            output.add(Integer.toString(CommunicationCode.ALL_OK));
             break;
         }
         case CommunicationCode.CONNECTION_REQUEST_WITH_BLOCKLIST: {
-            output.add(CommunicationCode.BLOCK_LIST + EMPTY_STRING);
+            output.add(CommunicationCode.BLOCK_LIST + LINE_DELIMITER);
             ArrayList<BlockedPage> blockList = UserPreference.getInstance()
                     .getBlockedList();
-            output.add(blockList.size() + EMPTY_STRING);
+            output.add(blockList.size() + LINE_DELIMITER);
             for (BlockedPage b : blockList) {
-                output.add(b.getUrl());
+                output.add(b.getUrl()+ LINE_DELIMITER);
             }
             break;
         }
