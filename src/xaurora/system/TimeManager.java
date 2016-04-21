@@ -143,7 +143,8 @@ public final class TimeManager {
         if (hours < MINIMUM_NON_NEGATIVE) {
             this.logger.error(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR + hours);
             message.showError(ERR_MSG_INVALID_UPDATE_EXPIRY_HOUR);
-        }
+        }else
+            this.expireInterval = hours * MILLISECONDS_PER_SECOND;
     }
 
     /**
