@@ -2,7 +2,7 @@
 This project aims to develop a productivity tool that allows users to copy and paste the text content on the webpage more efficiently by minimizing the number of windows switching in the copy and paste process. 
 
 ##current status:
-Logic (Completed)
+#Logic (Completed)
 	|_ Features
 		|_ Receive Text Extracted From Web Browser
 		|_ Construct the Encrypted text data files
@@ -64,10 +64,10 @@ Logic (Completed)
 		|_ Apache Common IO (For File IO)
 		|_ Junit 4.10
 
-UI (Incomplete)
-Web-Browser Plugin (Incomplete)
-Editor Plugin (Incomplete)
-Dropbox Synchronization (Incomplete)
+#UI (Incomplete)
+#Web-Browser Plugin (Incomplete)
+#Editor Plugin (Incomplete)
+#Dropbox Synchronization (Incomplete)
 
 ##System Set up
 
