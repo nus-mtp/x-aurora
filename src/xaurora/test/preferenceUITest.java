@@ -18,13 +18,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 
-
-
 /**
  *
  * @author Lee
  */
-public class preferenceUITest extends GuiTest{
+public class PreferenceUITest extends GuiTest{
     
     private static final String TEST_FILE = "test";
     private static final String INPUT_FILE_EXTENSION = ".in";
