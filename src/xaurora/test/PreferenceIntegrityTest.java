@@ -12,13 +12,13 @@ import java.util.UUID;
 import xaurora.util.UserPreference;
 
 public class PreferenceIntegrityTest {
-	UserPreference preferences = UserPreference.getInstance();
-	private static String EMPTY_FILE = "empty";
-	private static String INITIAL_FILE = "initial";
-	private static String RANDOM_FILE = "random";
-	private static String PREFERENCE_FILE = "preference";
-	private static String INPUT_FILE_EXTENSION = ".in";
+	private static final String EMPTY_FILE = "empty";
+	private static final String INITIAL_FILE = "initial";
+	private static final String RANDOM_FILE = "random";
+	private static final String PREFERENCE_FILE = "preference";
+	private static final String INPUT_FILE_EXTENSION = ".in";
 	private static final int numPreferences = 19;
+	UserPreference preferences = UserPreference.getInstance();
 
 	@Test
 	public void testInitWithEmptyFile() throws IOException{
@@ -68,7 +68,7 @@ public class PreferenceIntegrityTest {
         preferences.initPreferences();
         preferences.writePreferences(INITIAL_FILE);
 
-        //check if random input is corrected
+        //check if random input is corrected to initial value
         boolean isEqual = FileUtils.contentEquals(randomFile, initialFile);
         assertEquals(true, isEqual);	
 

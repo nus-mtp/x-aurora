@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import org.apache.log4j.Logger;
 
+import xaurora.ui.Message;
+
 /**
  * Description: this class is mainly in charge of generating MD5 hashed ID for
  * data file from their source URL and the current System time
@@ -16,6 +18,7 @@ import org.apache.log4j.Logger;
  *
  */
 public final class IDGenerator {
+    private static final String NEW_EMPTY_STRING = "";
     private static final String ERR_MSG_INVALID_HASH_ALGORITHM = "Error, unable to generate the hashed ID due to invalid Hash Algorithm. Error Message: %s.";
     private static final String MSG_START = "An instance of IDGenerator is created. This message should appear only once at every software running flow.";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
@@ -26,7 +29,9 @@ public final class IDGenerator {
     private static IDGenerator instance = null;
     public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     private static final String HASH_TYPE = "MD5";
+    private static int numOfIDs = 0;
     private Logger logger;
+    private Message message = new Message();
 
     private IDGenerator() {
         this.logger = Logger.getLogger(this.getClass());
@@ -63,7 +68,9 @@ public final class IDGenerator {
      * @author GAO RISHENG A0101891L
      */
     public final String GenerateID(final String url, final int type) {
-        String output = url + getNow() + type;
+        assert url != null && !url.equals(NEW_EMPTY_STRING);
+        String output = url + getNow() + type + numOfIDs;
+        numOfIDs++;
         byte[] id = output.getBytes();
         try {
             MessageDigest md = MessageDigest.getInstance(HASH_TYPE);
@@ -79,7 +86,10 @@ public final class IDGenerator {
             // return id;
         } catch (NoSuchAlgorithmException e) {
             // SHOW ERROR LOG MESSAGE
-            this.logger.error(String.format(ERR_MSG_INVALID_HASH_ALGORITHM, e.getMessage()));
+            this.logger.error(String.format(ERR_MSG_INVALID_HASH_ALGORITHM,
+                    e.getMessage()));
+            message.showError(String.format(ERR_MSG_INVALID_HASH_ALGORITHM,
+                    e.getMessage()));
             return new String(id);
         }
 

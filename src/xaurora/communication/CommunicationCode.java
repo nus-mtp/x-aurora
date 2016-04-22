@@ -17,4 +17,7 @@ public class CommunicationCode {
 
     public static final int HOT_KEY = 171;
     public static final int PREFERENCE_LIST = 172;
+    //@author GAO RISHENG A0101891L
+    public static final int QUERY_WITH_INPUT = 0xFF;
+    public static final int QUERY_WITH_INDEX = 0xEE;
 }

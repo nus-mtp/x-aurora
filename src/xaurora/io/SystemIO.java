@@ -15,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import xaurora.security.Security;
 import xaurora.system.SecurityManager;
+import xaurora.ui.Message;
 
 /**
  * Description: This class is mainly in charge of file IO that related to system
@@ -55,6 +56,7 @@ public final class SystemIO {
     private static final int INDEX_ZERO = 0;
     private Logger logger;
     private static SystemIO classInstance;
+    private Message message = new Message();
 
     private SystemIO() {
         this.logger = Logger.getLogger(this.getClass());
@@ -90,12 +92,14 @@ public final class SystemIO {
         if (!systemDir.mkdir()) {
             if (!systemDir.exists()) {
                 this.logger.error(ERR_MSG_FAIL_TO_CREATE_SYSTEM_DIRECTORY);
+                message.showError(ERR_MSG_FAIL_TO_CREATE_SYSTEM_DIRECTORY);
             }
         }
         assert systemDir.exists();
         if (!userDir.mkdir()) {
             if (!userDir.exists()) {
                 this.logger.error(ERR_MSG_FAIL_TO_CREATE_USER_DIRECTORY);
+                message.showError(ERR_MSG_FAIL_TO_CREATE_USER_DIRECTORY);
             }
         }
         assert userDir.exists();
@@ -161,12 +165,16 @@ public final class SystemIO {
                     this.logger.error(String.format(
                             ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY,
                             e.getMessage()));
+                    message.showError(String.format(
+                            ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY,
+                            e.getMessage()));
                     // ASSUMPTION: Fail in cleaning the indexing directory of
                     // this user will not affect new DataBase construction
                 }
                 instance.setIndexDirectory(indexDirectory.getAbsolutePath());
             } else {
                 this.logger.error(ERR_MSG_UNABLE_TO_CREATE_INDEX_DIRECTORY);
+                message.showError(ERR_MSG_UNABLE_TO_CREATE_INDEX_DIRECTORY);
                 // In this case, the index directory will be set to the default
                 // value in DataFileIO class.
             }
@@ -199,6 +207,9 @@ public final class SystemIO {
             FileUtils.cleanDirectory(indexDirectory);
         } catch (IOException e) {
             this.logger.error(String.format(
+                    ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY,
+                    e.getMessage()));
+            message.showError(String.format(
                     ERR_MSG_UNABLE_TO_CLEAN_UP_PREVIOUS_INDEXING_DIRECTORY,
                     e.getMessage()));
         }
@@ -287,6 +298,8 @@ public final class SystemIO {
             } catch (IOException e) {
                 this.logger.error(String.format(ERR_MSG_FAIL_TO_CREATE_KEY_FILE,
                         hashName, e.getMessage()));
+                message.showError(String.format(ERR_MSG_FAIL_TO_CREATE_KEY_FILE,
+                        hashName, e.getMessage()));
             }
         }
         assert keySetFile.exists();
@@ -341,6 +354,9 @@ public final class SystemIO {
                         keyset.put(new String(hashName), salt);
                     } catch (IOException e) {
                         this.logger.error(String.format(
+                                ERR_MSG_FAIL_TO_READ_KEY_FROM_KEY_FILE,
+                                f.getName(), e.getMessage()));
+                        message.showError(String.format(
                                 ERR_MSG_FAIL_TO_READ_KEY_FROM_KEY_FILE,
                                 f.getName(), e.getMessage()));
                     }

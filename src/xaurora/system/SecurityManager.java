@@ -19,6 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.log4j.Logger;
 import xaurora.io.SystemIO;
 import xaurora.security.Security;
+import xaurora.ui.Message;
 
 /**
  * @author GAO RISHENG A0101891L Description: This class is mainly in charge of
@@ -59,6 +60,7 @@ public final class SecurityManager {
     private static final int KEY_LENGTH_IN_BYTES = 16;
     private static final String ENCRYPT_ALGORITHM = "AES";
     private static final String ENCRYPT_METHOD = "AES/CBC/PKCS5PADDING";
+    private Message message = new Message();
 
     /**
      * Description: Singleton class constructor
@@ -95,6 +97,7 @@ public final class SecurityManager {
             this.logger.info(MSG_INFO_MASTER_KEY_INIT_COMPLETE);
         } catch (NoSuchAlgorithmException e) {
             this.logger.error(ERR_MSG_UNABLE_TO_GENERATE_MASTERKEY);
+            message.showError(ERR_MSG_UNABLE_TO_GENERATE_MASTERKEY);
         }
     }
 
@@ -120,14 +123,17 @@ public final class SecurityManager {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | InvalidAlgorithmParameterException e) {
             this.logger.error(ERR_MSG_UNKNOWN_ENCRYPTION_ERROR);
+            message.showError(ERR_MSG_UNKNOWN_ENCRYPTION_ERROR);
             return entry;
         } catch (IllegalBlockSizeException e) {
             this.logger
                     .error(ERR_MSG_INVALID_ENCRYPT_KEY_FORMAT + e.getMessage());
+            message.showError(ERR_MSG_INVALID_ENCRYPT_KEY_FORMAT);
             return entry;
         } catch (BadPaddingException e) {
             this.logger
                     .error(ERR_MSG_INVALID_ENCRYPT_KEY_FORMAT + e.getMessage());
+            message.showError(ERR_MSG_INVALID_ENCRYPT_KEY_FORMAT);
             return entry;
         }
     }
@@ -155,14 +161,17 @@ public final class SecurityManager {
                 | InvalidKeyException | InvalidAlgorithmParameterException e) {
             this.logger
                     .error(ERR_MSG_UNKNOWN_DECRYPTION_ERROR + e.getMessage());
+            message.showError(ERR_MSG_UNKNOWN_DECRYPTION_ERROR);
             return entry;
         } catch (IllegalBlockSizeException e) {
             this.logger
                     .error(ERR_MSG_INVALID_DECRYPT_KEY_FORMAT + e.getMessage());
+            message.showError(ERR_MSG_INVALID_DECRYPT_KEY_FORMAT);
             return entry;
         } catch (BadPaddingException e) {
             this.logger
                     .error(ERR_MSG_INVALID_DECRYPT_KEY_FORMAT + e.getMessage());
+            message.showError(ERR_MSG_INVALID_DECRYPT_KEY_FORMAT);
             return entry;
         }
     }

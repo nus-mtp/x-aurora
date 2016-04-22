@@ -48,7 +48,7 @@ public final class SecurityTest {
     private static final int INDEX_ZERO = 0;
     private static SystemManager testInstance;
     @Test
-    public void test() {
+    public final void test() {
         testInstance = SystemManager.getInstance();
         testInstance.reset();
         produceActualOutput(testInstance);
@@ -89,7 +89,7 @@ public final class SecurityTest {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private static void produceActualOutput(SystemManager testInstance) {
+    private final static void produceActualOutput(SystemManager testInstance) {
 
         File temp = new File(SecurityTestInputGenerator.NEW_EMPTY_STRING);
         File storeDir = new File(temp.getAbsolutePath()
@@ -144,7 +144,7 @@ public final class SecurityTest {
      * 
      * @author GAO RISHENG A0101891L
      */
-    private static ArrayList<SecurityTestTextUnit> getDirectoryContent(
+    private final static ArrayList<SecurityTestTextUnit> getDirectoryContent(
             String path) {
         ArrayList<SecurityTestTextUnit> contents = new ArrayList<SecurityTestTextUnit>();
         File temp = new File(SecurityTestInputGenerator.NEW_EMPTY_STRING);

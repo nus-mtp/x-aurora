@@ -23,6 +23,7 @@ import xaurora.system.SystemManager;
 import xaurora.system.DBManager;
 import xaurora.system.SecurityManager;
 import xaurora.text.TextIndexer;
+import xaurora.ui.Message;
 import xaurora.util.DataFileMetaData;
 
 import org.apache.commons.io.FilenameUtils;
@@ -70,6 +71,7 @@ public final class DataFileIO {
     private String indexDirectory = DEFAULT_INDEX_DIRECTORY;
     private static DataFileIO instance = null;
     private final Logger logger;
+    private Message message = new Message();
 
     // Singleton Class constructor
     // This is to limits that only 1 instance of DataFileIO will be created
@@ -100,8 +102,9 @@ public final class DataFileIO {
         if (!new File(path).exists() || !new File(path).isDirectory()) {
             this.logger.error(
                     String.format(ERR_MSG_UNABLE_TO_SET_SYNC_FILE, path));
+            message.showError(
+                    String.format(ERR_MSG_UNABLE_TO_SET_SYNC_FILE, path));
         } else {
-
             this.syncDirectory = path;
             this.logger.info(String.format(MSG_UPDATE_SYNC_DIRECTORY_SUCCESS,
                     this.syncDirectory));
@@ -111,6 +114,8 @@ public final class DataFileIO {
     public final void setIndexDirectory(final String path) {
         if (!new File(path).exists() || !new File(path).isDirectory()) {
             this.logger.error(
+                    String.format(ERR_MSG_UNABLE_TO_SET_INDEX_FILE, path));
+            message.showError(
                     String.format(ERR_MSG_UNABLE_TO_SET_INDEX_FILE, path));
         } else {
             this.indexDirectory = path;
@@ -159,7 +164,8 @@ public final class DataFileIO {
      * @author GAO RISHENG A0101891L
      */
     private final String generateDataFilePath(final String id) {
-        String dstpath = this.syncDirectory + PATH_SEPARATOR + new String(id)
+        assert id != null && !id.trim().equals(NEW_EMPTY_STRING);
+        String dstpath = this.syncDirectory + PATH_SEPARATOR + id
                 + DEFAULT_FILE_EXTENSION;
         this.logger.info(String.format(MSG_NEW_DATA_FILE_PATH_CREATE, dstpath));
         return dstpath;
@@ -210,15 +216,18 @@ public final class DataFileIO {
      */
     public final void createDataFile(final String url, final String id,
             final byte[] content, SystemManager manager, DBManager dbManager) {
+        assert url != null && id != null && !id.equals(NEW_EMPTY_STRING)
+                && content != null;
         String dstpath = generateDataFilePath(id);
         // Store the data in the lucene indexing system.
         long currentTime = System.currentTimeMillis();
+
         manager.getIndexerInstance().createIndexDocumentFromWeb(
                 new String(content), url, dstpath, currentTime);
         File dstFile = new File(dstpath);
         if (dstFile.exists()) {
             this.logger.error(ERR_MSG_MD5_COLLISION);
-
+            message.showError(ERR_MSG_MD5_COLLISION);
         } else {
             try {
                 writeDataFileWithEncryption(url, content, dstFile,
@@ -230,6 +239,10 @@ public final class DataFileIO {
                 this.logger
                         .error(String.format(ERR_MSG_UNABLE_TO_WRITE_DATA_FILE,
                                 dstFile, e.getMessage()));
+                message.showError(
+                        String.format(ERR_MSG_UNABLE_TO_WRITE_DATA_FILE,
+                                dstFile, e.getMessage()));
+
             }
         }
     }
@@ -247,7 +260,7 @@ public final class DataFileIO {
      */
     private final String readFileContent(final File f, SystemManager system) {
         assert (f.isFile() && f.exists() && !f.isDirectory()
-                && !FilenameUtils.getExtension(f.getAbsolutePath())
+                && FilenameUtils.getExtension(f.getAbsolutePath())
                         .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
 
         try {
@@ -264,24 +277,32 @@ public final class DataFileIO {
         } catch (IOException e) {
             this.logger.error(String.format(ERR_MSG_UNABLE_TO_READ_DATA_FILE,
                     f.getAbsolutePath(), e.getMessage()));
+            message.showError(String.format(ERR_MSG_UNABLE_TO_READ_DATA_FILE,
+                    f.getAbsolutePath(), e.getMessage()));
             return NEW_EMPTY_STRING;
         } catch (InvalidKeyException e) {
             this.logger.error(ERR_MSG_INVALID_KEY, e);
+            message.showError(ERR_MSG_INVALID_KEY);
             return NEW_EMPTY_STRING;
         } catch (InvalidAlgorithmParameterException e) {
             this.logger.error(ERR_MSG_INVALID_ALGORITHM, e);
+            message.showError(ERR_MSG_INVALID_ALGORITHM);
             return NEW_EMPTY_STRING;
         } catch (NoSuchAlgorithmException e) {
             this.logger.error(ERR_MSG_INVALID_ALGORITHM, e);
+            message.showError(ERR_MSG_INVALID_ALGORITHM);
             return NEW_EMPTY_STRING;
         } catch (NoSuchPaddingException e) {
             this.logger.error(ERR_MSG_INVALID_PADDING, e);
+            message.showError(ERR_MSG_INVALID_PADDING);
             return NEW_EMPTY_STRING;
         } catch (IllegalBlockSizeException e) {
             this.logger.error(ERR_MSG_ILLEGAL_BLOCK, e);
+            message.showError(ERR_MSG_ILLEGAL_BLOCK);
             return NEW_EMPTY_STRING;
         } catch (BadPaddingException e) {
             this.logger.error(ERR_MSG_INVALID_PADDING, e);
+            message.showError(ERR_MSG_INVALID_PADDING);
             return NEW_EMPTY_STRING;
         }
 
@@ -315,7 +336,7 @@ public final class DataFileIO {
                 deleteMetaData.add(allMetaData.get(index));
             }
         }
-        
+
         return deleteMetaData;
     }
 
@@ -339,6 +360,8 @@ public final class DataFileIO {
         } catch (IOException e) {
             this.logger.error(String.format(ERR_MSG_UNABLE_TO_DELETE_DATA_FILE,
                     filePath.toString(), e.getMessage()));
+            message.showError(String.format(ERR_MSG_UNABLE_TO_DELETE_DATA_FILE,
+                    filePath.toString(), e.getMessage()));
         }
 
     }
@@ -355,7 +378,7 @@ public final class DataFileIO {
     private final String getUrlFromFile(final File f, SystemManager manager) {
         // Assertion: thie method must read a txt file with valid file path
         assert (f.isFile() && f.exists() && !f.isDirectory()
-                && !FilenameUtils.getExtension(f.getAbsolutePath())
+                && FilenameUtils.getExtension(f.getAbsolutePath())
                         .equals(TEXT_FILE_TYPE)) : ERR_INVALID_FILE_TYPE;
         String textContent = readFileContent(f, manager);
         if (textContent.equals(NEW_EMPTY_STRING)) {

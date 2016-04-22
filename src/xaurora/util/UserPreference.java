@@ -7,40 +7,41 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+import xaurora.util.Hotkeys;
 
+
+/**
+ * 
+ * @author Lee
+ *
+ */
 public class UserPreference {
-    //System Pane
+    //System Pane preferences
     private boolean isRunOnStartUp;
     private boolean isHideInToolbar;
-    //Hotkeys Pane
-    private KeyCode[] extendWordHotkey;
-    private KeyCode[] reduceWordHotkey;
-    private KeyCode[] extendSentenceHotkey;
-    private KeyCode[] reduceSentenceHotkey;
-    private KeyCode[] extendParagraphHotkey;
-    private KeyCode[] reduceParagraphHotkey;
-    //Text Editor Pane
+    //Hotkeys Pane preferences
+    Hotkeys hotkeys;
+    //Text Editor Pane preferences
     private int numMatchingTextDisplay;
     private boolean isShowTextSource;
     private Color boxColour;
     private Color textColour;
     private double boxTransparency;
-    //Blocked List Pane
+    //Blocked List Pane preferences
     private ArrayList<BlockedPage> blockedList;
-    //Path Pane
+    //Path Pane preferences
     private String contentPath;
     private boolean isShowPreviewText;
     private String clearCachesTime;
-    //Storage Pane
+    //Storage Pane preferences
     private String maxTextSizeStored;
     private String previewTextLength;
     
+    private static final int numHotkeys = 6;
     private static final int numPreferences = 19;
     private static UserPreference instance = null;
     
@@ -48,6 +49,10 @@ public class UserPreference {
     	initPreferences();
     }
     
+    /**
+     * makes UserPreference a Singleton class
+     * @return an instance of UserPreference
+     */
     public static UserPreference getInstance(){
         if (instance == null){
             instance = new UserPreference();
@@ -55,38 +60,42 @@ public class UserPreference {
         return instance;
     }
 
+    /**
+     * initialize preferences with initial value
+     */
     public void initPreferences(){
-        //System Pane
+        //System Pane preferences
         isRunOnStartUp = true;
         isHideInToolbar = true;
-        //Hotkeys Pane
-        extendWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.Z};
-        reduceWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.X};
-        extendSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.C};
-        reduceSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.V};
-        extendParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.B};
-        reduceParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.N};
-        //Text Editor Pane
+        //Hotkeys Pane preferences
+        hotkeys = new Hotkeys();
+        //Text Editor Pane preferences
         numMatchingTextDisplay = 5;
         isShowTextSource = true;
         boxColour = Color.WHITE;
         textColour = Color.BLACK;
         boxTransparency = 0;
-        //Blocked List Pane
+        //Blocked List Pane preferences
         blockedList = new ArrayList<BlockedPage>();
-        //Path Pane
+        //Path Pane preferences
         contentPath = "C:/User/Desktop";
         isShowPreviewText = true;
         clearCachesTime = "device is off";
-        //Storage Pane
+        //Storage Pane preferences
         maxTextSizeStored = "100MB";
         previewTextLength = "one sentence";
     }
     
+    /**
+     * read preferences from file, run integrity check for each preference
+     * and load the correct value to UI 
+     * @param username
+     */
     public void readPreferences(String username) {
         String filename = username + ".in";
 
         try {
+        	//read preferences from file
             FileReader fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String[] settings = new String[numPreferences];
@@ -95,105 +104,36 @@ public class UserPreference {
             }
             
             int index = 0;
-            //System Pane
+            
+            //System Pane preferences
             isRunOnStartUp = toBoolean(settings[index++]);
             isHideInToolbar = toBoolean(settings[index++]);
 
-            //Hotkeys Pane
-            String[] hotkey;
-            try{
-            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            	extendWordHotkey = new KeyCode[hotkey.length];
-
-            	for (int i = 0; i < hotkey.length; i++){
-            		try{
-            			extendWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
-            		}catch(IllegalArgumentException | NullPointerException ex){
-            			extendWordHotkey = getDefaultExtendWordHotkey();
-            			break;
-            		}
+            //Hotkeys Pane preferences
+            String[] codes;
+            for (int i=0; i < numHotkeys; i++){
+            	try{
+                	codes = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
+            		KeyCode[] tempCodes = new KeyCode[codes.length];
+            		boolean isCorrect = true;
+                	for (int j = 0; j < codes.length; j++){
+                		try{
+                			tempCodes[j] = KeyCode.valueOf(codes[j]);
+                		}catch(IllegalArgumentException | NullPointerException ex){
+                			isCorrect = false;
+                			hotkeys.setHotkeyCodes(i, getDefaultHotkeyCodes(i));
+                			break;
+                		}
+                	}
+                	if (isCorrect){
+                		hotkeys.setHotkeyCodes(i, tempCodes);
+                	}
+            	}catch(IndexOutOfBoundsException | NullPointerException ex){
+            		hotkeys.setHotkeyCodes(i, getDefaultHotkeyCodes(i));
             	}
-            }catch(IndexOutOfBoundsException | NullPointerException ex){
-            	extendWordHotkey = getDefaultExtendWordHotkey();
-            }
-            
-            try{
-            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            	reduceWordHotkey = new KeyCode[hotkey.length];
-            	for (int i = 0; i < hotkey.length; i++){
-            		try{
-            			reduceWordHotkey[i] = KeyCode.valueOf(hotkey[i]);
-            		}catch(IllegalArgumentException | NullPointerException ex){
-            			reduceWordHotkey = getDefaultReduceWordHotkey();
-            			break;
-            		}
-            	}
-            }catch(IndexOutOfBoundsException | NullPointerException ex){
-            	reduceWordHotkey = getDefaultReduceWordHotkey();
             }
 
-            try{
-            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            	extendSentenceHotkey = new KeyCode[hotkey.length];
-            	for (int i = 0; i < hotkey.length; i++){
-            		try{
-            			extendSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
-            		}catch(IllegalArgumentException | NullPointerException ex){
-            			extendSentenceHotkey = getDefaultExtendSentenceHotkey();
-            			break;
-            		}
-            	}
-            }catch(IndexOutOfBoundsException | NullPointerException ex){
-            	extendSentenceHotkey = getDefaultExtendSentenceHotkey();
-            }
-
-            try{
-            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            	reduceSentenceHotkey = new KeyCode[hotkey.length];
-            	for (int i = 0; i < hotkey.length; i++){
-            		try{
-            			reduceSentenceHotkey[i] = KeyCode.valueOf(hotkey[i]);
-            		}catch(IllegalArgumentException | NullPointerException ex){
-            			reduceSentenceHotkey = getDafaultReduceSentenceHotkey();
-            			break;
-            		}
-            	}
-            }catch(IndexOutOfBoundsException | NullPointerException ex){
-            	reduceSentenceHotkey = getDafaultReduceSentenceHotkey();
-            }
-
-            try{
-            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            	extendParagraphHotkey = new KeyCode[hotkey.length];
-            	for (int i = 0; i < hotkey.length; i++){
-            		try{
-            			extendParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
-            		}catch(IllegalArgumentException | NullPointerException ex){
-            			extendParagraphHotkey = getDefaultExtendParagraphHotkey();
-            			break;
-            		}
-            	}
-            }catch(IndexOutOfBoundsException | NullPointerException ex){
-            	extendParagraphHotkey = getDefaultExtendParagraphHotkey();
-            }
-
-
-            try{
-            	hotkey = settings[index].substring(1, settings[index++].length() - 1).split(",\\s+");
-            	reduceParagraphHotkey = new KeyCode[hotkey.length];
-            	for (int i = 0; i < hotkey.length; i++){
-            		try{
-            			reduceParagraphHotkey[i] = KeyCode.valueOf(hotkey[i]);
-            		}catch(IllegalArgumentException | NullPointerException ex){
-            			reduceParagraphHotkey = getDefaultReduceParagraphHotkey();
-            			break;
-            		}
-            	}
-            }catch(IndexOutOfBoundsException | NullPointerException ex){
-            	reduceParagraphHotkey = getDefaultReduceParagraphHotkey();
-            }
-
-            //Text Editor Pane
+            //Text Editor Pane preferences
             try{
             	numMatchingTextDisplay = Integer.valueOf(settings[index++]);
             }catch(NumberFormatException ex){
@@ -216,7 +156,7 @@ public class UserPreference {
                 boxTransparency = getDefaultBoxTransparency();
             }
             
-            //Blocked List Pane
+            //Blocked List Pane preferences
             try{
             	String[] s = settings[index++].split("\\s+");
             	blockedList = new ArrayList<BlockedPage>();
@@ -228,7 +168,7 @@ public class UserPreference {
             	blockedList = new ArrayList<BlockedPage>();
             }
 
-            //Path Pane
+            //Path Pane preferences
             try{
             	String filepath = settings[index++];
             	File file = new File(filepath);
@@ -244,7 +184,7 @@ public class UserPreference {
             clearCachesTime = settings[index++];
             checkClearCachesTime();
             
-            //Storage Pane
+            //Storage Pane preferences
             maxTextSizeStored = settings[index++];
             checkMaxTextSizeStored();
             previewTextLength = settings[index++];
@@ -258,6 +198,11 @@ public class UserPreference {
         }
     }
     
+    /**
+     * convert a String to Boolean
+     * @param str
+     * @return a boolean value
+     */
     private boolean toBoolean(String str){
     	if (str != null && str.equalsIgnoreCase("FALSE")){
     		return false;
@@ -295,28 +240,28 @@ public class UserPreference {
 		previewTextLength = getDefaultPreviewTextLength();
 	}
 
+    /**
+     * write preferences to file
+     * @param username
+     */
     public void writePreferences(String username) {
         String filename = username + ".in";
 
         try {
             FileWriter fileWriter = new FileWriter(filename);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            
+            //System Pane preferences
             bufferedWriter.write(String.valueOf(isRunOnStartUp));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isHideInToolbar));
             bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(extendWordHotkey));
-            bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(reduceWordHotkey));
-            bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(extendSentenceHotkey));
-            bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(reduceSentenceHotkey));
-            bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(extendParagraphHotkey));
-            bufferedWriter.newLine();
-            bufferedWriter.write(Arrays.toString(reduceParagraphHotkey));
-            bufferedWriter.newLine();
+            //Hotkey Pane preferences
+            for (int i=0; i < numHotkeys; i++){
+            	bufferedWriter.write(Arrays.toString(hotkeys.getHotkeyCodes(i)));
+                bufferedWriter.newLine();
+            }
+            //Text Editor Pane preferences
             bufferedWriter.write(String.valueOf(numMatchingTextDisplay));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isShowTextSource));
@@ -327,25 +272,31 @@ public class UserPreference {
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(boxTransparency));
             bufferedWriter.newLine();
+            //Blocked List Pane preferences 
             for (int i=0; i < blockedList.size(); i++){
                 BlockedPage page = blockedList.get(i);
                 bufferedWriter.write(page.getUrl() + " " + String.valueOf(page.getIsEnabled()) + " ");
             }
-            bufferedWriter.newLine();         
+            bufferedWriter.newLine();       
+            //Path Pane preferences
             bufferedWriter.write(String.valueOf(contentPath));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(isShowPreviewText));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(clearCachesTime));
             bufferedWriter.newLine();
+            //Storage Pane preferences
             bufferedWriter.write(String.valueOf(maxTextSizeStored));
             bufferedWriter.newLine();
             bufferedWriter.write(String.valueOf(previewTextLength));
+            
             bufferedWriter.close();
         } catch (IOException ex) {
             System.out.println("Error writing file " + filename);
         }
     }
+ 
+    /** getters **/
     
     public boolean isRunOnStartUp() {
         return isRunOnStartUp;
@@ -355,54 +306,8 @@ public class UserPreference {
         return isHideInToolbar;
     }
 
-    public KeyCode[] getExtendWordHotkey() {
-        return extendWordHotkey;
-    }
-
-    public KeyCode[] getReduceWordHotkey() {
-        return reduceWordHotkey;
-    }
-
-    public KeyCode[] getExtendSentenceHotkey() {
-        return extendSentenceHotkey;
-    }
-
-    public KeyCode[] getReduceSentenceHotkey() {
-        return reduceSentenceHotkey;
-    }
-
-    public KeyCode[] getExtendParagraphHotkey() {
-        return extendParagraphHotkey;
-    }
-
-    public KeyCode[] getReduceParagraphHotkey() {
-        return reduceParagraphHotkey;
-    }
-    
-    public KeyCode[][] getAllHotkeys(){
-        KeyCode[][] hotkeys = null;
-        
-        KeyCode[] ewh = getExtendWordHotkey();
-        KeyCode[] rwh = getReduceWordHotkey();
-        KeyCode[] esh = getExtendSentenceHotkey();
-        KeyCode[] rsh = getReduceSentenceHotkey();
-        KeyCode[] eph = getExtendParagraphHotkey();
-        KeyCode[] rph = getReduceParagraphHotkey();
-        
-        for (int i=0; i < 6; i++){
-            KeyCode[] hk = null;
-            switch(i){
-                case 0: hk = ewh; break;
-                case 1: hk = rwh; break;
-                case 2: hk = esh; break;
-                case 3: hk = rsh; break;
-                case 4: hk = eph; break;
-                case 5: hk = rph; break; 
-            }
-            hotkeys[i] = hk;
-        }
-        
-        return hotkeys;
+    public KeyCode[] getHotkeyCodes(int index){
+    	return hotkeys.getHotkeyCodes(index);
     }
 
     public int getNumMatchingTextDisplay() {
@@ -467,28 +372,10 @@ public class UserPreference {
         return numPreferences;
     }
     
-    public KeyCode[] getDefaultExtendWordHotkey(){
-        return extendWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.Z};
-    }
-
-    public KeyCode[] getDefaultReduceWordHotkey() {
-        return reduceWordHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.X};
-    }
-
-    public KeyCode[] getDefaultExtendSentenceHotkey() {
-        return extendSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.C};
-    }
-
-    public KeyCode[] getDafaultReduceSentenceHotkey() {
-        return reduceSentenceHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.V};
-    }
-
-    public KeyCode[] getDefaultExtendParagraphHotkey() {
-        return extendParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.B};
-    }
-
-    public KeyCode[] getDefaultReduceParagraphHotkey() {
-        return reduceParagraphHotkey = new KeyCode[]{KeyCode.CONTROL, KeyCode.ALT, KeyCode.N};
+    /** default value getters **/
+    
+    public KeyCode[] getDefaultHotkeyCodes(int index){
+    	return hotkeys.getDefaultHotkeyCodes(index);
     }
     
     public int getDefaultNumMatchingTextDisplay() {
@@ -522,7 +409,11 @@ public class UserPreference {
     public String getDefaultPreviewTextLength() {
         return previewTextLength = "one sentence";
     }
-
+    public Hotkeys getHotKey(){
+        return this.hotkeys;
+    }
+    /** setters **/
+    
     public void setIsRunOnStartUp(boolean isRunOnStartUp) {
         this.isRunOnStartUp = isRunOnStartUp;
     }
@@ -531,28 +422,8 @@ public class UserPreference {
         this.isHideInToolbar = isHideInToolbar;
     }
 
-    public void setExtendWordHotkey(KeyCode[] extendWordHotkey) {
-        this.extendWordHotkey = extendWordHotkey;
-    }
-
-    public void setReduceWordHotkey(KeyCode[] reduceWordHotkey) {
-        this.reduceWordHotkey = reduceWordHotkey;
-    }
-
-    public void setExtendSentenceHotkey(KeyCode[] extendSentenceHotkey) {
-        this.extendSentenceHotkey = extendSentenceHotkey;
-    }
-
-    public void setReduceSentenceHotkey(KeyCode[] reduceSentenceHotkey) {
-        this.reduceSentenceHotkey = reduceSentenceHotkey;
-    }
-
-    public void setExtendParagraphHotkey(KeyCode[] extendParagraphHotkey) {
-        this.extendParagraphHotkey = extendParagraphHotkey;
-    }
-
-    public void setReduceParagraphHotkey(KeyCode[] reduceParagraphHotkey) {
-        this.reduceParagraphHotkey = reduceParagraphHotkey;
+    public void setHotkeyCodes(int index, KeyCode[] codes){
+    	hotkeys.setHotkeyCodes(index, codes);
     }
 
     public void setNumMatchingTextDisplay(int numMatchingTextDisplay) {

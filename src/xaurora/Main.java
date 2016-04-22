@@ -22,7 +22,7 @@ public class Main {
 
         BasicConfigurator.configure();
         PropertyConfigurator.configure(getProperties());
-        // Simulate the user Login process
+        
         SystemManager sa = SystemManager.getInstance();
         sa.reset();
         assert sa.isManagerInitialize();
@@ -30,37 +30,18 @@ public class Main {
         Thread autoUpdatingThread = new Thread(dbManager);
         autoUpdatingThread.start();
         if (sa.isNetAccessible()) {
-            ChromeServer chromeSvr = new ChromeServer(PORT_BROWSER);
+            sa.getTimeManagerInstance().calibrateTime();
+            BrowserCoimmunicator chromeSvr = new BrowserCoimmunicator(PORT_BROWSER);
             Thread chromeSvrThread = new Thread(chromeSvr);
             chromeSvrThread.start();
         }
-        WordServer wordSvr = new WordServer(PORT_PLUGIN);
+        EditorCommunicator wordSvr = new EditorCommunicator(PORT_PLUGIN);
         Thread wordSvrThread = new Thread(wordSvr);
 
         // Establish connection between browser/editor and logic
         wordSvrThread.start();
-        /*sa.changeUser("new user", "example@gmail.com",
-                "E:\\study\\study2015sem1\\CS3283\\x-aurora\\local_data\\",
-                10, 36);
         
-        try {
-            Thread.sleep(300000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        sa.reset();
-        try {
-            Thread.sleep(300000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        sa.changeUser("new user2", "abcde@gmail.com",
-                "E:\\study\\study2015sem1\\CS3283\\x-aurora\\local_data\\",
-                7, 24);
-        */
-
-        
-
+        LoginUI.main(args);
     }
 
     private static String getProperties() {

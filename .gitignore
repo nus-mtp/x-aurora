@@ -11,5 +11,7 @@ dropbox.png
 /build/
 /nbproject/
 /unit_testing/
-/conf_data/
+/conf_data/system/log
+/conf_data/user
 /target/
+*.ucls

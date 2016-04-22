@@ -43,7 +43,6 @@ public class LoginUI extends Application{
     private static final String loginPage = ""; //dummy 
     private static final String skipWarning = "Cross device copy paste will not be available without loggin in";
     private static final String defaultUser = "default";
-    private static final String noEmail = "";
     PreferenceUI preferenceUI = new PreferenceUI();
     SystemManager systemManager = SystemManager.getInstance(); 
    
@@ -60,6 +59,7 @@ public class LoginUI extends Application{
         String styleSheetsPath = new File(styleSheets).getAbsolutePath().replace("\\", "/");
         loginScene.getStylesheets().add("File:///" + styleSheetsPath);
         stage.show();
+        buildDefaultUser();
     }
     
     public Scene createLoginScene(){

@@ -14,8 +14,7 @@ import xaurora.text.PrefixMatcher;
 import xaurora.text.TextIndexer;
 
 /**
- * @author GAO RISHENG A0101891L,
- * Description: This is a Junit Testing program
+ * @author GAO RISHENG A0101891L, Description: This is a Junit Testing program
  *         in charge of testing functionalities of TextIndexer and Prefix
  *         Matcher of the system. As there are 3 components of this test program
  *         1. Insertion test. This is to test the correctness of data insertion
@@ -25,7 +24,9 @@ import xaurora.text.TextIndexer;
  *         the correctness of search query generation of prefix matcher and the
  *         correctness of the search result in TextIndexer
  */
-public class IndexingTest {
+public final class IndexingTest {
+    private static final String EXPECT_RESULT_TWO = "some content.\n*filename*\n7542F2c8ad800c05a7995109f042aaf5\n*index*\n3";
+    private static final String EXPECT_RESULT_ONE = "new content.\n*filename*\n7542F2c8ad800c05a7995109f042aaf5\n*index*\n2";
     private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
     private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
     private static final String NEWLINE = "\n";
@@ -43,15 +44,20 @@ public class IndexingTest {
             "b38d7b263bc6539ca7b3f4fca9e78f24.txt",
             "8c4e604c8cff5c30f08c36133b6b2f79.txt",
             "393e7cb3c73d247eb89e7768b8474b02.txt" };
+    private static final String special_filename = "7542F2c8ad800c05a7995109f042aaf5.txt";
+    private static final String special_content = "UNKNOWN\nSpecial content.\n\n new content.\n some content.";
+    private static final String special_url = "UNKNOWN";
     private static final int INDEX_ZERO = 0;
 
     @Test
-    public void test() {
+    public final void test() {
         SystemManager testInstance = SystemManager.getInstance();
         testInstance.reset();
         insertTest(testInstance.getIndexerInstance());
         deletionTest(testInstance.getIndexerInstance());
         searchTest(testInstance.getIndexerInstance());
+        testInstance.reset();
+        searchQuery2(testInstance.getIndexerInstance());
     }
 
     /**
@@ -62,7 +68,7 @@ public class IndexingTest {
      *            the text indexer instance
      * @author Gao Risheng A0101891L
      */
-    private static void insertTest(TextIndexer instance) {
+    private final static void insertTest(TextIndexer instance) {
         for (int i = INDEX_ZERO; i < contentSet.length; i++) {
             instance.createIndexDocumentFromWeb(
                     urlSet[i] + NEWLINE + contentSet[i], urlSet[i],
@@ -94,7 +100,7 @@ public class IndexingTest {
      *            the text indexer instance
      * @author Gao Risheng A0101891L
      */
-    private static void deletionTest(TextIndexer instance) {
+    private final static void deletionTest(TextIndexer instance) {
         int counter = contentSet.length;
         for (int i = INDEX_ZERO; i < contentSet.length; i++) {
             assertFalse(instance.getReader().maxDoc() == INDEX_ZERO);
@@ -114,7 +120,7 @@ public class IndexingTest {
      *            the text indexer instance
      * @author Gao Risheng A0101891L
      */
-    private static void searchTest(TextIndexer instance) {
+    private final static void searchTest(TextIndexer instance) {
         for (int i = INDEX_ZERO; i < contentSet.length; i++) {
             instance.createIndexDocumentFromWeb(
                     urlSet[i] + NEWLINE + contentSet[i], urlSet[i],
@@ -126,8 +132,12 @@ public class IndexingTest {
         assertEquals(2, testResult1.size());
         // expected output should be content of contentset[1] and contentset[3]
         // since they have the keyword 'content'
-        assertEquals(contentSet[1], testResult1.get(0));
-        assertEquals(contentSet[3], testResult1.get(1));
+        assertEquals(contentSet[1] + "\n*filename*\n"
+                + "d15df9e7386bc56b51f3fb5f85d41991" + "\n*index*\n" + 1,
+                testResult1.get(0));
+        assertEquals(contentSet[3] + "\n*filename*\n"
+                + "8c4e604c8cff5c30f08c36133b6b2f79" + "\n*index*\n" + 1,
+                testResult1.get(1));
         // Test for input that have multiple terms
         // expected output should be content of contentset[4] since it is the
         // only
@@ -135,14 +145,18 @@ public class IndexingTest {
         ArrayList<String> testResult2 = PrefixMatcher.getResult("random input",
                 instance);
         assertEquals(1, testResult2.size());
-        assertEquals(contentSet[4], testResult2.get(0));
+        assertEquals(contentSet[4] + "\n*filename*\n"
+                + "393e7cb3c73d247eb89e7768b8474b02" + "\n*index*\n" + 1,
+                testResult2.get(0));
         // Test for numerical input
         // expected output should be content of contentset[4] since it is the
         // only
         // entry with a single keyword '1'
         ArrayList<String> testResult3 = PrefixMatcher.getResult("1", instance);
         assertEquals(1, testResult3.size());
-        assertEquals(contentSet[4], testResult3.get(0));
+        assertEquals(contentSet[4] + "\n*filename*\n"
+                + "393e7cb3c73d247eb89e7768b8474b02" + "\n*index*\n" + 1,
+                testResult3.get(0));
         // Test for invalid input
         // Expected output should be empty as none of the content of contentset
         // will have
@@ -158,6 +172,24 @@ public class IndexingTest {
         ArrayList<String> testResult5 = PrefixMatcher.getResult("email:",
                 instance);
         assertTrue(testResult5.isEmpty());
+
+    }
+
+    /**
+     * Description: Testing the new search query (retrieving the next paragraph)
+     * 
+     * @param instance,
+     *            the tested textIndexer instance
+     * @author GAO RISHENG A0101891L
+     */
+    private final static void searchQuery2(TextIndexer instance) {
+        instance.createIndexDocumentFromWeb(special_content, special_url,
+                special_filename, System.currentTimeMillis());
+        assertEquals(instance.getReader().maxDoc(), 3);
+        assertEquals(EXPECT_RESULT_ONE,
+                PrefixMatcher.getResult(special_filename, 2, instance));
+        assertEquals(EXPECT_RESULT_TWO,
+                PrefixMatcher.getResult(special_filename, 3, instance));
 
     }
 
