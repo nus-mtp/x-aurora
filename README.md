@@ -66,7 +66,12 @@ This project aims to develop a productivity tool that allows users to copy and p
 			|_ Junit 4.10
 		|_ Continuous Integration Server
 			|_ https://travis-ci.org/nus-mtp/x-aurora
-	#UI (Incomplete)
+	#UI
+		|_ LoginUI to login as Dropbox user (not connected to Dropbox)
+		|_ PreferenceUI 
+			|_ Set user preferences (e.g. Hotkeys, Blocked List, File Expire Time)
+			|_ View data information from database
+
 	#Web-Browser Plugin (Incomplete)
 	#Editor Plugin (Incomplete)
 	#Dropbox Synchronization (Incomplete)
@@ -96,7 +101,15 @@ This project aims to develop a productivity tool that allows users to copy and p
 			|_ Right click-> Compile with JavaCC
 		|_ Run Main.java
 
-	#UI (Incomplete)
+	#UI
+	|_ Requirements: 
+		|_ Junit 4.10 Unit Testing Framework
+		|_ TestFX 3.1.2 JavaFX Testing Framework
+			|_ Github repository: https://github.com/TestFX/TestFX
+			|_ Details APIs and install instructions are in the webpage above 
+		|_ Guava.jar
+			|_ can be downloaded from http://www.java2s.com/Code/Jar/g/Downloadguavajar.htm
+
 	#Web-Browser Plugin (Incomplete)
 	#Editor Plugin (Incomplete)
 	#Dropbox Synchronization (Incomplete)
@@ -111,6 +124,11 @@ This project aims to develop a productivity tool that allows users to copy and p
 		|_ Check through the /local_data/ folder for encrypted data files
 		|_ Check through the /conf_data/user/ folder for .ks files and indexing system files
 		|_ Check through the /conf_data/system/log/ foler for all the log files
+	
+	#UI
+		Two test class under xaurora.test package
+		|_ PreferenceIntegrityTest.java
+		|_ PreferenceUITest.java
 
 ##Current Problem:
 
