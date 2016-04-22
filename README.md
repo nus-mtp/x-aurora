@@ -64,7 +64,8 @@ This project aims to develop a productivity tool that allows users to copy and p
 			|_ Log4J Framework (log4j-1.2.17)
 			|_ Apache Common IO (For File IO)
 			|_ Junit 4.10
-
+		|_ Continuous Integration Server
+			|_ https://travis-ci.org/nus-mtp/x-aurora
 	#UI (Incomplete)
 	#Web-Browser Plugin (Incomplete)
 	#Editor Plugin (Incomplete)
