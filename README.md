@@ -72,8 +72,16 @@ This project aims to develop a productivity tool that allows users to copy and p
 			|_ Set user preferences (e.g. Hotkeys, Blocked List, File Expire Time)
 			|_ View data information from database
 
-	#Web-Browser Plugin (Incomplete)
+	#Web-Browser Plugin
+		|_ Extract all webpage content for Google Chrome.
+		|_ Notification Icon for different connection state with logic.
+
 	#Editor Plugin (Incomplete)
+		|_ Send request and receive content with logic.
+		|_ Simple UI(Wrong place)
+		|_ Extension of choices
+		|_ Revert of chosen preferences.
+
 	#Dropbox Synchronization (Incomplete)
 
 ##System Set up
@@ -110,8 +118,19 @@ This project aims to develop a productivity tool that allows users to copy and p
 		|_ Guava.jar
 			|_ can be downloaded from http://www.java2s.com/Code/Jar/g/Downloadguavajar.htm
 
-	#Web-Browser Plugin (Incomplete)
+	#Web-Browser Plugin
+	|_ Requirements: 
+		|_ Google Chrome (Not researched can be used after which version)
+	|_ Installation:
+		|_ In Extension Page of Google Chrome, enable Developer Mode.
+		|_ Choose Load Unpacked Extension.
+		|_ Select target folder with X-aurora Chrome Extension.
+
 	#Editor Plugin (Incomplete)
+	|_ Requirements: Microsoft Visual Studio (Version later than 2012)
+	|_ Running:
+		|_ Run in Visual Studio.
+	
 	#Dropbox Synchronization (Incomplete)
 
 ##Testing
