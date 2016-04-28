@@ -127,7 +127,9 @@ This project aims to develop a productivity tool that allows users to copy and p
 		|_ Select target folder with X-aurora Chrome Extension.
 
 	#Editor Plugin (Incomplete)
-	|_ Requirements: Microsoft Visual Studio (Version later than 2012)
+	|_ Requirements: 
+		|_ Microsoft Visual Studio (Version later than 2012)
+		|_ Microsoft Word (Later than 2010)
 	|_ Running:
 		|_ Run in Visual Studio.
 	
