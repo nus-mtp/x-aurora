@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tree type="Call Tree" viewMode="Tree" threadSelection="All thread groups" threadStatus="Runnable" aggregationLevel="Methods">
+  <node leaf="false" class="xaurora.system.DBManager" methodName="run" methodSignature="()V" time="410881192" count="1" selfTime="410451518" lineNumber="-1" percent="100.0">
+    <node leaf="false" class="xaurora.system.DBManager" methodName="monitorFileSet" methodSignature="()Ljava/util/ArrayList;" time="429674" count="1" selfTime="114" lineNumber="-1" percent="0.1">
+      <node leaf="false" class="xaurora.io.DataFileIO" methodName="getAllMetaData" methodSignature="(Lxaurora/system/SystemManager;)Ljava/util/ArrayList;" time="429333" count="1" selfTime="755" lineNumber="-1" percent="0.1">
+        <node leaf="false" class="xaurora.io.DataFileIO" methodName="getUrlFromFile" methodSignature="(Ljava/io/File;Lxaurora/system/SystemManager;)Ljava/lang/String;" time="413491" count="36" selfTime="360" lineNumber="-1" percent="0.1">
+          <node leaf="false" class="xaurora.io.DataFileIO" methodName="readFileContent" methodSignature="(Ljava/io/File;Lxaurora/system/SystemManager;)Ljava/lang/String;" time="403721" count="36" selfTime="301790" lineNumber="-1" percent="0.1">
+            <node leaf="true" class="java.lang.StringBuilder" methodName="append" methodSignature="(Ljava/lang/String;)Ljava/lang/StringBuilder;" time="43999" count="147095" selfTime="43999" lineNumber="-1" percent="0.0"/>
+            <node leaf="false" class="xaurora.security.Security" methodName="decrypt" methodSignature="([BLjava/lang/String;Lxaurora/system/SecurityManager;)[B" time="39339" count="36" selfTime="556" lineNumber="-1" percent="0.0">
+              <node leaf="true" class="javax.crypto.Cipher" methodName="getInstance" methodSignature="(Ljava/lang/String;)Ljavax/crypto/Cipher;" time="14276" count="36" selfTime="14276" lineNumber="-1" percent="0.0"/>
+              <node leaf="true" class="javax.crypto.Cipher" methodName="init" methodSignature="(ILjava/security/Key;Ljava/security/spec/AlgorithmParameterSpec;)V" time="11715" count="36" selfTime="11715" lineNumber="-1" percent="0.0"/>
+              <node leaf="false" class="xaurora.security.Security" methodName="generateKey" methodSignature="(Ljava/lang/String;[B)[B" time="7547" count="36" selfTime="364" lineNumber="-1" percent="0.0">
+                <node leaf="true" class="java.security.MessageDigest" methodName="getInstance" methodSignature="(Ljava/lang/String;)Ljava/security/MessageDigest;" time="5556" count="36" selfTime="5556" lineNumber="-1" percent="0.0"/>
+                <node leaf="true" class="java.security.MessageDigest" methodName="digest" methodSignature="([B)[B" time="1342" count="36" selfTime="1342" lineNumber="-1" percent="0.0"/>
+                <node leaf="true" class="java.lang.String" methodName="getBytes" methodSignature="(Ljava/lang/String;)[B" time="236" count="36" selfTime="236" lineNumber="-1" percent="0.0"/>
+                <node leaf="true" class="java.util.Arrays" methodName="copyOf" methodSignature="([BI)[B" time="49" count="36" selfTime="49" lineNumber="-1" percent="0.0"/>
+              </node>
+              <node leaf="true" class="javax.crypto.Cipher" methodName="doFinal" methodSignature="([B)[B" time="2922" count="36" selfTime="2922" lineNumber="-1" percent="0.0"/>
+              <node leaf="true" class="javax.crypto.spec.SecretKeySpec" methodName="&lt;init&gt;" methodSignature="([BLjava/lang/String;)V" time="1468" count="36" selfTime="1468" lineNumber="-1" percent="0.0"/>
+              <node leaf="false" class="xaurora.security.Security" methodName="createIV" methodSignature="(Ljava/lang/String;)[B" time="345" count="36" selfTime="259" lineNumber="-1" percent="0.0">
+                <node leaf="true" class="java.lang.String" methodName="toCharArray" methodSignature="()[C" time="86" count="36" selfTime="86" lineNumber="-1" percent="0.0"/>
+              </node>
+              <node leaf="true" class="javax.crypto.spec.IvParameterSpec" methodName="&lt;init&gt;" methodSignature="([B)V" time="262" count="36" selfTime="262" lineNumber="-1" percent="0.0"/>
+              <node leaf="false" class="xaurora.system.SecurityManager" methodName="getSalt" methodSignature="(Ljava/lang/String;)[B" time="201" count="36" selfTime="53" lineNumber="-1" percent="0.0">
+                <node leaf="true" class="java.util.HashMap" methodName="get" methodSignature="(Ljava/lang/Object;)Ljava/lang/Object;" time="148" count="36" selfTime="148" lineNumber="-1" percent="0.0"/>
+              </node>
+              <node leaf="true" class="xaurora.system.SecurityManager" methodName="getCurrentHash" methodSignature="()Ljava/lang/String;" time="47" count="36" selfTime="47" lineNumber="-1" percent="0.0"/>
+            </node>
+            <node leaf="true" class="java.nio.file.Files" methodName="readAllBytes" methodSignature="(Ljava/nio/file/Path;)[B" time="13902" count="36" selfTime="13902" lineNumber="-1" percent="0.0"/>
+            <node leaf="true" class="java.lang.String" methodName="replace" methodSignature="(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;" time="2432" count="36" selfTime="2432" lineNumber="-1" percent="0.0"/>
+            <node leaf="true" class="java.nio.file.Paths" methodName="get" methodSignature="(Ljava/lang/String;[Ljava/lang/String;)Ljava/nio/file/Path;" time="1705" count="36" selfTime="1705" lineNumber="-1" percent="0.0"/>
+            <node leaf="true" class="java.io.File" methodName="getName" methodSignature="()Ljava/lang/String;" time="413" count="36" selfTime="413" lineNumber="-1" percent="0.0"/>
+            <node leaf="true" class="xaurora.system.SystemManager" methodName="getSecurityManagerInstance" methodSignature="()Lxaurora/system/SecurityManager;" time="77" count="36" selfTime="77" lineNumber="-1" percent="0.0"/>
+            <node leaf="true" class="java.io.File" methodName="getAbsolutePath" methodSignature="()Ljava/lang/String;" time="64" count="36" selfTime="64" lineNumber="-1" percent="0.0"/>
+          </node>
+          <node leaf="true" class="java.lang.String" methodName="split" methodSignature="(Ljava/lang/String;)[Ljava/lang/String;" time="9410" count="36" selfTime="9410" lineNumber="-1" percent="0.0"/>
+        </node>
+        <node leaf="true" class="java.io.File" methodName="lastModified" methodSignature="()J" time="4561" count="36" selfTime="4561" lineNumber="-1" percent="0.0"/>
+        <node leaf="false" class="xaurora.util.DataFileMetaData" methodName="&lt;init&gt;" methodSignature="(Ljava/lang/String;Ljava/lang/String;)V" time="2782" count="36" selfTime="357" lineNumber="-1" percent="0.0">
+          <node leaf="false" class="xaurora.util.DataFileMetaData" methodName="getHostFromURL" methodSignature="()V" time="2425" count="36" selfTime="149" lineNumber="-1" percent="0.0">
+            <node leaf="true" class="java.net.URL" methodName="&lt;init&gt;" methodSignature="(Ljava/lang/String;)V" time="2238" count="36" selfTime="2238" lineNumber="-1" percent="0.0"/>
+            <node leaf="true" class="java.net.URL" methodName="getHost" methodSignature="()Ljava/lang/String;" time="38" count="36" selfTime="38" lineNumber="-1" percent="0.0"/>
+          </node>
+        </node>
+        <node leaf="true" class="java.io.File" methodName="length" methodSignature="()J" time="2580" count="36" selfTime="2580" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.io.File" methodName="exists" methodSignature="()Z" time="1187" count="37" selfTime="1187" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.io.File" methodName="listFiles" methodSignature="()[Ljava/io/File;" time="686" count="1" selfTime="686" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.io.File" methodName="isDirectory" methodSignature="()Z" time="681" count="37" selfTime="681" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="org.apache.commons.io.FilenameUtils" methodName="getExtension" methodSignature="(Ljava/lang/String;)Ljava/lang/String;" time="568" count="36" selfTime="568" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="org.apache.log4j.Logger" methodName="info" methodSignature="(Ljava/lang/Object;)V" time="479" count="1" selfTime="479" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.io.File" methodName="getName" methodSignature="()Ljava/lang/String;" time="380" count="72" selfTime="380" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.String" methodName="format" methodSignature="(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;" time="307" count="1" selfTime="307" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.Stack" methodName="pop" methodSignature="()Ljava/lang/Object;" time="184" count="37" selfTime="184" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.String" methodName="substring" methodSignature="(II)Ljava/lang/String;" time="120" count="36" selfTime="120" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.Stack" methodName="isEmpty" methodSignature="()Z" time="104" count="38" selfTime="104" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="xaurora.util.DataFileMetaData" methodName="addFileMetaData" methodSignature="(JJ)V" time="103" count="36" selfTime="103" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.io.File" methodName="getAbsolutePath" methodSignature="()Ljava/lang/String;" time="83" count="36" selfTime="83" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.Stack" methodName="push" methodSignature="(Ljava/lang/Object;)Ljava/lang/Object;" time="52" count="37" selfTime="52" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.io.File" methodName="&lt;init&gt;" methodSignature="(Ljava/lang/String;)V" time="51" count="1" selfTime="51" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.ArrayList" methodName="add" methodSignature="(Ljava/lang/Object;)Z" time="42" count="36" selfTime="42" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.String" methodName="equals" methodSignature="(Ljava/lang/Object;)Z" time="40" count="36" selfTime="40" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.String" methodName="lastIndexOf" methodSignature="(I)I" time="33" count="36" selfTime="33" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.Stack" methodName="&lt;init&gt;" methodSignature="()V" time="30" count="1" selfTime="30" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.Integer" methodName="valueOf" methodSignature="(I)Ljava/lang/Integer;" time="12" count="1" selfTime="12" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.ArrayList" methodName="&lt;init&gt;" methodSignature="()V" time="11" count="1" selfTime="11" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.ArrayList" methodName="size" methodSignature="()I" time="11" count="1" selfTime="11" lineNumber="-1" percent="0.0"/>
+      </node>
+      <node leaf="true" class="java.util.HashSet" methodName="contains" methodSignature="(Ljava/lang/Object;)Z" time="94" count="36" selfTime="94" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="xaurora.system.SystemManager" methodName="getDataFileIOInstance" methodSignature="()Lxaurora/io/DataFileIO;" time="31" count="1" selfTime="31" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="xaurora.util.DataFileMetaData" methodName="getFilename" methodSignature="()Ljava/lang/String;" time="31" count="36" selfTime="31" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.util.ArrayList" methodName="iterator" methodSignature="()Ljava/util/Iterator;" time="19" count="1" selfTime="19" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.util.Iterator" methodName="hasNext" methodSignature="()Z" time="19" count="37" selfTime="19" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.util.Iterator" methodName="next" methodSignature="()Ljava/lang/Object;" time="19" count="36" selfTime="19" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.util.ArrayList" methodName="&lt;init&gt;" methodSignature="()V" time="14" count="1" selfTime="14" lineNumber="-1" percent="0.0"/>
+    </node>
+  </node>
+  <node leaf="false" class="xaurora.communication.ChromeServer" methodName="run" methodSignature="()V" time="81911" count="1" selfTime="1" lineNumber="-1" percent="0.0">
+    <node leaf="false" class="xaurora.communication.ChromeServer" methodName="receiveMessage" methodSignature="()Ljava/lang/String;" time="81910" count="198" selfTime="7803" lineNumber="-1" percent="0.0">
+      <node leaf="true" class="java.io.PrintWriter" methodName="&lt;init&gt;" methodSignature="(Ljava/io/OutputStream;Z)V" time="13031" count="198" selfTime="13031" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.net.ServerSocket" methodName="accept" methodSignature="()Ljava/net/Socket;" time="11097" count="198" selfTime="11097" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.BufferedReader" methodName="readLine" methodSignature="()Ljava/lang/String;" time="10934" count="2376" selfTime="10934" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.net.Socket" methodName="getInputStream" methodSignature="()Ljava/io/InputStream;" time="6584" count="198" selfTime="6584" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.net.Socket" methodName="getOutputStream" methodSignature="()Ljava/io/OutputStream;" time="5921" count="198" selfTime="5921" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.String" methodName="split" methodSignature="(Ljava/lang/String;)[Ljava/lang/String;" time="4763" count="198" selfTime="4763" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.InputStreamReader" methodName="&lt;init&gt;" methodSignature="(Ljava/io/InputStream;)V" time="4668" count="198" selfTime="4668" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.PrintWriter" methodName="flush" methodSignature="()V" time="3760" count="198" selfTime="3760" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.PrintWriter" methodName="close" methodSignature="()V" time="3310" count="198" selfTime="3310" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.BufferedReader" methodName="close" methodSignature="()V" time="1965" count="198" selfTime="1965" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.BufferedReader" methodName="&lt;init&gt;" methodSignature="(Ljava/io/Reader;)V" time="1735" count="198" selfTime="1735" lineNumber="-1" percent="0.0"/>
+      <node leaf="false" class="xaurora.communication.ChromeServer" methodName="genOutput" methodSignature="(Ljava/lang/String;I)Ljava/lang/String;" time="1563" count="198" selfTime="606" lineNumber="-1" percent="0.0">
+        <node leaf="true" class="java.lang.String" methodName="&lt;init&gt;" methodSignature="()V" time="535" count="198" selfTime="535" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.Integer" methodName="toString" methodSignature="(I)Ljava/lang/String;" time="422" count="198" selfTime="422" lineNumber="-1" percent="0.0"/>
+      </node>
+      <node leaf="true" class="java.io.BufferedReader" methodName="read" methodSignature="([C)I" time="1176" count="198" selfTime="1176" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.PrintWriter" methodName="print" methodSignature="(Ljava/lang/String;)V" time="869" count="198" selfTime="869" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.String" methodName="valueOf" methodSignature="(I)Ljava/lang/String;" time="794" count="198" selfTime="794" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.String" methodName="trim" methodSignature="()Ljava/lang/String;" time="664" count="198" selfTime="664" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.net.Socket" methodName="close" methodSignature="()V" time="388" count="198" selfTime="388" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.Integer" methodName="parseInt" methodSignature="(Ljava/lang/String;)I" time="371" count="396" selfTime="371" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.String" methodName="valueOf" methodSignature="(Ljava/lang/Object;)Ljava/lang/String;" time="209" count="198" selfTime="209" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.StringBuilder" methodName="append" methodSignature="(Ljava/lang/String;)Ljava/lang/StringBuilder;" time="170" count="198" selfTime="170" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.String" methodName="length" methodSignature="()I" time="135" count="396" selfTime="135" lineNumber="-1" percent="0.0"/>
+    </node>
+  </node>
+</tree>

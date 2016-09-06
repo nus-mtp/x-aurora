@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tree type="Allocation Call Tree" viewMode="Tree" garbageCollectorMode="Live objects" allocationsOf="All classes" aggregationLevel="Methods">
+  <node leaf="false" class="xaurora.system.DBManager" methodName="run" methodSignature="()V" allocationBytes="3763848" count="155406" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="98.5">
+    <node leaf="false" class="xaurora.system.DBManager" methodName="monitorFileSet" methodSignature="()Ljava/util/ArrayList;" allocationBytes="3763848" count="155406" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="98.5">
+      <node leaf="false" class="xaurora.io.DataFileIO" methodName="getAllMetaData" methodSignature="(Lxaurora/system/SystemManager;)Ljava/util/ArrayList;" allocationBytes="3763792" count="155404" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="98.5">
+        <node leaf="false" class="xaurora.io.DataFileIO" methodName="getUrlFromFile" methodSignature="(Ljava/io/File;Lxaurora/system/SystemManager;)Ljava/lang/String;" allocationBytes="3749728" count="154934" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="98.2">
+          <node leaf="false" class="xaurora.io.DataFileIO" methodName="readFileContent" methodSignature="(Ljava/io/File;Lxaurora/system/SystemManager;)Ljava/lang/String;" allocationBytes="3670168" count="151667" selfAllocationBytes="3532008" selfAllocationCount="147167" lineNumber="-1" percent="96.1">
+            <node leaf="false" class="xaurora.security.Security" methodName="decrypt" methodSignature="([BLjava/lang/String;Lxaurora/system/SecurityManager;)[B" allocationBytes="105904" count="3492" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="2.8">
+              <node leaf="true" class="javax.crypto.Cipher" methodName="getInstance" methodSignature="(Ljava/lang/String;)Ljavax/crypto/Cipher;" allocationBytes="65088" count="2340" selfAllocationBytes="65088" selfAllocationCount="2340" lineNumber="-1" percent="1.7"/>
+              <node leaf="true" class="javax.crypto.Cipher" methodName="init" methodSignature="(ILjava/security/Key;Ljava/security/spec/AlgorithmParameterSpec;)V" allocationBytes="30344" count="864" selfAllocationBytes="30344" selfAllocationCount="864" lineNumber="-1" percent="0.8"/>
+              <node leaf="false" class="xaurora.security.Security" methodName="generateKey" methodSignature="(Ljava/lang/String;[B)[B" allocationBytes="9032" count="216" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="0.2">
+                <node leaf="true" class="java.security.MessageDigest" methodName="getInstance" methodSignature="(Ljava/lang/String;)Ljava/security/MessageDigest;" allocationBytes="9032" count="216" selfAllocationBytes="9032" selfAllocationCount="216" lineNumber="-1" percent="0.2"/>
+              </node>
+              <node leaf="true" class="javax.crypto.spec.SecretKeySpec" methodName="&lt;init&gt;" methodSignature="([BLjava/lang/String;)V" allocationBytes="864" count="36" selfAllocationBytes="864" selfAllocationCount="36" lineNumber="-1" percent="0.0"/>
+              <node leaf="true" class="javax.crypto.spec.IvParameterSpec" methodName="&lt;init&gt;" methodSignature="([B)V" allocationBytes="576" count="36" selfAllocationBytes="576" selfAllocationCount="36" lineNumber="-1" percent="0.0"/>
+            </node>
+            <node leaf="true" class="java.nio.file.Files" methodName="readAllBytes" methodSignature="(Ljava/nio/file/Path;)[B" allocationBytes="16992" count="540" selfAllocationBytes="16992" selfAllocationCount="540" lineNumber="-1" percent="0.4"/>
+            <node leaf="true" class="java.lang.String" methodName="replace" methodSignature="(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;" allocationBytes="9504" count="252" selfAllocationBytes="9504" selfAllocationCount="252" lineNumber="-1" percent="0.2"/>
+            <node leaf="true" class="java.nio.file.Paths" methodName="get" methodSignature="(Ljava/lang/String;[Ljava/lang/String;)Ljava/nio/file/Path;" allocationBytes="4896" count="180" selfAllocationBytes="4896" selfAllocationCount="180" lineNumber="-1" percent="0.1"/>
+            <node leaf="true" class="java.io.File" methodName="getName" methodSignature="()Ljava/lang/String;" allocationBytes="864" count="36" selfAllocationBytes="864" selfAllocationCount="36" lineNumber="-1" percent="0.0"/>
+          </node>
+          <node leaf="true" class="java.lang.String" methodName="split" methodSignature="(Ljava/lang/String;)[Ljava/lang/String;" allocationBytes="79560" count="3267" selfAllocationBytes="79560" selfAllocationCount="3267" lineNumber="-1" percent="2.1"/>
+        </node>
+        <node leaf="false" class="xaurora.util.DataFileMetaData" methodName="&lt;init&gt;" methodSignature="(Ljava/lang/String;Ljava/lang/String;)V" allocationBytes="7560" count="219" selfAllocationBytes="1728" selfAllocationCount="36" lineNumber="-1" percent="0.2">
+          <node leaf="false" class="xaurora.util.DataFileMetaData" methodName="getHostFromURL" methodSignature="()V" allocationBytes="5832" count="183" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="0.2">
+            <node leaf="true" class="java.net.URL" methodName="&lt;init&gt;" methodSignature="(Ljava/lang/String;)V" allocationBytes="5832" count="183" selfAllocationBytes="5832" selfAllocationCount="183" lineNumber="-1" percent="0.2"/>
+          </node>
+        </node>
+        <node leaf="true" class="java.io.File" methodName="listFiles" methodSignature="()[Ljava/io/File;" allocationBytes="2016" count="72" selfAllocationBytes="2016" selfAllocationCount="72" lineNumber="-1" percent="0.1"/>
+        <node leaf="true" class="java.io.File" methodName="getName" methodSignature="()Ljava/lang/String;" allocationBytes="1728" count="72" selfAllocationBytes="1728" selfAllocationCount="72" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.String" methodName="substring" methodSignature="(II)Ljava/lang/String;" allocationBytes="864" count="36" selfAllocationBytes="864" selfAllocationCount="36" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="org.apache.commons.io.FilenameUtils" methodName="getExtension" methodSignature="(Ljava/lang/String;)Ljava/lang/String;" allocationBytes="864" count="36" selfAllocationBytes="864" selfAllocationCount="36" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.String" methodName="format" methodSignature="(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;" allocationBytes="440" count="16" selfAllocationBytes="440" selfAllocationCount="16" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="org.apache.log4j.Logger" methodName="info" methodSignature="(Ljava/lang/Object;)V" allocationBytes="432" count="13" selfAllocationBytes="432" selfAllocationCount="13" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.io.File" methodName="&lt;init&gt;" methodSignature="(Ljava/lang/String;)V" allocationBytes="104" count="4" selfAllocationBytes="104" selfAllocationCount="4" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.Stack" methodName="&lt;init&gt;" methodSignature="()V" allocationBytes="32" count="1" selfAllocationBytes="32" selfAllocationCount="1" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.util.ArrayList" methodName="&lt;init&gt;" methodSignature="()V" allocationBytes="24" count="1" selfAllocationBytes="24" selfAllocationCount="1" lineNumber="-1" percent="0.0"/>
+      </node>
+      <node leaf="true" class="java.util.ArrayList" methodName="iterator" methodSignature="()Ljava/util/Iterator;" allocationBytes="32" count="1" selfAllocationBytes="32" selfAllocationCount="1" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.util.ArrayList" methodName="&lt;init&gt;" methodSignature="()V" allocationBytes="24" count="1" selfAllocationBytes="24" selfAllocationCount="1" lineNumber="-1" percent="0.0"/>
+    </node>
+  </node>
+  <node leaf="false" class="xaurora.communication.ChromeServer" methodName="run" methodSignature="()V" allocationBytes="56256" count="1704" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="1.5">
+    <node leaf="false" class="xaurora.communication.ChromeServer" methodName="receiveMessage" methodSignature="()Ljava/lang/String;" allocationBytes="56256" count="1704" selfAllocationBytes="1728" selfAllocationCount="72" lineNumber="-1" percent="1.5">
+      <node leaf="true" class="java.net.ServerSocket" methodName="accept" methodSignature="()Ljava/net/Socket;" allocationBytes="16512" count="480" selfAllocationBytes="16512" selfAllocationCount="480" lineNumber="-1" percent="0.4"/>
+      <node leaf="true" class="java.io.PrintWriter" methodName="&lt;init&gt;" methodSignature="(Ljava/io/OutputStream;Z)V" allocationBytes="11904" count="288" selfAllocationBytes="11904" selfAllocationCount="288" lineNumber="-1" percent="0.3"/>
+      <node leaf="true" class="java.io.BufferedReader" methodName="readLine" methodSignature="()Ljava/lang/String;" allocationBytes="8064" count="312" selfAllocationBytes="8064" selfAllocationCount="312" lineNumber="-1" percent="0.2"/>
+      <node leaf="true" class="java.io.InputStreamReader" methodName="&lt;init&gt;" methodSignature="(Ljava/io/InputStream;)V" allocationBytes="4224" count="96" selfAllocationBytes="4224" selfAllocationCount="96" lineNumber="-1" percent="0.1"/>
+      <node leaf="true" class="java.lang.String" methodName="split" methodSignature="(Ljava/lang/String;)[Ljava/lang/String;" allocationBytes="3648" count="120" selfAllocationBytes="3648" selfAllocationCount="120" lineNumber="-1" percent="0.1"/>
+      <node leaf="true" class="java.net.Socket" methodName="getOutputStream" methodSignature="()Ljava/io/OutputStream;" allocationBytes="2496" count="96" selfAllocationBytes="2496" selfAllocationCount="96" lineNumber="-1" percent="0.1"/>
+      <node leaf="true" class="java.net.Socket" methodName="getInputStream" methodSignature="()Ljava/io/InputStream;" allocationBytes="1920" count="72" selfAllocationBytes="1920" selfAllocationCount="72" lineNumber="-1" percent="0.1"/>
+      <node leaf="true" class="java.io.PrintWriter" methodName="close" methodSignature="()V" allocationBytes="1152" count="24" selfAllocationBytes="1152" selfAllocationCount="24" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.io.PrintWriter" methodName="flush" methodSignature="()V" allocationBytes="1152" count="24" selfAllocationBytes="1152" selfAllocationCount="24" lineNumber="-1" percent="0.0"/>
+      <node leaf="false" class="xaurora.communication.ChromeServer" methodName="genOutput" methodSignature="(Ljava/lang/String;I)Ljava/lang/String;" allocationBytes="1152" count="48" selfAllocationBytes="0" selfAllocationCount="0" lineNumber="-1" percent="0.0">
+        <node leaf="true" class="java.lang.Integer" methodName="toString" methodSignature="(I)Ljava/lang/String;" allocationBytes="576" count="24" selfAllocationBytes="576" selfAllocationCount="24" lineNumber="-1" percent="0.0"/>
+        <node leaf="true" class="java.lang.String" methodName="&lt;init&gt;" methodSignature="()V" allocationBytes="576" count="24" selfAllocationBytes="576" selfAllocationCount="24" lineNumber="-1" percent="0.0"/>
+      </node>
+      <node leaf="true" class="java.io.BufferedReader" methodName="&lt;init&gt;" methodSignature="(Ljava/io/Reader;)V" allocationBytes="1152" count="24" selfAllocationBytes="1152" selfAllocationCount="24" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.String" methodName="valueOf" methodSignature="(I)Ljava/lang/String;" allocationBytes="576" count="24" selfAllocationBytes="576" selfAllocationCount="24" lineNumber="-1" percent="0.0"/>
+      <node leaf="true" class="java.lang.String" methodName="trim" methodSignature="()Ljava/lang/String;" allocationBytes="576" count="24" selfAllocationBytes="576" selfAllocationCount="24" lineNumber="-1" percent="0.0"/>
+    </node>
+  </node>
+</tree>

@@ -1,19 +1,159 @@
-x-aurora
-simplify copy and paste
-current status:
-UI and Logic: Not connected
-Logic and Chrome Plugin: Connected
-Logic and Word Plugin: Connected
-Logic and data synchronization: not Connected
+###X-aurora
+This project aims to develop a productivity tool that allows users to copy and paste the text content on the webpage more efficiently by minimizing the number of windows switching in the copy and paste process. 
 
-Testing step:
-1. Open Chrome -> Tools -> Extension or (chrome://extensions/) -> Load unpacked extensions -> Select Chrome Plugin folder under Xaurora Folder
-2. Open XAuroraWordPlugin.sln under Word Plugin\XAuroraWordPlugin folder under Xaurora Folder (Visual Studio 2015 Professional is the most preferable)
-3. Run the XAuroraWordPlugin.sln, the program will automatically run a Microsoft Word application (depends on the word version installed on the PC, currently available for Microsoft Word 2010/2013/2013 Professional Plus/365/2016)
-4. Import the X-aurora project into Eclipse, Run Main.java. (In case of error, it is caused by JAVAFX library and the configuration conflicts between Eclipse and Netbeans IDE, Currently since UI and Logic is not connected, there will not be any problem)
-5. Browse any webpage other than the default dummy block list (wikipedia)
-6. The text data of the repective webpage will be pasted directly on the Word Document
+##current status:
 
-Current Problem:
-1. Maximum data transmission length is only 1024 bytes, will be modified in the next sprint
-2. Some special Unicode Character may not be able to paste correctly (e.g �)
+	#Logic (Completed)
+		|_ Features
+			|_ Receive Text Extracted From Web Browser
+			|_ Construct the Encrypted text data files
+			|_ Pre-process and construct the correct Indexing entries
+			|_ Prefix Searching
+			|_ Term Searching
+			|_ Email and Number Recognition
+			|_ Email and Number Searching
+			|_ Auto-Deletion for expired files
+			|_ User login (Not dropbox authentication)
+			|_ User switching
+			|_ Sending Suggestions towards editor Plugin
+		|_ Robustness
+			|_ Unit Testing
+				|_ Data Encryption
+				|_ Data Decryption
+				|_ Data File Creation
+				|_ Data File Deletion
+				|_ Indexing Document (Lucene Document) Insertion
+				|_ Indexing Document Deletion
+				|_ Document Searching (Based on Index and Keyword)
+				|_ Data File Expiry Setting (in both hours and seconds)
+				|_ User Login
+				|_ Switch User
+			|_ Input Validity Check
+			|_ Assertions
+			|_ Logging (Log4j)
+				|_ Master_log (Log of everything)
+				|_ IO_log (log of File IO)
+				|_ Text_log (log of Indexing)
+				|_ Error_log (log of exceptions)
+		|_ Usability
+			|_ Prefix Matching
+			|_ Name and Email Recognition
+			|_ Sorting by Relevance and Reference Time
+		|_ Performance
+			|_ Lighter weight API (350+ MB Stanford G.A.T.E library -> 1.6 MB JavaCC Parser, lose in recogniton precison but increase the loading performance)
+			|_ No iterative String Concatenation (Java String builder/passing data in byte arrays, Eliminate Unnecessary Memory Copy)
+			|_ Incremental Database construction (Eliminate Unnecessary File I/O)
+			|_ Only 1 query in every operation towards the indexing system (Eliminate Unnecessary Database Access)
+		|_ Security
+			|_ Data Security 
+				|_ AES Encryption of text data files (Confidentiality)
+				|_ Key is constructed with MD5 hashed User Name and Email and Unique Salt of Each User (Authenticity)
+				|_ Initial Vector (IV) is determined by Filename of the document, which is the MD5 hashed data source and extraction time (Integrity, as modification of filename or content will lead to failure in decryption)
+				|_ User Unique .ks (Key Set) files (Synchronized)
+				|_ Hard Coded Master Key to encrypt user Key Set Files
+			|_ Runtime Security (Data Confidentiality/Integrity at Runtime)
+				|_ Disallow Clone for all defined objects
+				|_ Disallow Serialization and DeSerialization of all defined object
+				|_ Disallow sub-Class Creation of all defined objects (all classes are final)
+				|_ Disallow overwriting of all defined public method (all public method are final)
+				|_ All Members are defined as private
+				|_ Consider Input Parameters as final if necessary (to avoid accidential data writing/corruption)
+		|_ Library Build Path (For Logic)
+			|_ Lucene 5.4.1 (Indexing)
+			|_ JavaCC Eclipse Plugin
+			|_ Log4J Framework (log4j-1.2.17)
+			|_ Apache Common IO (For File IO)
+			|_ Junit 4.10
+		|_ Continuous Integration Server
+			|_ https://travis-ci.org/nus-mtp/x-aurora
+	#UI
+		|_ LoginUI to login as Dropbox user (not connected to Dropbox)
+		|_ PreferenceUI 
+			|_ Set user preferences (e.g. Hotkeys, Blocked List, File Expire Time)
+			|_ View data information from database
+
+	#Web-Browser Plugin
+		|_ Extract all webpage content for Google Chrome.
+		|_ Notification Icon for different connection state with logic.
+
+	#Editor Plugin (Incomplete)
+		|_ Send request and receive content with logic.
+		|_ Simple UI(Wrong place)
+		|_ Extension of choices
+		|_ Revert of chosen preferences.
+
+	#Dropbox Synchronization (Incomplete)
+
+##System Set up
+
+	#Logic
+	|_ Requirement : Eclipse 4.5
+	|_ Installation of JavaCC Ecplise Plugin:
+		|_ Help -> Install New Software
+		|_ input http://eclipse-javacc.sourceforge.net/ -> add
+		|_ installation will be completed automatically
+	|_Installation of Junit 4.10 Unit Testing Framework
+		|_ Download Junit archive
+			|_ Windows	junit4.10.jar
+			|_ Linux	junit4.10.jar
+			|_ Mac OSX	junit4.10.jar
+		|_ Build Path
+			|_ Open Eclipse
+			|_ Right click on project
+			|_ Click on property
+			|_ Build Path -> Configure Build Path
+			|_ Add External Jars -> Add the junit4.10.jar
+	|_ Running
+		|_ prepare the parser
+			|_ Project Package View -> xaurora.text -> XauroraParser.jj
+			|_ Right click-> Compile with JavaCC
+		|_ Run Main.java
+
+	#UI
+	|_ Requirements: 
+		|_ Junit 4.10 Unit Testing Framework
+		|_ TestFX 3.1.2 JavaFX Testing Framework
+			|_ Github repository: https://github.com/TestFX/TestFX
+			|_ Details APIs and install instructions are in the webpage above 
+		|_ Guava.jar
+			|_ can be downloaded from http://www.java2s.com/Code/Jar/g/Downloadguavajar.htm
+
+	#Web-Browser Plugin
+	|_ Requirements: 
+		|_ Google Chrome (Not researched can be used after which version)
+	|_ Installation:
+		|_ In Extension Page of Google Chrome, enable Developer Mode.
+		|_ Choose Load Unpacked Extension.
+		|_ Select target folder with X-aurora Chrome Extension.
+
+	#Editor Plugin (Incomplete)
+	|_ Requirements: 
+		|_ Microsoft Visual Studio (Version later than 2012)
+		|_ Microsoft Word (Later than 2010)
+	|_ Running:
+		|_ Run in Visual Studio.
+	
+	#Dropbox Synchronization (Incomplete)
+
+##Testing
+
+	#Logic
+		Unit Testing
+		|_ Run all testing programs under xaurora.test package
+		Manual Testing
+		|_ Run the web plugin and Main.java
+		|_ Check through the /local_data/ folder for encrypted data files
+		|_ Check through the /conf_data/user/ folder for .ks files and indexing system files
+		|_ Check through the /conf_data/system/log/ foler for all the log files
+	
+	#UI
+		Two test class under xaurora.test package
+		|_ PreferenceIntegrityTest.java
+		|_ PreferenceUITest.java
+
+##Current Problem:
+
+	1. Other Components May not be connected and Working
+	2. Hard to demostrate the correctness of Logic Components (credit by Dr.Bimlesh Wadhwa)
+	3. Still can Improve on Performance and Usability of Logic (like early garbage collection, increase the precision of recognition) (credit by Dr.Bimlesh Wadhwa)
+	4. Extend the security consideration towards other components like UI preference etc

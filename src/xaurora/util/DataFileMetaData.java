@@ -1,12 +1,27 @@
 package xaurora.util;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import xaurora.system.TimeManager;
+import org.apache.log4j.Logger;
 
-public class DataFileMetaData {
+/**
+ * This class is a helper class that mainly stores the needed meta data of a
+ * data file
+ * 
+ * @author GAO RISHENG A0101891L
+ *
+ */
+public final class DataFileMetaData {
+
+    private static final String UNABLE_TO_DECODE_HOST_IN_URL = "Unable to decode host in URL %s.";
+    private static final String FILE_LENGTH_UNIT = " KB";
+    private static final String DEFAULT_FILE_SIZE_FORMAT = "#.##";
+    private static final double BYTES_PER_KB = 1024.0;
     private String filename;
     private String url;
     private String source;
@@ -14,6 +29,9 @@ public class DataFileMetaData {
     private long lastModified;
     private String lastModifeidDateTime;
     private static final String SOURCE_UNKNOWN = "unknown";
+    private static final String SECURITY_MSG_DISABLE_SERIALIZE = "Object cannot be serialized";
+    private static final String CLASS_CANNOT_BE_DESERIALIZED = "Class cannot be deserialized";
+    private static Logger logger = Logger.getLogger(DataFileMetaData.class);
 
     public DataFileMetaData(String filename, String url) {
         this.filename = filename;
@@ -27,45 +45,115 @@ public class DataFileMetaData {
             URL sourceURL = new URL(this.url);
             this.source = sourceURL.getHost();
         } catch (MalformedURLException e) {
-
-            //e.printStackTrace(); log here
+            logger.warn(String.format(UNABLE_TO_DECODE_HOST_IN_URL, this.url));
         }
     }
 
+    /**
+     * @param length,
+     *            is the size of the file
+     * @param lastModified,
+     *            is the time that file is created
+     * @author GAO RISHENG A0101891L
+     */
     public void addFileMetaData(long length, long lastModified) {
         this.length = length;
         this.lastModified = lastModified;
     }
 
-    public String getFilename() {
+    /**
+     * @return the File name of the data file
+     * @author GAO RISHENG
+     */
+    public final String getFilename() {
         return this.filename;
     }
-    
-    public String getUrl() {
-        String[] urls = this.url.split("\n");
-        return urls[0];
+
+    /**
+     * @return the URL (which is default the first line inside the file) of a
+     *         data file
+     * @author GAO RISHENG
+     */
+    public final String getUrl() {
+        return this.url;
     }
 
-    public String getSource() {
+    /**
+     * @return the host name of the source of a data file
+     * @author GAO RISHENG
+     */
+    public final String getSource() {
         return this.source;
     }
 
-    public String getLength() {
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(this.length / 1024.0) + " KB";
+    /**
+     * @return the file size in KBs of a data file
+     * @author GAO RISHENG A0101891L
+     */
+    public final String getLength() {
+        DecimalFormat df = new DecimalFormat(DEFAULT_FILE_SIZE_FORMAT);
+        return df.format(this.length / BYTES_PER_KB) + FILE_LENGTH_UNIT;
     }
 
-    public long getLastModified() {
+    /**
+     * @return the last modified field in milliseconds of a data file
+     * @author GAO RISHENG A0101891L
+     */
+    public final long getLastModified() {
         return this.lastModified;
     }
-    
-    public String getLastModifiedDateTime() {
+
+    /**
+     * @return the String format of the last Modified Field of the data file
+     * @author GAO RISHENG A0101891L
+     */
+    public final String getLastModifiedDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat();
         this.lastModifeidDateTime = sdf.format(lastModified);
         return this.lastModifeidDateTime;
     }
 
-    public String getCreateTime() {
+    /**
+     * @return the Last Modified Field of the data file, which is the time it is
+     *         created or down loaded
+     * @author GAO RISHENG A0101891L
+     */
+    public final String getCreateTime() {
         return TimeManager.formatDateInMilliseconds(this.lastModified);
+    }
+
+    /**
+     * Secure Programming. Making this Object not-clonable. Object.clone()
+     * allows cloning the data of an object without initialize it which may leak
+     * the chances for attacker to access the data internally
+     * 
+     * @Author GAO RISHENG A0101891L
+     */
+    public final Object clone() throws java.lang.CloneNotSupportedException {
+        throw new java.lang.CloneNotSupportedException();
+    }
+
+    /**
+     * Secure Programming. Disable the serialize option of the object which
+     * avoid attacker to print the object in serialize manner and inspect the
+     * internal status of the object
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    private final void writeObject(ObjectOutputStream out)
+            throws java.io.IOException {
+        throw new java.io.IOException(SECURITY_MSG_DISABLE_SERIALIZE);
+    }
+
+    /**
+     * Secure Programming. Disable the de-serialize option of the object which
+     * avoid attacker to de-serialize the object stores in the file system and
+     * inspect the internal status of the object
+     * 
+     * @author GAO RISHENG A0101891L
+     */
+    private final void readObject(ObjectInputStream in)
+            throws java.io.IOException {
+        throw new java.io.IOException(CLASS_CANNOT_BE_DESERIALIZED);
     }
 }

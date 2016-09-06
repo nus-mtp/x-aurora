@@ -3,7 +3,7 @@
  */
 options
 {
-  static = true;
+   static = true;
 }
 
 PARSER_BEGIN(XauroraParser)
@@ -153,7 +153,7 @@ private void parseEmails(Document doc):
 | 	< TERM_SEPARATOR >{
   if(!number.equals(""))
 	  {
-		TextIndexer.addNumber(doc,number);
+		TextIndexer.addNumber(doc,number); 
 		number = "";
 	  }}
 | < CHARACTERS >{
